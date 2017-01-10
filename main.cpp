@@ -48,15 +48,14 @@ int main(int argc, char **argv )
 
     MyActorBinding::register_class( L );
 
-    run( L, "a = MyActor( 'Bob', 24 )" );
+    run( L, "a = MyActor( 'Alara', 27 )" );
     run( L, "a:walk()" );
     run( L, "b = a" );
-    run( L, "a:setName('Robert')" );
+    run( L, "a:setName('Awesome Chick')" );
 
     {
         lua_getglobal( L, "b" );
-        cout << lua_typename( L, lua_type( L, -1 ) ) << endl;
-        MyActorPtr b = lua_toMyActorPtr( L, -1 );
+        MyActorPtr b = MyActorBinding::fromStack( L, -1 );
         lua_pop( L, 1 );
 
         cout << "Use count is now: " << b.use_count() << endl;
@@ -66,7 +65,7 @@ int main(int argc, char **argv )
     {
         MyActorPtr actor = std::make_shared<MyActor>("Nigel",39);
         cout << "Actor use count is: " << actor.use_count() << endl;
-        lua_pushMyActorPtr( L, actor );
+        MyActorBinding::push( L, actor );
         lua_setglobal( L, "actor" );
         cout << "Pushed to Lua" << endl;
         cout << "Actor use count is: " << actor.use_count() << endl;
