@@ -31,7 +31,6 @@ struct Binding {
         lua_register( L, B::class_name, B::create );
     }
 
-
     static int destroy( lua_State *L )
     {
         std::cout << "Destroy called\n";
@@ -45,9 +44,9 @@ struct Binding {
 
         std::cout << "Use count is: " << sp->use_count() << std::endl;
 
-        std::cout << "Resetting shared pointer\n";
+        std::cout << "Deleting shared pointer\n";
 
-        sp->reset();
+        sp->~shared_ptr();
 
         return 0;
     }
