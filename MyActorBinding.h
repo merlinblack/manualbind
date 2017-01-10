@@ -6,7 +6,14 @@
 
 typedef std::shared_ptr<MyActor> MyActorPtr;
 
+void lua_pushMyActorPtr( lua_State *L, MyActorPtr sp );
+
+// Using struct basically as a namespace.
+
 struct MyActorBinding {
+
+    // Method glue functions
+    //
 
     static int walk( lua_State *L )
     {
@@ -31,6 +38,10 @@ struct MyActorBinding {
         return 0;
     }
 
+
+    // Class maintenance
+    //
+
     static int register_class( lua_State *L )
     {
         std::cout << "Registering class\n";
@@ -45,6 +56,8 @@ struct MyActorBinding {
         luaL_setfuncs( L, members, 0 );
         lua_pushvalue( L, -1 );
         lua_setfield( L, -2, "__index" );
+        lua_pushvalue( L, -1 );
+        lua_setfield( L, -2, "__newindex" );
         lua_pushcfunction( L, destroy );
         lua_setfield( L, -2, "__gc" );
 
@@ -60,13 +73,9 @@ struct MyActorBinding {
         const char *name = luaL_checkstring( L, 1 );
         int age = luaL_checkint( L, 2 );
 
-        void *ud = lua_newuserdata( L, sizeof(MyActorPtr));
+        MyActorPtr sp = std::make_shared<MyActor>( name, age );
 
-        auto sp = new(ud) MyActorPtr( new MyActor( name , age ));
-
-        std::cout << "Use count is: " << sp->use_count() << std::endl;
-
-        luaL_setmetatable( L, "MyActorType" );
+        lua_pushMyActorPtr( L, sp );
 
         return 1;
     }
@@ -89,6 +98,8 @@ struct MyActorBinding {
 
         return 0;
     }
+
+    // Helpers
 
     static MyActorPtr getSelf( lua_State *L, int index )
     {
@@ -114,5 +125,23 @@ struct MyActorBinding {
         return;
     }
 };
+
+// Push and pop
+//
+    
+MyActorPtr lua_toMyActorPtr( lua_State *L, int index )
+{
+    MyActorPtr sp = MyActorBinding::getSelf( L, index );
+    return sp;
+}
+
+void lua_pushMyActorPtr( lua_State *L, MyActorPtr sp )
+{
+    void *ud = lua_newuserdata( L, sizeof(MyActorPtr));
+
+    new(ud) MyActorPtr( sp );
+
+    luaL_setmetatable( L, "MyActorType" );
+}
 
 #endif // __MYACTORBINDING_H

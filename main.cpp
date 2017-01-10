@@ -3,9 +3,12 @@
 #include "MyActor.h"
 #include "MyActorBinding.h"
 
+using std::cout;
+using std::endl;
+
 static void stackDump (lua_State *L) {
     int i=lua_gettop(L);
-    std::cout << " ----------------  Stack Dump ----------------\n";
+    cout << " ----------------  Stack Dump ----------------\n";
     while(  i   ) {
         int t = lua_type(L, i);
         switch (t) {
@@ -18,18 +21,22 @@ static void stackDump (lua_State *L) {
             case LUA_TNUMBER:
                 printf("%d: %g\n",  i, lua_tonumber(L, i));
                 break;
-            default: printf("%d: %s\n", i, lua_typename(L, t)); break;
+            default: 
+                printf("%d: %s\n", i, lua_typename(L, t)); 
+                break;
         }
         i--;
     }
-    std::cout << "--------------- Stack Dump Finished ---------------\n";
+    cout << "--------------- Stack Dump Finished ---------------\n";
 }
 
 void run( lua_State *L, const char *code )
 {
+    cout << "code> " << code << endl;
+
     if( luaL_dostring( L, code ) )
     {
-        std::cout << lua_tostring( L, -1 ) << std::endl;
+        cout << lua_tostring( L, -1 ) << endl;
     }
 }
 
@@ -43,9 +50,34 @@ int main(int argc, char **argv )
 
     run( L, "a = MyActor( 'Bob', 24 )" );
     run( L, "a:walk()" );
+    run( L, "b = a" );
     run( L, "a:setName('Robert')" );
 
-    std::cout << "Closing Lua\n";
+    {
+        lua_getglobal( L, "b" );
+        cout << lua_typename( L, lua_type( L, -1 ) ) << endl;
+        MyActorPtr b = lua_toMyActorPtr( L, -1 );
+        lua_pop( L, 1 );
+
+        cout << "Use count is now: " << b.use_count() << endl;
+        b->walk();
+    }
+
+    {
+        MyActorPtr actor = std::make_shared<MyActor>("Nigel",39);
+        cout << "Actor use count is: " << actor.use_count() << endl;
+        lua_pushMyActorPtr( L, actor );
+        lua_setglobal( L, "actor" );
+        cout << "Pushed to Lua" << endl;
+        cout << "Actor use count is: " << actor.use_count() << endl;
+        run( L, "actor:walk()" );
+    }
+
+    // Override (for all instances) a method, while calling the old implementation
+    run( L, "local old = actor.walk actor.walk = function(self) old(self) print( 'RUN!' ) end" );
+    run( L, "b:walk()" );
+
+    cout << "Closing Lua\n";
     lua_close( L );
 
     return 0;
