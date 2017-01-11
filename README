@@ -1,0 +1,17 @@
+Experiment in Semi-manual binding between C++ and Lua.
+
+Basically make the boring slightly difficult stuff easier, and leaving the more fun
+not so hard stuff to do. :-)
+
+The memory management, life-cycle, and method despatch is the same for each
+bound class, only the glue functions that marshal the parameters are
+different.
+
+Hand writing the glue functions also allows them to be as complicated or as
+simple as required.  For example you could support optional arguments, or even
+overloading.
+
+Shared pointers are used to simplify the question of who owns what, and who
+should delete it. Class instances can be created in Lua or C++ and passed to
+the other freely, as the last one holding a reference will call the
+destructor when required.

@@ -70,11 +70,16 @@ int main(int argc, char **argv )
         cout << "Pushed to Lua" << endl;
         cout << "Actor use count is: " << actor.use_count() << endl;
         run( L, "actor:walk()" );
+        run( L, "actor.age = actor.age + 1 print( 'Happy Birthday')" );
+        run( L, "print( actor.age )" );
+        cout << actor->_age << endl;
     }
 
     // Override (for all instances) a method, while calling the old implementation
     run( L, "local old = actor.walk actor.walk = function(self) old(self) print( 'RUN!' ) end" );
     run( L, "b:walk()" );
+
+    run( L, "a:splat()" );
 
     cout << "Closing Lua\n";
     lua_close( L );

@@ -7,8 +7,8 @@ typedef std::shared_ptr<MyActor> MyActorPtr;
 
 struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
-    static constexpr const char* lua_type   = "MyActorType";
     static constexpr const char* class_name = "MyActor";
+
     static luaL_Reg* members()
     {
         static luaL_Reg members[] = {
@@ -17,6 +17,14 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
             { NULL, NULL }
         };
         return members;
+    }
+
+    static bind_properties* properties() {
+        static bind_properties properties[] = {
+            { "age", get_age, set_age },
+            { NULL, NULL, NULL }
+        };
+        return properties;
     }
 
     // Lua constructor
@@ -58,6 +66,37 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
         const char *name = lua_tostring( L, 2 );
 
         a->setName( name );
+
+        return 0;
+    }
+
+    // Propertie getters and setters
+
+    // 1 - class metatable
+    // 2 - key
+    static int get_age( lua_State *L )
+    {
+        checkArgCount( L, 2 );
+
+        MyActorPtr a = fromStack( L, 1 );
+
+        lua_pushinteger( L, a->_age );
+
+        return 1;
+    }
+
+    // 1 - class metatable
+    // 2 - key
+    // 3 - value
+    static int set_age( lua_State *L )
+    {
+        checkArgCount( L, 3 );
+
+        MyActorPtr a = fromStack( L, 1 );
+
+        int age = luaL_checkinteger( L, 3 );
+
+        a->_age = age;
 
         return 0;
     }

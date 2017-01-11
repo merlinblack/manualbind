@@ -4,29 +4,34 @@
 
 class MyActor {
     protected:
-        std::string _name;
-        int _age;
+
+    std::string _name;
 
     public:
-        MyActor( std::string name, int age ) : _name(name), _age(age)
+
+    int _age;
+
+    public:
+
+    MyActor( std::string name, int age ) : _name(name), _age(age)
     {
         std::cout << "Hello my name is " << _name << " and I am " << _age << " years old." << std::endl;
     }
 
-        void walk() {
-            std::cout << _name << " is Walking\n";
-        }
+    void walk() {
+        std::cout << _name << " is Walking\n";
+    }
 
-        void setName( std::string name )
-        {
-            std::cout << "Changing my name to: " << name << std::endl;
-            _name = name;
-        }
+    void setName( std::string name )
+    {
+        std::cout << "Changing my name to: " << name << std::endl;
+        _name = name;
+    }
 
-        ~MyActor()
-        {
-            std::cout << "Goodbye from " << _name << std::endl;
-        }
+    ~MyActor()
+    {
+        std::cout << "Goodbye from " << _name << std::endl;
+    }
 };
 
 #endif // __MYACTOR_H
