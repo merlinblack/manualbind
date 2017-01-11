@@ -79,7 +79,7 @@ struct Binding {
         // 4 - class properties table
         lua_pushvalue( L, 2 );
         lua_gettable( L, 4 );
-        // 6 - property table for key ( or nil )
+        // 5 - property table for key ( or nil )
         if( lua_type( L, 5 ) == LUA_TTABLE ) { // Found in properties.
             lua_pushliteral( L, "get" );
             lua_gettable( L, 5 );
