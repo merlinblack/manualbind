@@ -2,6 +2,8 @@
 #include <lua.hpp>
 #include "MyActor.h"
 #include "MyActorBinding.h"
+#include "MyVector3d.h"
+#include "MyVector3dBinding.h"
 
 using std::cout;
 using std::endl;
@@ -47,6 +49,7 @@ int main(int argc, char **argv )
     run( L, "print( 'Selam Dünya' ) print( _VERSION )" );
 
     MyActorBinding::register_class( L );
+    MyVector3dBinding::register_class( L );
 
     run( L, "a = MyActor( 'Alara', 27 )" );
     run( L, "a:walk()" );
@@ -80,6 +83,10 @@ int main(int argc, char **argv )
     run( L, "b:walk()" );
 
     run( L, "a:splat()" );
+
+    run( L, "v = MyVector3d( 1, 2, 3 )" );
+    run( L, "v.x = 4" );
+    run( L, "print( v.x, v.y, v.z )" );
 
     cout << "Closing Lua\n";
     lua_close( L );
