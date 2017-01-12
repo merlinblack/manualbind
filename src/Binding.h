@@ -24,7 +24,7 @@ struct Binding {
         luaL_setmetatable( L, B::class_name );
     }
 
-    static int register_class( lua_State *L )
+    static void register_class( lua_State *L )
     {
         std::cout << "Registering class " << B::class_name << std::endl;
 
@@ -39,6 +39,7 @@ struct Binding {
         lua_newtable( L ); // __properties
         set_properties( L, B::properties() );
         lua_setfield( L, -2, "__properties" );
+        lua_pop( L, 1 );
 
         lua_register( L, B::class_name, B::create );
     }
