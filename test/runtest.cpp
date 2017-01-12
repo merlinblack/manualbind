@@ -15,7 +15,7 @@ static void stackDump (lua_State *L) {
         int t = lua_type(L, i);
         switch (t) {
             case LUA_TSTRING:
-                printf("%d:`%s'\n", i, lua_tostring(L, i));
+                printf("%d: “%s”\n", i, lua_tostring(L, i));
                 break;
             case LUA_TBOOLEAN:
                 printf("%d: %s\n",i,lua_toboolean(L, i) ? "true" : "false");
@@ -24,7 +24,7 @@ static void stackDump (lua_State *L) {
                 printf("%d: %g\n",  i, lua_tonumber(L, i));
                 break;
             default: 
-                printf("%d: %s\n", i, lua_typename(L, t)); 
+                printf("%d: %s 0x%x\n", i, lua_typename(L, t), lua_topointer(L, i)); 
                 break;
         }
         i--;
@@ -39,6 +39,7 @@ void run( lua_State *L, const char *code )
     if( luaL_dostring( L, code ) )
     {
         cout << lua_tostring( L, -1 ) << endl;
+        lua_pop( L, 1 );
     }
 }
 
