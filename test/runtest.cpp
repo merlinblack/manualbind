@@ -79,6 +79,10 @@ int main(int argc, char **argv )
         cout << actor->_age << endl;
     }
 
+    run( L, "b = MyActor( 'Short lived', 0 )" );
+    run( L, "b = nil" );
+    run( L, "collectgarbage()" );
+
     // Override (for all instances) a method, while calling the old implementation
     run( L, "local old = actor.walk actor.walk = function(self) old(self) print( 'RUN!' ) end" );
     run( L, "b:walk()" );

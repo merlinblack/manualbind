@@ -155,21 +155,16 @@ struct Binding {
 
     static int destroy( lua_State *L )
     {
-        // We don't use fromStack as we want to
-        // to work on the shared pointer that Lua
-        // has, not a copy.
-        void* ud = luaL_checkudata( L, 1, B::class_name );
+        std::shared_ptr<T> sp = fromStack( L, 1 );
 
-        std::shared_ptr<T> *sp = (std::shared_ptr<T>*)ud;
-
-        sp->~shared_ptr();
+        sp.~shared_ptr();
 
         return 0;
     }
 
     // Helpers
 
-    static std::shared_ptr<T> fromStack( lua_State *L, int index )
+    static std::shared_ptr<T>& fromStack( lua_State *L, int index )
     {
         void* ud = luaL_checkudata( L, index, B::class_name );
 
