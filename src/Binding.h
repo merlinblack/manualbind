@@ -26,8 +26,6 @@ struct Binding {
 
     static void register_class( lua_State *L )
     {
-        std::cout << "Registering class " << B::class_name << std::endl;
-
         luaL_newmetatable( L, B::class_name );
         luaL_setfuncs( L, B::members(), 0 );
         lua_pushcfunction( L, index );
@@ -69,6 +67,18 @@ struct Binding {
         // 2 - key
         lua_getmetatable( L, 1 );
         // 3 - class metatable
+        if( lua_isnumber( L, 2 ) ) { // Array access
+            lua_pushliteral( L, "__arrayindex" );
+            lua_gettable( L, 3 );
+            if( lua_type( L, 4 ) == LUA_TFUNCTION ) {
+                lua_pushvalue( L, 1 );
+                lua_pushvalue( L, 2 );
+                lua_call( L, 2, 1 );
+            } else {
+                luaL_error( L, "Attempt to index without __arrayindex" );
+            }
+            return 1;
+        }
         lua_pushvalue( L, 2 ); // Key
         lua_gettable( L, 3 );
         if( lua_type( L, 4 ) != LUA_TNIL ) { // Found in metatable.
@@ -103,6 +113,19 @@ struct Binding {
         // 2 - key
         // 3 - value
         lua_getmetatable( L, 1 );
+        if( lua_isnumber( L, 2 ) ) { // Array access
+            lua_pushliteral( L, "__arraynewindex" );
+            lua_gettable( L, 4 );
+            if( lua_type( L, 5 ) == LUA_TFUNCTION ) {
+                lua_pushvalue( L, 1 );
+                lua_pushvalue( L, 2 );
+                lua_pushvalue( L, 3 );
+                lua_call( L, 3, 0 );
+            } else {
+                luaL_error( L, "Attempt to assign to index without __arraynewindex" );
+            }
+            return 0;
+        }
         // 4 - class metatable
         lua_pushliteral( L, "__properties" );
         lua_gettable( L, 4 );
@@ -132,18 +155,12 @@ struct Binding {
 
     static int destroy( lua_State *L )
     {
-        std::cout << "Destroy called\n";
-
         // We don't use fromStack as we want to
         // to work on the shared pointer that Lua
         // has, not a copy.
         void* ud = luaL_checkudata( L, 1, B::class_name );
 
         std::shared_ptr<T> *sp = (std::shared_ptr<T>*)ud;
-
-        std::cout << "Use count is: " << sp->use_count() << std::endl;
-
-        std::cout << "Deleting shared pointer\n";
 
         sp->~shared_ptr();
 
@@ -154,14 +171,9 @@ struct Binding {
 
     static std::shared_ptr<T> fromStack( lua_State *L, int index )
     {
-        std::cout << "fromStack called ";
         void* ud = luaL_checkudata( L, index, B::class_name );
 
-        std::shared_ptr<T> *psp = (std::shared_ptr<T>*)ud;
-
-        std::cout << "Use count is: " << psp->use_count() << std::endl;
-
-        return *psp;
+        return *((std::shared_ptr<T>*)ud);
     }
 
     static void checkArgCount( lua_State *L, int expected )
