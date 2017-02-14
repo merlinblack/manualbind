@@ -164,7 +164,7 @@ struct Binding {
 
     // Helpers
 
-    static std::shared_ptr<T>& fromStack( lua_State *L, int index )
+    static const std::shared_ptr<T>& fromStack( lua_State *L, int index )
     {
         void* ud = luaL_checkudata( L, index, B::class_name );
 
