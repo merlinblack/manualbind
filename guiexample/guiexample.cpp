@@ -1,0 +1,149 @@
+#include <cstdlib>
+#include <iostream>
+#include <string.h>
+#include <lua.hpp>
+
+#include "Binding.h"
+
+using std::cout;
+using std::endl;
+
+// Some GUI class that represents a 2D rectangular region.
+// This could be a 'window' or a 'button', etc.
+//
+// ( Like Betajean's Gorilla's rectangle. )
+//
+
+class Rectangle
+{
+    int _x, _y, _width, _height;
+
+    public:
+    Rectangle( int x, int y, int w, int h ) : _x(x), _y(y), _width(w), _height(h)
+    {
+        cout << "Created Rectangle" << endl;
+    }
+
+    bool isInside( int tx, int ty )
+    {
+        cout << "Checking x: " << tx << ", y: " << ty;
+        cout << " Against ( " << _x << ", " << _y << " ) - ( " << _x + _width << ", " << _y + _height << " )" << endl;
+        if( tx < _x )
+            return false;
+        if( ty < _y )
+            return false;
+        if( tx > _x + _width )
+            return false;
+        if( ty > _y + _height )
+            return false;
+
+        return true;
+    }
+    virtual ~Rectangle() {}
+};
+
+typedef std::shared_ptr<Rectangle> RectanglePtr;
+
+struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
+{
+
+    static constexpr const char* class_name = "GUIRectangle";
+
+    static luaL_Reg* members()
+    {
+        static luaL_Reg members[] = {
+            { "isInside", isInside },
+            { NULL, NULL }
+        };
+        return members;
+    }
+
+    static bind_properties* properties() {
+        static bind_properties properties[] = {
+            { NULL, NULL, NULL }
+        };
+        return properties;
+    }
+
+    // Lua constructor
+    static int create( lua_State *L )
+    {
+        std::cout << "Create called\n";
+
+        checkArgCount( L, 4 );
+
+        int x = luaL_checkint( L, 1 );
+        int y = luaL_checkint( L, 2 );
+        int w = luaL_checkint( L, 3 );
+        int h = luaL_checkint( L, 4 );
+
+        RectanglePtr sp = std::make_shared<Rectangle>( x, y, w, h );
+
+        push( L, sp );
+
+        return 1;
+    }
+
+    // Method glue functions
+    //
+
+    static int isInside( lua_State *L )
+    {
+        checkArgCount( L, 3 );
+
+        RectanglePtr rect = fromStack( L, 1 );
+        int x = luaL_checkint( L, 2 );
+        int y = luaL_checkint( L, 3 );
+
+        if( rect->isInside( x, y ) ) {
+            lua_pushboolean( L, 1 );
+        } else {
+            lua_pushboolean( L, 0 );
+        }
+
+        return 1;
+    }
+
+    // Property getters and setters
+
+};
+
+void run( lua_State *L, const char *code )
+{
+    cout << "code> " << code << endl;
+
+    if( luaL_dostring( L, code ) )
+    {
+        cout << lua_tostring( L, -1 ) << endl;
+        lua_pop( L, 1 );
+    }
+}
+
+void test( lua_State* L )
+{
+    RectangleBinding::register_class( L );
+
+    if( luaL_dofile( L, "test.lua" ) )
+    {
+        cout << lua_tostring( L, -1 ) << endl;
+        lua_pop( L, 1 );
+        return;
+    }
+
+    run( L, "test()" );
+
+    return;
+}
+
+int main()
+{
+    lua_State* L = luaL_newstate();
+
+    luaL_openlibs( L );
+
+    test( L );
+
+    lua_close( L );
+
+    return EXIT_SUCCESS;
+}
