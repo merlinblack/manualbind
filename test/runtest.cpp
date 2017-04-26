@@ -85,7 +85,7 @@ int main(int argc, char **argv )
 
     // Override (for all instances) a method, while calling the old implementation
     run( L, "local old = actor.walk actor.walk = function(self) old(self) print( 'RUN!' ) end" );
-    run( L, "b:walk()" );
+    run( L, "actor:walk()" );
 
     run( L, "a:splat()" );
 
