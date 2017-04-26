@@ -39,7 +39,10 @@ class Rectangle
 
         return true;
     }
-    virtual ~Rectangle() {}
+    virtual ~Rectangle() 
+    {
+        cout << "Destroyed Rectangle" << endl;
+    }
 };
 
 typedef std::shared_ptr<Rectangle> RectanglePtr;
