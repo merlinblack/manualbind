@@ -17,6 +17,11 @@ struct Binding {
 
     static void push( lua_State *L, std::shared_ptr<T> sp )
     {
+        if( sp == nullptr ) {
+            lua_pushnil( L );
+            return;
+        }
+
         void *ud = lua_newuserdata( L, sizeof(std::shared_ptr<T>));
 
         new(ud) std::shared_ptr<T>( sp );
