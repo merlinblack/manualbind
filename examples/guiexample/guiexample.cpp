@@ -98,16 +98,13 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
         int x = luaL_checkint( L, 2 );
         int y = luaL_checkint( L, 3 );
 
-        if( rect->isInside( x, y ) ) {
-            lua_pushboolean( L, 1 );
-        } else {
-            lua_pushboolean( L, 0 );
-        }
-
+        lua_pushboolean( L, rect->isInside( x, y ) ); 
         return 1;
     }
 
     // Property getters and setters
+
+    // None.
 
 };
 
