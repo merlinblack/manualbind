@@ -1,5 +1,5 @@
-downcast:	downcast.cpp ../../src/Binding.h 
-	g++ -std=c++14 -O0 -g downcast.cpp -I../../src -o downcast -llua
+downcast:	downcast.cpp ../../src/Binding.h Makefile
+	g++ -O3 -g downcast.cpp -I../../src -o downcast -llua
 
 clean:
 	rm downcast
