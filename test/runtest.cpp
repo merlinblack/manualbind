@@ -8,6 +8,7 @@
 using std::cout;
 using std::endl;
 
+/*
 static void stackDump (lua_State *L) {
     int i=lua_gettop(L);
     cout << " ----------------  Stack Dump ----------------\n";
@@ -31,6 +32,7 @@ static void stackDump (lua_State *L) {
     }
     cout << "--------------- Stack Dump Finished ---------------\n";
 }
+*/
 
 void run( lua_State *L, const char *code )
 {
@@ -82,6 +84,18 @@ int main(int argc, char **argv )
     run( L, "b = MyActor( 'Short lived', 0 )" );
     run( L, "b = nil" );
     run( L, "collectgarbage()" );
+
+    {
+        MyActorPtr shorty = std::make_shared<MyActor>("Shorty", 5);
+        cout << "Shorty use count is: " << shorty.use_count() << endl;
+        MyActorBinding::push( L, shorty );
+        lua_setglobal( L, "shorty" );
+        cout << "Shorty use count is: " << shorty.use_count() << endl;
+        lua_pushnil( L );
+        lua_setglobal( L, "shorty" );
+        run( L, "collectgarbage()" );
+        cout << "Shorty use count is: " << shorty.use_count() << endl;
+    }
 
     // Override (for all instances) a method, while calling the old implementation
     run( L, "local old = actor.walk actor.walk = function(self) old(self) print( 'RUN!' ) end" );
