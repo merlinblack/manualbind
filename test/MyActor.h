@@ -16,6 +16,7 @@ class MyActor {
     MyActor( std::string name, int age ) : _name(name), _age(age)
     {
         std::cout << "Hello my name is " << _name << " and I am " << _age << " years old." << std::endl;
+        std::cout << std::hex << this << std::dec << std::endl;
     }
 
     void walk() {
@@ -31,6 +32,7 @@ class MyActor {
     ~MyActor()
     {
         std::cout << "Goodbye from " << _name << std::endl;
+        std::cout << std::hex << this << std::dec << std::endl;
     }
 };
 
