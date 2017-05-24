@@ -3,6 +3,12 @@
 #include <memory>
 #include <lua.hpp>
 
+#if 0
+#include <iostream>
+using std::cout;
+using std::endl;
+#endif
+
 struct bind_properties {
     const char *name;
     lua_CFunction getter;
@@ -17,6 +23,7 @@ struct Binding {
 
     static void push( lua_State *L, std::shared_ptr<T> sp )
     {
+
         if( sp == nullptr ) {
             lua_pushnil( L );
             return;
@@ -160,9 +167,12 @@ struct Binding {
 
     static int destroy( lua_State *L )
     {
-        std::shared_ptr<T> sp = fromStack( L, 1 );
+        void* ud = luaL_checkudata( L, 1, B::class_name );
 
-        sp.~shared_ptr();
+        std::shared_ptr<T> *sp = static_cast<std::shared_ptr<T>*>(ud);
+
+        // Explicitly called, as this was 'placement new'd
+        sp->~shared_ptr();
 
         return 0;
     }
@@ -173,7 +183,9 @@ struct Binding {
     {
         void* ud = luaL_checkudata( L, index, B::class_name );
 
-        return *((std::shared_ptr<T>*)ud);
+        std::shared_ptr<T> *sp = static_cast<std::shared_ptr<T>*>(ud);
+
+        return *sp;
     }
 
     static void checkArgCount( lua_State *L, int expected )
