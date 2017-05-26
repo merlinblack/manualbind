@@ -1,6 +1,6 @@
 #ifndef __MYACTORBINDING_H
 #define __MYACTORBINDING_H
-#include "Binding.h"
+#include "LuaBinding.h"
 #include "MyActor.h"
 
 typedef std::shared_ptr<MyActor> MyActorPtr;

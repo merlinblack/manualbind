@@ -3,7 +3,7 @@
 #include <string.h>
 #include <lua.hpp>
 
-#include "Binding.h"
+#include "LuaBinding.h"
 
 using std::cout;
 using std::endl;
