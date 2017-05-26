@@ -1,4 +1,4 @@
-#include "Binding.h"
+#include "LuaBinding.h"
 #include <iostream>
 #include <vector>
 #include "MyActor.h"

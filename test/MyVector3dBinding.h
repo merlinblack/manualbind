@@ -1,6 +1,6 @@
 #ifndef __MYVECTOR3DBINDING_H
 #define __MYVECTOR3DBINDING_H
-#include "Binding.h"
+#include "LuaBinding.h"
 #include "MyVector3d.h"
 
 typedef std::shared_ptr<MyVector3d> MyVector3dPtr;
