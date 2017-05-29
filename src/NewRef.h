@@ -73,59 +73,57 @@ class LuaRefBase
 
 class LuaRef;
 
+template<typename K>
 class LuaTableElement : public LuaRefBase
 {
     friend class LuaRef;
     private:
-    int m_tableRef;
+    K m_key;
 
     // Expects on the Lua stack
     // 1 - The table
-    // 2 - The key
-    LuaTableElement( lua_State* L ) 
+    LuaTableElement( lua_State* L, K key ) 
         : LuaRefBase( L, FromStack() )
+        , m_key( key )
     {
-        m_tableRef = luaL_ref( m_L, LUA_REGISTRYINDEX );
     }
 
     public:
     ~LuaTableElement()
     {
-        luaL_unref( m_L, LUA_REGISTRYINDEX, m_tableRef );
     }
 
     inline void push() const
     {
-        lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_tableRef );
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
+        LuaStack<K>::push( m_L, m_key );
         lua_gettable( m_L, -2 );
         lua_remove( m_L, -2 );
     }
 
     // Assign a new value to this table/key.
-    template<class T>
+    template<typename T>
     LuaTableElement& operator= ( T v )
     {
         StackPopper p( m_L );
-        lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_tableRef );
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
+        LuaStack<K>::push( m_L, m_key );
         LuaStack<T>::push( m_L, v );
         lua_settable( m_L, -3 );
         return *this;
     }
 
-    LuaTableElement operator[]( const char* key ) const
+    LuaTableElement<K> operator[]( const char* key ) const
     {
         push();
-        lua_pushstring( m_L, key );
-        return LuaTableElement( m_L );
+        return LuaTableElement<K>( m_L, key );
     }
 };
 
-template<>
-struct LuaStack<LuaTableElement>
+template<typename K>
+struct LuaStack<LuaTableElement<K> >
 {
-    static inline void push( lua_State* L, LuaTableElement const& e )
+    static inline void push( lua_State* L, LuaTableElement<K> const& e )
     {
         e.push();
     }
@@ -147,11 +145,11 @@ class LuaRef : public LuaRefBase
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
     }
 
-    LuaTableElement operator[]( const char* key ) const
+    template<typename K>
+    LuaTableElement<K> operator[]( K key ) const
     {
         push();
-        lua_pushstring( m_L, key );
-        return LuaTableElement( m_L );
+        return LuaTableElement<K>( m_L, key );
     }
 
     static LuaRef fromStack( lua_State* L, int index = -1 )
