@@ -20,11 +20,14 @@ int main()
     luaL_openlibs(L);
 
     run( L, "function testing( ... ) print( '> ', ... ) end" );
-    run( L, "a = {}" );
-    run( L, "a.testing = function( ... ) print( '> ', ... ) end" );
 
     {
         LuaRef testing = getGlobal( L, "testing" );
+        LuaRef tbl = newTable( L );
+        tbl["testing"] = testing;
+        tbl.push(L);
+        lua_setglobal( L, "a" );
+        
 
         testing();
         testing( 1, 2, 3 );
