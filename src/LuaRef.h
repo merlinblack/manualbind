@@ -67,7 +67,7 @@ class LuaRef
 {
     private:
         class Proxy;
-        friend struct Stack <Proxy>;
+        friend struct LuaStack <Proxy>;
 
         //----------------------------------------------------------------------------
         /**
@@ -190,7 +190,7 @@ class LuaRef
                         StackPop p (m_L, 1);
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_tableRef);
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_keyRef);
-                        Stack <T>::push (m_L, v);
+                        LuaStack <T>::push (m_L, v);
                         lua_settable (m_L, -3);
                         return *this;
                     }
@@ -207,7 +207,7 @@ class LuaRef
                         StackPop p (m_L, 1);
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_tableRef);
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_keyRef);
-                        Stack <T>::push (m_L, v);
+                        LuaStack <T>::push (m_L, v);
                         lua_rawset (m_L, -3);
                         return *this;
                     }
@@ -273,7 +273,7 @@ class LuaRef
                         // lua_gettop is used because Userdata::getClass() doesn't handle
                         // negative stack indexes.
                         //
-                        return Stack <T>::get (m_L, lua_gettop (m_L));
+                        return LuaStack <T>::get (m_L, lua_gettop (m_L));
                     }
 
                 //--------------------------------------------------------------------------
@@ -311,7 +311,7 @@ class LuaRef
                     {
                         StackPop p (m_L, 2);
                         push (m_L);
-                        Stack <T>::push (m_L, rhs);
+                        LuaStack <T>::push (m_L, rhs);
                         return lua_compare (m_L, -2, -1, LUA_OPEQ) == 1;
                     }
 
@@ -320,7 +320,7 @@ class LuaRef
                     {
                         StackPop p (m_L, 2);
                         push (m_L);
-                        Stack <T>::push (m_L, rhs);
+                        LuaStack <T>::push (m_L, rhs);
                         return lua_compare (m_L, -2, -1, LUA_OPLT) == 1;
                     }
 
@@ -329,7 +329,7 @@ class LuaRef
                     {
                         StackPop p (m_L, 2);
                         push (m_L);
-                        Stack <T>::push (m_L, rhs);
+                        LuaStack <T>::push (m_L, rhs);
                         return lua_compare (m_L, -2, -1, LUA_OPLE) == 1;
                     }
 
@@ -338,7 +338,7 @@ class LuaRef
                     {
                         StackPop p (m_L, 2);
                         push (m_L);
-                        Stack <T>::push (m_L, rhs);
+                        LuaStack <T>::push (m_L, rhs);
                         return lua_compare (m_L, -1, -2, LUA_OPLT) == 1;
                     }
 
@@ -347,7 +347,7 @@ class LuaRef
                     {
                         StackPop p (m_L, 2);
                         push (m_L);
-                        Stack <T>::push (m_L, rhs);
+                        LuaStack <T>::push (m_L, rhs);
                         return lua_compare (m_L, -1, -2, LUA_OPLE) == 1;
                     }
 
@@ -356,7 +356,7 @@ class LuaRef
                     {
                         StackPop p (m_L, 2);
                         push (m_L);
-                        Stack <T>::push (m_L, rhs);
+                        LuaStack <T>::push (m_L, rhs);
                         return lua_rawequal (m_L, -1, -2) == 1;
                     }
                 /** @} */
@@ -385,7 +385,7 @@ class LuaRef
                     {
                         StackPop (m_L, 1);
                         push (m_L);
-                        Stack <T>::push (m_L, key);
+                        LuaStack <T>::push (m_L, key);
                         lua_rawget (m_L, -2);
                         return LuaRef (m_L, FromStack ());
                     }
@@ -400,7 +400,7 @@ class LuaRef
                     void append (T v) const
                     {
                         push (m_L);
-                        Stack <T>::push (m_L, v);
+                        LuaStack <T>::push (m_L, v);
                         luaL_ref (m_L, -2);
                         lua_pop (m_L, 1);
                     }
@@ -432,13 +432,13 @@ class LuaRef
                 template<typename T> 
                     void varpush( T first ) const
                     {
-                        Stack<T>::push( m_L, first );
+                        LuaStack<T>::push( m_L, first );
                     }
 
                 template<typename T, typename... Args>
                     void varpush( T first, Args... args ) const
                     {
-                        Stack<T>::push( m_L, first );
+                        LuaStack<T>::push( m_L, first );
                         varpush( args... );
                     }
 
@@ -459,7 +459,7 @@ class LuaRef
         };
 
     private:
-        friend struct Stack <LuaRef>;
+        friend struct LuaStack <LuaRef>;
 
         //----------------------------------------------------------------------------
         /**
@@ -547,7 +547,7 @@ class LuaRef
             LuaRef (lua_State* L, T v)
             : m_L (L)
             {
-                Stack <T>::push (m_L, v);
+                LuaStack <T>::push (m_L, v);
                 m_ref = luaL_ref (m_L, LUA_REGISTRYINDEX);
             }
 
@@ -634,7 +634,7 @@ class LuaRef
             LuaRef& operator= (T rhs)
             {
                 luaL_unref (m_L, LUA_REGISTRYINDEX, m_ref);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 m_ref = luaL_ref (m_L, LUA_REGISTRYINDEX);
                 return *this;
             }
@@ -801,7 +801,7 @@ class LuaRef
                 // lua_gettop is used because Userdata::getClass() doesn't handle
                 // negative stack indexes.
                 //
-                return Stack <T>::get (m_L, lua_gettop (m_L));
+                return LuaStack <T>::get (m_L, lua_gettop (m_L));
             }
 
         //----------------------------------------------------------------------------
@@ -839,7 +839,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             {
                 StackPop p (m_L, 2);
                 push (m_L);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 return lua_compare (m_L, -2, -1, LUA_OPEQ) == 1;
             }
 
@@ -848,7 +848,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             {
                 StackPop p (m_L, 2);
                 push (m_L);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 return lua_compare (m_L, -2, -1, LUA_OPLT) == 1;
             }
 
@@ -857,7 +857,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             {
                 StackPop p (m_L, 2);
                 push (m_L);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 return lua_compare (m_L, -2, -1, LUA_OPLE) == 1;
             }
 
@@ -866,7 +866,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             {
                 StackPop p (m_L, 2);
                 push (m_L);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 return lua_compare (m_L, -1, -2, LUA_OPLT) == 1;
             }
 
@@ -875,7 +875,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             {
                 StackPop p (m_L, 2);
                 push (m_L);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 return lua_compare (m_L, -1, -2, LUA_OPLE) == 1;
             }
 
@@ -884,7 +884,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             {
                 StackPop p (m_L, 2);
                 push (m_L);
-                Stack <T>::push (m_L, rhs);
+                LuaStack <T>::push (m_L, rhs);
                 return lua_rawequal (m_L, -1, -2) == 1;
             }
         /** @} */
@@ -899,7 +899,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
             void append (T v) const
             {
                 push (m_L);
-                Stack <T>::push (m_L, v);
+                LuaStack <T>::push (m_L, v);
                 luaL_ref (m_L, -2);
                 lua_pop (m_L, 1);
             }
@@ -926,7 +926,7 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
         template <class T>
             Proxy operator[] (T key) const
             {
-                Stack <T>::push (m_L, key);
+                LuaStack <T>::push (m_L, key);
                 return Proxy (m_L, m_ref);
             }
 
@@ -940,13 +940,13 @@ https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-
         template<typename T> 
             void varpush( T first ) const
             {
-                Stack<T>::push( m_L, first );
+                LuaStack<T>::push( m_L, first );
             }
 
         template<typename T, typename... Args>
             void varpush( T first, Args... args ) const
             {
-                Stack<T>::push( m_L, first );
+                LuaStack<T>::push( m_L, first );
                 varpush( args... );
             }
 
@@ -987,10 +987,10 @@ LuaRef const LuaRef::operator() () const
 }
 //------------------------------------------------------------------------------
 /**
-  Stack specialization for Nil
+  LuaStack specialization for Nil
   */
 template <>
-struct Stack <Nil>
+struct LuaStack <Nil>
 {
     public:
         static inline void push (lua_State* L, Nil)
@@ -1001,10 +1001,10 @@ struct Stack <Nil>
 
 //------------------------------------------------------------------------------
 /**
-  Stack specialization for LuaRef.
+  LuaStack specialization for LuaRef.
   */
 template <>
-struct Stack <LuaRef>
+struct LuaStack <LuaRef>
 {
     public:
         // The value is const& to prevent a copy construction.
@@ -1022,10 +1022,10 @@ struct Stack <LuaRef>
 
 //------------------------------------------------------------------------------
 /**
-  Stack specialization for Proxy.
+  LuaStack specialization for Proxy.
   */
 template <>
-struct Stack <LuaRef::Proxy>
+struct LuaStack <LuaRef::Proxy>
 {
     public:
         // The value is const& to prevent a copy construction.
