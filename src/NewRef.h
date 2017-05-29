@@ -7,8 +7,17 @@
 #define __LUAREF_H
 
 #include <string>
+#include "LuaStack.h"
 
-struct Nil;
+struct LuaNil;
+template<>
+struct LuaStack<LuaNil>
+{
+    static inline void push( lua_State* L, LuaNil& nil )
+    {
+        lua_pushnil(L);
+    }
+};
 
 class LuaRefBase
 {
@@ -70,17 +79,19 @@ class LuaTableElement : public LuaRefBase
     private:
     int m_tableRef;
 
-    LuaTableElement( lua_State* L, int tableRef ) 
-        : LuaRefBase( L, LUA_REFNIL )
-        , m_tableRef( tableRef )
+    // Expects on the Lua stack
+    // 1 - The table
+    // 2 - The key
+    LuaTableElement( lua_State* L ) 
+        : LuaRefBase( L, FromStack() )
     {
-        m_ref = luaL_ref( L, LUA_REGISTRYINDEX );
+        m_tableRef = luaL_ref( m_L, LUA_REGISTRYINDEX );
     }
 
     public:
     ~LuaTableElement()
     {
-        luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
+        luaL_unref( m_L, LUA_REGISTRYINDEX, m_tableRef );
     }
 
     inline void push() const
@@ -88,15 +99,17 @@ class LuaTableElement : public LuaRefBase
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_tableRef );
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
         lua_gettable( m_L, -2 );
+        lua_remove( m_L, -2 );
     }
 
     // Assign a new value to this table/key.
-    LuaTableElement& operator= ( const char* str )
+    template<class T>
+    LuaTableElement& operator= ( T v )
     {
         StackPopper p( m_L );
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_tableRef );
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
-        lua_pushstring( m_L, str );
+        LuaStack<T>::push( m_L, v );
         lua_settable( m_L, -3 );
         return *this;
     }
@@ -104,9 +117,17 @@ class LuaTableElement : public LuaRefBase
     LuaTableElement operator[]( const char* key ) const
     {
         push();
-        int newref = luaL_ref( m_L, LUA_REGISTRYINDEX );
         lua_pushstring( m_L, key );
-        return LuaTableElement( m_L, newref );
+        return LuaTableElement( m_L );
+    }
+};
+
+template<>
+struct LuaStack<LuaTableElement>
+{
+    static inline void push( lua_State* L, LuaTableElement const& e )
+    {
+        e.push();
     }
 };
 
@@ -121,16 +142,16 @@ class LuaRef : public LuaRefBase
     {
     }
 
-    LuaTableElement operator[]( const char* key ) const
+    inline void push() const
     {
-        lua_pushstring( m_L, key );
-        return LuaTableElement( m_L, m_ref );
+        lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
     }
 
-    LuaTableElement operator[]( const int key ) const
+    LuaTableElement operator[]( const char* key ) const
     {
-        lua_pushinteger( m_L, key );
-        return LuaTableElement( m_L, m_ref );
+        push();
+        lua_pushstring( m_L, key );
+        return LuaTableElement( m_L );
     }
 
     static LuaRef fromStack( lua_State* L, int index = -1 )
@@ -151,5 +172,15 @@ class LuaRef : public LuaRefBase
         return LuaRef (L, FromStack ());
     }
 };
+
+template<>
+struct LuaStack<LuaRef>
+{
+    static inline void push( lua_State* L, LuaRef const& r )
+    {
+        r.push();
+    }
+};
+
 
 #endif // __LUAREF_H

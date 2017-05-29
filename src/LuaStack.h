@@ -31,16 +31,16 @@
 #define LUASTACK_H
 
 template<typename T>
-struct Stack;
+struct LuaStack;
 
 //------------------------------------------------------------------------------
 /**
     Push an object onto the Lua stack.
 */
 template <class T>
-inline void push (lua_State* L, T t)
+inline void lua_push (lua_State* L, T t)
 {
-  Stack <T>::push (L, t);
+  LuaStack <T>::push (L, t);
 }
 
 //------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ inline void push (lua_State* L, T t)
     Receive the lua_State* as an argument.
 */
 template <>
-struct Stack <lua_State*>
+struct LuaStack <lua_State*>
 {
   static lua_State* get (lua_State* L, int)
   {
@@ -61,7 +61,7 @@ struct Stack <lua_State*>
     Push a lua_CFunction.
 */
 template <>
-struct Stack <lua_CFunction>
+struct LuaStack <lua_CFunction>
 {
   static void push (lua_State* L, lua_CFunction f)
   {
@@ -76,10 +76,10 @@ struct Stack <lua_CFunction>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `int`.
+    LuaStack specialization for `int`.
 */
 template <>
-struct Stack <int>
+struct LuaStack <int>
 {
   static inline void push (lua_State* L, int value)
   {
@@ -93,7 +93,7 @@ struct Stack <int>
 };
 
 template <>
-struct Stack <int const&>
+struct LuaStack <int const&>
 {
   static inline void push (lua_State* L, int value)
   {
@@ -107,10 +107,10 @@ struct Stack <int const&>
 };
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `unsigned int`.
+    LuaStack specialization for `unsigned int`.
 */
 template <>
-struct Stack <unsigned int>
+struct LuaStack <unsigned int>
 {
   static inline void push (lua_State* L, unsigned int value)
   {
@@ -124,7 +124,7 @@ struct Stack <unsigned int>
 };
 
 template <>
-struct Stack <unsigned int const&>
+struct LuaStack <unsigned int const&>
 {
   static inline void push (lua_State* L, unsigned int value)
   {
@@ -139,10 +139,10 @@ struct Stack <unsigned int const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `unsigned char`.
+    LuaStack specialization for `unsigned char`.
 */
 template <>
-struct Stack <unsigned char>
+struct LuaStack <unsigned char>
 {
   static inline void push (lua_State* L, unsigned char value)
   {
@@ -156,7 +156,7 @@ struct Stack <unsigned char>
 };
 
 template <>
-struct Stack <unsigned char const&>
+struct LuaStack <unsigned char const&>
 {
   static inline void push (lua_State* L, unsigned char value)
   {
@@ -171,10 +171,10 @@ struct Stack <unsigned char const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `short`.
+    LuaStack specialization for `short`.
 */
 template <>
-struct Stack <short>
+struct LuaStack <short>
 {
   static inline void push (lua_State* L, short value)
   {
@@ -188,7 +188,7 @@ struct Stack <short>
 };
 
 template <>
-struct Stack <short const&>
+struct LuaStack <short const&>
 {
   static inline void push (lua_State* L, short value)
   {
@@ -203,10 +203,10 @@ struct Stack <short const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `unsigned short`.
+    LuaStack specialization for `unsigned short`.
 */
 template <>
-struct Stack <unsigned short>
+struct LuaStack <unsigned short>
 {
   static inline void push (lua_State* L, unsigned short value)
   {
@@ -220,7 +220,7 @@ struct Stack <unsigned short>
 };
 
 template <>
-struct Stack <unsigned short const&>
+struct LuaStack <unsigned short const&>
 {
   static inline void push (lua_State* L, unsigned short value)
   {
@@ -235,10 +235,10 @@ struct Stack <unsigned short const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `long`.
+    LuaStack specialization for `long`.
 */
 template <>
-struct Stack <long>
+struct LuaStack <long>
 {
   static inline void push (lua_State* L, long value)
   {
@@ -252,7 +252,7 @@ struct Stack <long>
 };
 
 template <>
-struct Stack <long const&>
+struct LuaStack <long const&>
 {
   static inline void push (lua_State* L, long value)
   {
@@ -267,10 +267,10 @@ struct Stack <long const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `unsigned long`.
+    LuaStack specialization for `unsigned long`.
 */
 template <>
-struct Stack <unsigned long>
+struct LuaStack <unsigned long>
 {
   static inline void push (lua_State* L, unsigned long value)
   {
@@ -284,7 +284,7 @@ struct Stack <unsigned long>
 };
 
 template <>
-struct Stack <unsigned long const&>
+struct LuaStack <unsigned long const&>
 {
   static inline void push (lua_State* L, unsigned long value)
   {
@@ -299,10 +299,10 @@ struct Stack <unsigned long const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `float`.
+    LuaStack specialization for `float`.
 */
 template <>
-struct Stack <float>
+struct LuaStack <float>
 {
   static inline void push (lua_State* L, float value)
   {
@@ -316,7 +316,7 @@ struct Stack <float>
 };
 
 template <>
-struct Stack <float const&>
+struct LuaStack <float const&>
 {
   static inline void push (lua_State* L, float value)
   {
@@ -331,9 +331,9 @@ struct Stack <float const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `double`.
+    LuaStack specialization for `double`.
 */
-template <> struct Stack <double>
+template <> struct LuaStack <double>
 {
   static inline void push (lua_State* L, double value)
   {
@@ -346,7 +346,7 @@ template <> struct Stack <double>
   }
 };
 
-template <> struct Stack <double const&>
+template <> struct LuaStack <double const&>
 {
   static inline void push (lua_State* L, double value)
   {
@@ -361,10 +361,10 @@ template <> struct Stack <double const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `bool`.
+    LuaStack specialization for `bool`.
 */
 template <>
-struct Stack <bool> {
+struct LuaStack <bool> {
   static inline void push (lua_State* L, bool value)
   {
     lua_pushboolean (L, value ? 1 : 0);
@@ -377,7 +377,7 @@ struct Stack <bool> {
 };
 
 template <>
-struct Stack <bool const&> {
+struct LuaStack <bool const&> {
   static inline void push (lua_State* L, bool value)
   {
     lua_pushboolean (L, value ? 1 : 0);
@@ -391,10 +391,10 @@ struct Stack <bool const&> {
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `char`.
+    LuaStack specialization for `char`.
 */
 template <>
-struct Stack <char>
+struct LuaStack <char>
 {
   static inline void push (lua_State* L, char value)
   {
@@ -409,7 +409,7 @@ struct Stack <char>
 };
 
 template <>
-struct Stack <char const&>
+struct LuaStack <char const&>
 {
   static inline void push (lua_State* L, char value)
   {
@@ -425,10 +425,10 @@ struct Stack <char const&>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `float`.
+    LuaStack specialization for `float`.
 */
 template <>
-struct Stack <char const*>
+struct LuaStack <char const*>
 {
   static inline void push (lua_State* L, char const* str)
   {
@@ -446,10 +446,10 @@ struct Stack <char const*>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `std::string`.
+    LuaStack specialization for `std::string`.
 */
 template <>
-struct Stack <std::string>
+struct LuaStack <std::string>
 {
   static inline void push (lua_State* L, std::string const& str)
   {
@@ -466,10 +466,10 @@ struct Stack <std::string>
 
 //------------------------------------------------------------------------------
 /**
-    Stack specialization for `std::string const&`.
+    LuaStack specialization for `std::string const&`.
 */
 template <>
-struct Stack <std::string const&>
+struct LuaStack <std::string const&>
 {
   static inline void push (lua_State* L, std::string const& str)
   {

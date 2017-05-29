@@ -49,7 +49,7 @@ int main()
     {
         LuaRef testing = LuaRef::getGlobal( L, "testing" );
         LuaRef table = LuaRef::newTable( L );
-        table["testing"] = "Hello";
+        table["testing"] = testing;
 
         table.push();
         lua_setglobal( L, "a" );
@@ -59,9 +59,6 @@ int main()
         run( L, "a.b.c = {}" );
 
         table["b"]["c"]["hello"] = "World!";
-        //LuaTableElement b = table["b"];
-        //LuaTableElement hello = b["hello"];
-        //hello = "World!";
 
         run( L, "print( a.b.c.hello )" );
     }
