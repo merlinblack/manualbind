@@ -86,7 +86,7 @@ class LuaRef
           }
 
           @note The `StackPop` object must always be a named local variable.
-          */
+        */
         class StackPop
         {
             public:
@@ -129,10 +129,10 @@ class LuaRef
                   The table is in the registry, and the key is at the top of the stack.
                   The key is popped off the stack.
                   */
-                Proxy (lua_State* L, int tableRef)
+            Proxy (lua_State* L, int tableRef)
                     : m_L (L)
-                      , m_tableRef (tableRef)
-                      , m_keyRef (luaL_ref (L, LUA_REGISTRYINDEX))
+                    , m_tableRef (tableRef)
+                    , m_keyRef (luaL_ref (L, LUA_REGISTRYINDEX))
             {
             }
 
@@ -144,9 +144,9 @@ class LuaRef
                   an extra temporary Lua reference. Typically this is done by passing
                   the Proxy parameter as a `const` reference.
                   */
-                Proxy (Proxy const& other)
-                    : m_L (other.m_L)
-                      , m_tableRef (other.m_tableRef)
+            Proxy (Proxy const& other)
+                 : m_L (other.m_L)
+                 , m_tableRef (other.m_tableRef)
             {
                 // If this assert goes off it means code is taking this path,
                 // which is better avoided.
@@ -191,7 +191,7 @@ class LuaRef
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_tableRef);
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_keyRef);
                         Stack <T>::push (m_L, v);
-                        lua_rawset (m_L, -3);
+                        lua_settable (m_L, -3);
                         return *this;
                     }
 
@@ -208,7 +208,7 @@ class LuaRef
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_tableRef);
                         lua_rawgeti (m_L, LUA_REGISTRYINDEX, m_keyRef);
                         Stack <T>::push (m_L, v);
-                        lua_settable (m_L, -3);
+                        lua_rawset (m_L, -3);
                         return *this;
                     }
 
@@ -280,20 +280,20 @@ class LuaRef
                 /**
                   Universal implicit conversion operator.
 
-NOTE: Visual Studio 2010 and 2012 have a bug where this function
-is not used. See:
+                  NOTE: Visual Studio 2010 and 2012 have a bug where this function
+                  is not used. See:
 
-http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/e30b2664-a92d-445c-9db2-e8e0fbde2014
-https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-doesnt-compile
+                  http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/e30b2664-a92d-445c-9db2-e8e0fbde2014
+                  https://connect.microsoft.com/VisualStudio/feedback/details/771509/correct-code-doesnt-compile
 
-                // This code snippet fails to compile in vs2010,vs2012
-                struct S {
-                template <class T> inline operator T () const { return T (); }
-                };
-                int main () {
-                S () || false;
-                return 0;
-                }
+                  // This code snippet fails to compile in vs2010,vs2012
+                  struct S {
+                    template <class T> inline operator T () const { return T (); }
+                  };
+                  int main () {
+                    S () || false;
+                    return 0;
+                  }
                 */
                 template <class T>
                     inline operator T () const
