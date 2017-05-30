@@ -77,6 +77,12 @@ int main()
         testing( 1, 2, 3 );
         testing( "Hello" );
         testing( "Hello", "World" );
+        
+        // Note: BAD. This makes a boat load of LuaRef copies
+        // temporarily. The recursive parameter pushing
+        // means later parameters get for each parameter in
+        // front of them.
+        // So put expensive parameters at the start!!!
         testing( "Hello", "World", 1, 2, 3, testing );
 
         testing( "Nigel", "Alara", "Aldora", "Ayna",
@@ -84,9 +90,14 @@ int main()
                  "Tom",   "Sonja", "Greg",   "Trish" 
                );
 
-        //testing = LuaRef::getGlobal( L, "a" );
-        //testing["testing"](testing,3,2,1,"Calling array element");
-        //testing["testing"]();
+        table["testing"](testing,3,2,1,"Calling array element");
+        table["testing"]();
+
+        LuaRef newfuncref( L );
+
+        newfuncref = testing;
+
+        newfuncref( "Did it copy correctly?" );
     }
 
     lua_close(L);
