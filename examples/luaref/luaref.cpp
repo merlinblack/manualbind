@@ -74,9 +74,16 @@ int main()
 
         run( L, "print( a.b.c.hello )" );
 
-        table["b"][10] = "Index 10";
+        auto b = table["b"];
+        b[3] = "Index 3";
+        for( int i = 1; i < 5; i++ )
+        {
+            b.append( i );
+        }
+        b[1] = LuaNil();
+        b.append( "Add more." );
 
-        run( L, "print( a.b[10] )" );
+        run( L, "for k,v in pairs( a.b ) do print( k,v ) end" );
 
         table["b"] = LuaNil();
 
