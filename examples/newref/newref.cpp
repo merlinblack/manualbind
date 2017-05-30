@@ -58,19 +58,20 @@ int main()
         run( L, "a.b = {}" );
         run( L, "a.b.c = {}" );
 
+        cout << "Is table a table? " 
+             << (table.isTable() ? "true" : "false" )
+             << endl;
+        cout << "Is table[\"b\"] a table? " 
+             << (table["b"].isTable() ? "true" : "false" ) 
+             << endl;
+
         table["b"]["c"]["hello"] = "World!";
 
         run( L, "print( a.b.c.hello )" );
-    }
 
-    /*
-    {
-        LuaRef testing = getGlobal( L, "testing" );
-        LuaRef tbl = newTable( L );
-        tbl["testing"] = testing;
-        tbl.push(L);
-        lua_setglobal( L, "a" );
-        
+        table["b"] = LuaNil();
+
+        run( L, "print( a.b )" );
 
         testing();
         testing( 1, 2, 3 );
@@ -79,16 +80,14 @@ int main()
         testing( "Hello", "World", 1, 2, 3, testing );
 
         testing( "Nigel", "Alara", "Aldora", "Ayna",
-                "Sarah", "Gavin", "Joe",    "Linda",
-                "Tom",   "Sonja", "Greg",   "Trish" 
+                 "Sarah", "Gavin", "Joe",    "Linda",
+                 "Tom",   "Sonja", "Greg",   "Trish" 
                );
 
-        testing = getGlobal( L, "a" );
-
-        testing["testing"](testing,3,2,1,"Calling array element");
-        testing["testing"]();
+        //testing = LuaRef::getGlobal( L, "a" );
+        //testing["testing"](testing,3,2,1,"Calling array element");
+        //testing["testing"]();
     }
-    */
 
     lua_close(L);
     return 0;
