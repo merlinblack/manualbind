@@ -226,6 +226,8 @@ class LuaRef : public LuaRefBase
     LuaRef& operator=( LuaRef&& other )
     {
         if( this == &other ) return *this;
+        luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
+        cout << "Zap ref: " << m_ref << " before reassigning." << endl;
 
         m_L = other.m_L;
         m_ref = other.m_ref;
@@ -239,6 +241,8 @@ class LuaRef : public LuaRefBase
     LuaRef& operator=( LuaRef const& other )
     {
         if( this == &other ) return *this;
+        luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
+        cout << "Zap ref: " << m_ref << " before reassigning." << endl;
         other.push();
         m_L = other.m_L;
         m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
