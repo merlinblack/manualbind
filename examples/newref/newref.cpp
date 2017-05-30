@@ -38,6 +38,11 @@ void run( lua_State* L, const char* code )
     }
 }
 
+LuaRef getTesting( lua_State* L )
+{
+    lua_getglobal( L, "testing" );
+    return LuaRef::fromStack(L);
+}
 
 int main()
 {
@@ -102,6 +107,8 @@ int main()
         newfuncref = testing;
 
         newfuncref( "Did it copy correctly?" );
+
+        newfuncref = getTesting( L );
     }
 
     lua_close(L);
