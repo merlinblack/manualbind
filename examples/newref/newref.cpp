@@ -69,6 +69,10 @@ int main()
 
         run( L, "print( a.b.c.hello )" );
 
+        table["b"][10] = "Index 10";
+
+        run( L, "print( a.b[10] )" );
+
         table["b"] = LuaNil();
 
         run( L, "print( a.b )" );

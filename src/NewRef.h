@@ -128,6 +128,10 @@ class LuaTableElement : public LuaRefBase
     private:
     K m_key;
 
+    // This has to be public, so that the operator[]
+    // with a differing template type can call it.
+    // I could not find a way to 'friend' it.
+    public:
     // Expects on the Lua stack
     // 1 - The table
     LuaTableElement( lua_State* L, K key ) 
@@ -137,7 +141,6 @@ class LuaTableElement : public LuaRefBase
         cout << "Created Table Element with key '" << key << "'" << endl;
     }
 
-    public:
     ~LuaTableElement()
     {
         cout << "Destroying Table Element" << endl;
@@ -175,7 +178,6 @@ class LuaTableElement : public LuaRefBase
         push();
         return LuaTableElement<NK>( m_L, key );
     }
-
 };
 
 template<typename K>
