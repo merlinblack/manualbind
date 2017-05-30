@@ -44,10 +44,9 @@ void pushToLua( lua_State* L, MyActorPtrList list )
 {
     lua_newtable( L );
     
-    int index = 1;
     for( auto ap = list.begin(); ap != list.end(); ap++ ) {
         MyActorBinding::push( L, *ap );
-        lua_rawseti( L, -2, index++ );
+        luaL_ref( L, -2 );
     }
 }
 
@@ -87,6 +86,8 @@ int main()
         pushToLua( L, actors );
         lua_setglobal( L, "actors" );
     }
+    
+    run( L, "for k,v in pairs(actors) do print( k, v.name ) end" );
 
     cout << "Editing actor list..." << endl;
     run( L, "actors[2] = nil                    -- Who is this? Pfft, delete." );
