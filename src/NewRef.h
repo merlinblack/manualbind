@@ -8,16 +8,26 @@
 
 #include <string>
 #include "LuaStack.h"
+#include "LuaException.h"
 
-struct LuaNil;
+#include <iostream>
+using std::cout;
+using std::endl;
+static void dump (lua_State *L);
+
+struct LuaNil
+{
+};
 template<>
 struct LuaStack<LuaNil>
 {
-    static inline void push( lua_State* L, LuaNil& nil )
+    static inline void push( lua_State* L, LuaNil const& nil )
     {
         lua_pushnil(L);
     }
 };
+
+class LuaRef;
 
 class LuaRefBase
 {
@@ -43,21 +53,24 @@ class LuaRefBase
     LuaRefBase( lua_State* L, FromStack ) : m_L( L )
     {
         m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
+        cout << "New ref: " << m_ref << endl;
     }
 
     LuaRefBase( lua_State* L, int ref ) : m_L( L ), m_ref( ref )
     {
     }
 
-    ~LuaRefBase()
+    virtual ~LuaRefBase()
     {
         luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
+        cout << "Zap ref: " << m_ref << endl;
     }
 
     public:
-    inline void push() const
+    virtual void push() const
     {
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
+        cout << "Get ref: " << m_ref << endl;
     }
         
     std::string tostring() const
@@ -69,9 +82,42 @@ class LuaRefBase
         lua_pop( m_L, 1 );
         return std::string(str);
     }
-};
 
-class LuaRef;
+    int type () const
+    {
+        int result;
+        push();
+        result = lua_type (m_L, -1);
+        lua_pop (m_L, 1);
+        return result;
+    }
+
+    inline bool isNil () const { return type () == LUA_TNIL; }
+    inline bool isNumber () const { return type () == LUA_TNUMBER; }
+    inline bool isString () const { return type () == LUA_TSTRING; }
+    inline bool isTable () const { return type () == LUA_TTABLE; }
+    inline bool isFunction () const { return type () == LUA_TFUNCTION; }
+    inline bool isUserdata () const { return type () == LUA_TUSERDATA; }
+    inline bool isThread () const { return type () == LUA_TTHREAD; }
+    inline bool isLightUserdata () const { return type () == LUA_TLIGHTUSERDATA; }
+
+    protected:
+    template<typename T> 
+    void varpush( T first ) const
+    {
+        LuaStack<T>::push( m_L, first );
+    }
+
+    template<typename T, typename... Args>
+    void varpush( T first, Args... args ) const
+    {
+        LuaStack<T>::push( m_L, first );
+        varpush( args... );
+    }
+
+    public:
+
+};
 
 template<typename K>
 class LuaTableElement : public LuaRefBase
@@ -86,19 +132,25 @@ class LuaTableElement : public LuaRefBase
         : LuaRefBase( L, FromStack() )
         , m_key( key )
     {
+        cout << "Created Table Element" << endl;
     }
 
     public:
     ~LuaTableElement()
     {
+        cout << "Destroying Table Element" << endl;
     }
 
     inline void push() const
     {
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
+        cout << "Get ref: " << m_ref << endl;
         LuaStack<K>::push( m_L, m_key );
+        cout << "Get key: " << m_key << endl;
+        dump( m_L );
         lua_gettable( m_L, -2 );
         lua_remove( m_L, -2 );
+        dump( m_L );
     }
 
     // Assign a new value to this table/key.
@@ -109,6 +161,7 @@ class LuaTableElement : public LuaRefBase
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
         LuaStack<K>::push( m_L, m_key );
         LuaStack<T>::push( m_L, v );
+        dump( m_L );
         lua_settable( m_L, -3 );
         return *this;
     }
@@ -118,6 +171,7 @@ class LuaTableElement : public LuaRefBase
         push();
         return LuaTableElement<K>( m_L, key );
     }
+
 };
 
 template<typename K>
@@ -140,9 +194,11 @@ class LuaRef : public LuaRefBase
     {
     }
 
-    inline void push() const
+    LuaRef( LuaRef const& other ) : LuaRefBase( other.m_L, LUA_REFNIL )
     {
-        lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
+        other.push();
+        m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
+        cout << "New ref: " << m_ref << " as copy of " << other.m_ref << endl;
     }
 
     template<typename K>
@@ -169,7 +225,26 @@ class LuaRef : public LuaRefBase
         lua_getglobal (L, name);
         return LuaRef (L, FromStack ());
     }
+
+    template<typename... Args>
+    LuaRef const operator()( Args... args ) const
+    {
+        const int n = sizeof...(Args);
+        push();
+        varpush( args... );
+        LuaException::pcall( m_L, n, 1 );
+        return LuaRef (m_L, FromStack ());
+    }
 };
+
+template<>
+LuaRef const LuaRef::operator() () const
+{
+    push();
+    LuaException::pcall (m_L, 0, 1);
+    return LuaRef (m_L, FromStack ());
+}
+
 
 template<>
 struct LuaStack<LuaRef>
