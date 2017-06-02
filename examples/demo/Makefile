@@ -1,5 +1,13 @@
-demo:	demo.cpp ../../src/LuaBinding.h MyActor.h MyActorBinding.h MyVector3d.h MyVector3dBinding.h Makefile
-	g++ -O3 -g ../common/common.cpp demo.cpp -I../../src -I../common -o demo -llua
+INCLUDES=-I../../src -I../common
+LIBS=-llua ../common/common.o
+EXEC=demo
+SRC=demo.cpp
+
+.PHONY: clean
+
+$(EXEC):	$(SRC) Makefile 
+	g++ $(INCLUDES) $(LIBS) -O3 -g $(SRC) -o $(EXEC)
 
 clean:
-	-rm -f demo
+	-rm -f $(EXEC)
+

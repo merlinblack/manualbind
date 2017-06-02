@@ -1,6 +1,13 @@
-luaref:	luaref.cpp Makefile 
-	g++ -O3 -g ../common/common.cpp luaref.cpp -I ../../src -I../common -o luaref -llua
+INCLUDES=-I../../src -I../common
+LIBS=-llua ../common/common.o
+EXEC=luaref
+SRC=luaref.cpp
+
+.PHONY: clean
+
+$(EXEC):	$(SRC) Makefile 
+	g++ $(INCLUDES) $(LIBS) -O3 -g $(SRC) -o $(EXEC)
 
 clean:
-	-rm -f luaref
+	-rm -f $(EXEC)
 

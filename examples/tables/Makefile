@@ -1,5 +1,13 @@
-tables:	tables.cpp ../../src/LuaBinding.h MyActor.h MyActorBinding.h Makefile
-	g++ -O3 -g ../common/common.cpp tables.cpp -I../../src -I../common -o tables -llua
+INCLUDES=-I../../src -I../common
+LIBS=-llua ../common/common.o
+EXEC=tables
+SRC=tables.cpp
+
+.PHONY: clean
+
+$(EXEC):	$(SRC) Makefile 
+	g++ $(INCLUDES) $(LIBS) -O3 -g $(SRC) -o $(EXEC)
 
 clean:
-	-rm -f tables
+	-rm -f $(EXEC)
+
