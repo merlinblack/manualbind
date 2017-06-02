@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Binding.h"
+#include "LuaBinding.h"
 
 // Down casting example.
 // Not often needed, but here is how to do it, while maintaining 
