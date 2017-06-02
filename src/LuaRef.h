@@ -13,7 +13,6 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-static void dump (lua_State *L);
 
 struct LuaNil
 {

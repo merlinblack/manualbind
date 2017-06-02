@@ -1,3 +1,4 @@
+#include "common.h"
 #include <iostream>
 #include "LuaBinding.h"
 
@@ -128,17 +129,6 @@ struct CarBinding: public Binding<CarBinding, Car> {
         return 1;
     }
 };
-
-void run( lua_State *L, const char *code )
-{
-    cout << "code> " << code << endl;
-
-    if( luaL_dostring( L, code ) )
-    {
-        cout << lua_tostring( L, -1 ) << endl;
-        lua_pop( L, 1 );
-    }
-}
 
 int main()
 {
