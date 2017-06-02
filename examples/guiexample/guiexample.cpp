@@ -108,17 +108,6 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
 
 };
 
-void run( lua_State *L, const char *code )
-{
-    cout << "code> " << code << endl;
-
-    if( luaL_dostring( L, code ) )
-    {
-        cout << lua_tostring( L, -1 ) << endl;
-        lua_pop( L, 1 );
-    }
-}
-
 void test( lua_State* L )
 {
     RectangleBinding::register_class( L );
@@ -130,7 +119,12 @@ void test( lua_State* L )
         return;
     }
 
-    run( L, "test()" );
+    if( luaL_dostring( L, "test()" ) )
+    {
+        cout << lua_tostring( L, -1 ) << endl;
+        lua_pop( L, 1 );
+        return;
+    }
 
     return;
 }

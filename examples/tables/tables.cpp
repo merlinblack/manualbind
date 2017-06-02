@@ -1,3 +1,4 @@
+#include "common.h"
 #include "LuaBinding.h"
 #include <iostream>
 #include <vector>
@@ -6,17 +7,6 @@
 
 using std::cout;
 using std::endl;
-
-void run( lua_State *L, const char *code )
-{
-    cout << "code> " << code << endl;
-
-    if( luaL_dostring( L, code ) )
-    {
-        cout << lua_tostring( L, -1 ) << endl;
-        lua_pop( L, 1 );
-    }
-}
 
 typedef std::vector<MyActorPtr> MyActorPtrList;
 

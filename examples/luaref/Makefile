@@ -1,5 +1,5 @@
 luaref:	luaref.cpp Makefile 
-	g++ -O3 -g luaref.cpp -I ../../src -o luaref -llua
+	g++ -O3 -g ../common/common.cpp luaref.cpp -I ../../src -I../common -o luaref -llua
 
 clean:
 	-rm -f luaref
