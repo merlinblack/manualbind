@@ -1,24 +1,27 @@
 # Make all the examples
 #
 
-.PHONY: demo downcast guiexample luaref Makefile tables clean
+.PHONY: common demo downcast guiexample luaref Makefile tables clean
 
 all: demo downcast guiexample luaref Makefile tables
 
-demo:
+demo:	common
 	@$(MAKE) --no-print-directory -C demo
 
-downcast:
+downcast:	common
 	@$(MAKE) --no-print-directory -C downcast
 
 guiexample:
 	@$(MAKE) --no-print-directory -C guiexample
 
-luaref:
+luaref:	common
 	@$(MAKE) --no-print-directory -C luaref
 
-tables:
+tables:	common
 	@$(MAKE) --no-print-directory -C tables
+
+common:	common/common.o
+	@$(MAKE) --no-print-directory -C common
 
 clean:
 	@$(MAKE) --no-print-directory -C demo clean
@@ -26,3 +29,4 @@ clean:
 	@$(MAKE) --no-print-directory -C guiexample clean
 	@$(MAKE) --no-print-directory -C luaref clean
 	@$(MAKE) --no-print-directory -C tables clean
+	@$(MAKE) --no-print-directory -C common clean
