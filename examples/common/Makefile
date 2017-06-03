@@ -1,7 +1,8 @@
+include ../config.mk
 .PHONY: clean
 
 common.o:	common.cpp common.h
-	g++ -O3 -c common.cpp -I../../src
+	c++ $(CFLAGS) -O3 -c common.cpp -I../../src
 
 clean:
-	-rm common.o
+	-rm -f common.o

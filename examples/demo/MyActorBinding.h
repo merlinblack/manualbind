@@ -35,7 +35,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
         checkArgCount( L, 2 );
 
         const char *name = luaL_checkstring( L, 1 );
-        int age = luaL_checkint( L, 2 );
+        int age = luaL_checkinteger( L, 2 );
 
         MyActorPtr sp = std::make_shared<MyActor>( name, age );
 
