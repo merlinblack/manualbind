@@ -11,7 +11,7 @@ demo:	common
 downcast:	common
 	@$(MAKE) --no-print-directory -C downcast
 
-guiexample:
+guiexample: common
 	@$(MAKE) --no-print-directory -C guiexample
 
 luaref:	common
@@ -21,6 +21,8 @@ tables:	common
 	@$(MAKE) --no-print-directory -C tables
 
 common:	common/common.o
+
+common/common.o:
 	@$(MAKE) --no-print-directory -C common
 
 clean:

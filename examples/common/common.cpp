@@ -21,7 +21,7 @@ void dump( lua_State* L )
                 printf("%d: %g\n",  i, lua_tonumber(L, i));
                 break;
             default:
-                printf("%d: %s 0x%x\n", i, lua_typename(L, t), lua_topointer(L, i));
+                printf("%d: %s 0x%lX\n", i, lua_typename(L, t), (unsigned long)lua_topointer(L, i));
                 break;
         }
         i--;

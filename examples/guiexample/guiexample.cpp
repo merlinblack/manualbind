@@ -75,10 +75,10 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
 
         checkArgCount( L, 4 );
 
-        int x = luaL_checkint( L, 1 );
-        int y = luaL_checkint( L, 2 );
-        int w = luaL_checkint( L, 3 );
-        int h = luaL_checkint( L, 4 );
+        int x = luaL_checkinteger( L, 1 );
+        int y = luaL_checkinteger( L, 2 );
+        int w = luaL_checkinteger( L, 3 );
+        int h = luaL_checkinteger( L, 4 );
 
         RectanglePtr sp = std::make_shared<Rectangle>( x, y, w, h );
 
@@ -95,8 +95,8 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
         checkArgCount( L, 3 );
 
         RectanglePtr rect = fromStack( L, 1 );
-        int x = luaL_checkint( L, 2 );
-        int y = luaL_checkint( L, 3 );
+        int x = luaL_checkinteger( L, 2 );
+        int y = luaL_checkinteger( L, 3 );
 
         lua_pushboolean( L, rect->isInside( x, y ) ); 
         return 1;
