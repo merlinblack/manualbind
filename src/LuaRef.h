@@ -10,9 +10,14 @@
 #include "LuaStack.h"
 #include "LuaException.h"
 
+#ifdef _DEBUGOUTPUT
 #include <iostream>
-using std::cout;
-using std::endl;
+#define COUT( str, x ) std::cout << str << x << std::endl
+#define DUMP( L ) dump( L )
+#else
+#define COUT( str, x )
+#define DUMP( L  )
+#endif
 
 struct LuaNil
 {
@@ -52,7 +57,7 @@ class LuaRefBase
     LuaRefBase( lua_State* L, FromStack ) : m_L( L )
     {
         m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-        cout << "New ref: " << m_ref << endl;
+        COUT( "New ref: ", m_ref );
     }
 
     LuaRefBase( lua_State* L, int ref ) : m_L( L ), m_ref( ref )
@@ -62,14 +67,14 @@ class LuaRefBase
     virtual ~LuaRefBase()
     {
         luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
-        cout << "Zap ref: " << m_ref << endl;
+        COUT( "Zap ref: ", m_ref );
     }
 
     public:
     virtual void push() const
     {
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
-        cout << "Get ref: " << m_ref << endl;
+        COUT( "Get ref: ", m_ref );
     }
         
     std::string tostring() const
@@ -146,24 +151,25 @@ class LuaTableElement : public LuaRefBase
         : LuaRefBase( L, FromStack() )
         , m_key( key )
     {
-        cout << "Created Table Element with key '" << key << "'" << endl;
+        COUT( "Created Table Element with key: ", key );
+        COUT( "with table ref:", m_ref );
     }
 
     ~LuaTableElement()
     {
-        cout << "Destroying Table Element" << endl;
+        COUT( "Destroying Table Element", "" );
     }
 
     void push() const
     {
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
-        cout << "Get ref: " << m_ref << endl;
+        COUT( "Get ref: ", m_ref );
         LuaStack<K>::push( m_L, m_key );
-        cout << "Get key: " << m_key << endl;
-        dump( m_L );
+        COUT( "Get key: ", m_key );
+        DUMP( m_L );
         lua_gettable( m_L, -2 );
         lua_remove( m_L, -2 );
-        dump( m_L );
+        DUMP( m_L );
     }
 
     // Assign a new value to this table/key.
@@ -174,9 +180,9 @@ class LuaTableElement : public LuaRefBase
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
         LuaStack<K>::push( m_L, m_key );
         LuaStack<T>::push( m_L, v );
-        dump( m_L );
+        DUMP( m_L );
         lua_settable( m_L, -3 );
-        cout << "settable" << endl;
+        COUT( "settable", "" );
         return *this;
     }
 
@@ -213,26 +219,27 @@ class LuaRef : public LuaRefBase
     {
         other.push();
         m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-        cout << "New ref: " << m_ref << " as copy of " << other.m_ref << endl;
+        COUT( "New ref: ", m_ref );
+        COUT( " as copy of ", other.m_ref );
     }
 
     LuaRef( LuaRef&& other ) : LuaRefBase( other.m_L, other.m_ref )
     {
         other.m_ref = LUA_REFNIL;
-        cout << "New ref: " << m_ref << " moved." << endl;
+        COUT( "Moved new ref: ", m_ref );
     }
 
     LuaRef& operator=( LuaRef&& other )
     {
         if( this == &other ) return *this;
         luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
-        cout << "Zap ref: " << m_ref << " before reassigning." << endl;
+        COUT( "Before reassigning, zap ref: ", m_ref );
 
         m_L = other.m_L;
         m_ref = other.m_ref;
 
         other.m_ref = LUA_REFNIL;
-        cout << "New ref: " << m_ref << " moved by assignment." << endl;
+        COUT( "New ref moved by assignment: ", m_ref );
 
         return *this;
     }
@@ -241,11 +248,12 @@ class LuaRef : public LuaRefBase
     {
         if( this == &other ) return *this;
         luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
-        cout << "Zap ref: " << m_ref << " before reassigning." << endl;
+        COUT( "Before reassigning, zap ref: ", m_ref );
         other.push();
         m_L = other.m_L;
         m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-        cout << "New ref: " << m_ref << " as assigned copy of " << other.m_ref << endl;
+        COUT( "New ref: ", m_ref );
+        COUT( "as assigned copy of ", other.m_ref );
         return *this;
     }
 
