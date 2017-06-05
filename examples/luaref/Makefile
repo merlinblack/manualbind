@@ -6,8 +6,8 @@ SRC=luaref.cpp
 
 .PHONY: clean
 
-$(EXEC):	$(SRC) Makefile 
-	c++ $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -O3 -g $(SRC) -o $(EXEC)
+$(EXEC):	$(SRC) Makefile ../../src/LuaRef.h
+	c++ -D_DEBUGOUTPUT $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -O3 -g $(SRC) -o $(EXEC)
 
 clean:
 	-rm -f $(EXEC)
