@@ -60,12 +60,7 @@ int main()
         testing( 1, 2, 3 );
         testing( "Hello" );
         testing( "Hello", "World" );
-        
-        // Note: BAD. This makes a boat load of LuaRef copies
-        // temporarily. The recursive parameter pushing
-        // means later parameters get for each parameter in
-        // front of them.
-        // So put expensive parameters at the start!!!
+
         testing( "Hello", "World", 1, 2, 3, testing );
 
         testing( "Nigel", "Alara", "Aldora", "Ayna",

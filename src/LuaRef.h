@@ -105,22 +105,6 @@ class LuaRefBase
     inline bool isThread () const { return type () == LUA_TTHREAD; }
     inline bool isLightUserdata () const { return type () == LUA_TLIGHTUSERDATA; }
 
-    protected:
-    template<typename T> 
-    inline void varpush( T first ) const
-    {
-        LuaStack<T>::push( m_L, first );
-    }
-
-    template<typename T, typename... Args>
-    inline void varpush( T first, Args... args ) const
-    {
-        LuaStack<T>::push( m_L, first );
-        varpush( args... );
-    }
-
-    public:
-
     template<typename... Args>
     LuaRef const operator()( Args... args ) const;
 
@@ -305,7 +289,9 @@ LuaRef const LuaRefBase::operator()( Args... args ) const
 {
     const int n = sizeof...(Args);
     push();
-    varpush( args... );
+    // Initializer expansion trick to call push for each arg.
+    // https://stackoverflow.com/questions/25680461/variadic-template-pack-expansion
+    int dummy[] = { 0, ( (void) LuaStack<Args>::push( m_L, std::forward<Args>(args) ), 0 ) ... };
     LuaException::pcall( m_L, n, 1 );
     return LuaRef (m_L, FromStack ());
 }
