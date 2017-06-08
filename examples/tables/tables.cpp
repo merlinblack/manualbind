@@ -8,11 +8,11 @@
 using std::cout;
 using std::endl;
 
-typedef std::vector<MyActorPtr> MyActorPtrList;
+using MyActorList = std::vector<MyActorPtr>;
 
-MyActorPtrList createList()
+MyActorList createList()
 {
-    MyActorPtrList actors {
+    MyActorList actors {
         std::make_shared<MyActor>( "James" ),
         std::make_shared<MyActor>( "Who? Random extra" ),
         std::make_shared<MyActor>( "Harry" ),
@@ -22,7 +22,7 @@ MyActorPtrList createList()
     return actors;
 }
 
-void pushToLua( lua_State* L, MyActorPtrList list )
+void pushToLua( lua_State* L, MyActorList list )
 {
     lua_newtable( L );
     
@@ -32,11 +32,11 @@ void pushToLua( lua_State* L, MyActorPtrList list )
     }
 }
 
-MyActorPtrList pullFromLua( lua_State* L )
+MyActorList pullFromLua( lua_State* L )
 {
     // Note this only stores the values, not the keys/indexes,
     // which are usually just numbers.
-    MyActorPtrList list;
+    MyActorList list;
 
     if( lua_istable( L, -1 ) )
     {
@@ -64,7 +64,7 @@ int main()
     
     {
         cout << "Pushing actor list to Lua." << endl;
-        MyActorPtrList actors = createList();
+        MyActorList actors = createList();
         pushToLua( L, actors );
         lua_setglobal( L, "actors" );
     }
@@ -81,7 +81,7 @@ int main()
     {
         cout << "Pull list back into C++ vector, and list..." << endl;
         lua_getglobal( L, "actors" );
-        MyActorPtrList actors = pullFromLua( L );
+        MyActorList actors = pullFromLua( L );
         lua_pop( L, 1 );
 
         for( const auto& actor : actors )

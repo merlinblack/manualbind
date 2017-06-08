@@ -3,7 +3,7 @@
 #include "LuaBinding.h"
 #include "MyActor.h"
 
-typedef std::shared_ptr<MyActor> MyActorPtr;
+using MyActorPtr = std::shared_ptr<MyActor>;
 
 struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
