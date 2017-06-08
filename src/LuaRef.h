@@ -54,6 +54,9 @@ class LuaRefBase
 
     struct FromStack {};
 
+    // These constructors as destructor are protected as this
+    // class should not be used directly.
+
     LuaRefBase( lua_State* L, FromStack ) : m_L( L )
     {
         m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
@@ -64,7 +67,7 @@ class LuaRefBase
     {
     }
 
-    virtual ~LuaRefBase()
+    ~LuaRefBase()
     {
         luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
         COUT( "Zap ref: ", m_ref );
@@ -139,7 +142,7 @@ class LuaTableElement : public LuaRefBase
         COUT( "with table ref:", m_ref );
     }
 
-    ~LuaTableElement() override
+    ~LuaTableElement()
     {
         COUT( "Destroying Table Element", "" );
     }
@@ -207,23 +210,22 @@ class LuaRef : public LuaRefBase
         COUT( " as copy of ", other.m_ref );
     }
 
-    LuaRef( LuaRef&& other ) : LuaRefBase( other.m_L, other.m_ref )
+    LuaRef( LuaRef&& other ) noexcept : LuaRefBase( other.m_L, other.m_ref )
     {
         other.m_ref = LUA_REFNIL;
         COUT( "Moved new ref: ", m_ref );
     }
 
-    LuaRef& operator=( LuaRef&& other )
+    LuaRef& operator=( LuaRef&& other ) noexcept
     {
         if( this == &other ) return *this;
-        luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
-        COUT( "Before reassigning, zap ref: ", m_ref );
 
-        m_L = other.m_L;
-        m_ref = other.m_ref;
+        COUT( "Move assignement, swap ref: ", m_ref );
 
-        other.m_ref = LUA_REFNIL;
-        COUT( "New ref moved by assignment: ", m_ref );
+        std::swap( m_L, other.m_L);
+        std::swap( m_ref, other.m_ref);
+
+        COUT( "With ref: ", m_ref );
 
         return *this;
     }
