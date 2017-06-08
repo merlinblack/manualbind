@@ -34,8 +34,8 @@ void pushToLua( lua_State* L, MyActorPtrList list )
 {
     lua_newtable( L );
     
-    for( auto ap = list.begin(); ap != list.end(); ap++ ) {
-        MyActorBinding::push( L, *ap );
+    for( const auto& actor : list ) {
+        MyActorBinding::push( L, actor );
         luaL_ref( L, -2 );
     }
 }
@@ -92,9 +92,9 @@ int main()
         MyActorPtrList actors = pullFromLua( L );
         lua_pop( L, 1 );
 
-        for( auto ap = actors.begin(); ap != actors.end(); ap++ )
+        for( const auto& actor : actors )
         {
-            cout << (*ap)->_name << endl;
+            cout << actor->_name << endl;
         }
     }
 
