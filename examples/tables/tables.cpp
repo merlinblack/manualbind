@@ -12,20 +12,12 @@ typedef std::vector<MyActorPtr> MyActorPtrList;
 
 MyActorPtrList createList()
 {
-    const char* names[] = {
-        "James",
-        "Who? Random extra",
-        "Harry",
-        "Mike",
-        nullptr
+    MyActorPtrList actors {
+        std::make_shared<MyActor>( "James" ),
+        std::make_shared<MyActor>( "Who? Random extra" ),
+        std::make_shared<MyActor>( "Harry" ),
+        std::make_shared<MyActor>( "Mike" )
     };
-
-    MyActorPtrList actors;
-
-    for( int i = 0; names[i] != nullptr; i++ )
-    {
-        actors.push_back( std::make_shared<MyActor>( names[i] ) );
-    }
 
     return actors;
 }
