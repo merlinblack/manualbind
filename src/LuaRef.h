@@ -139,12 +139,12 @@ class LuaTableElement : public LuaRefBase
         COUT( "with table ref:", m_ref );
     }
 
-    ~LuaTableElement()
+    ~LuaTableElement() override
     {
         COUT( "Destroying Table Element", "" );
     }
 
-    void push() const
+    void push() const override
     {
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
         COUT( "Get ref: ", m_ref );
