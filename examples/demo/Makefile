@@ -6,7 +6,7 @@ SRC=demo.cpp
 
 .PHONY: clean
 
-$(EXEC):	$(SRC) Makefile 
+$(EXEC):	$(SRC) Makefile ../../src/LuaBinding.h
 	c++ $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -O3 -g $(SRC) -o $(EXEC)
 
 clean:
