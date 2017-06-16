@@ -36,6 +36,7 @@ MyActorList pullFromLua( lua_State* L )
 {
     // Note this only stores the values, not the keys/indexes,
     // which are usually just numbers.
+    // Also it simply skips over any elements that are not 'MyActor's.
     MyActorList list;
 
     if( lua_istable( L, -1 ) )
