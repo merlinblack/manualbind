@@ -77,6 +77,8 @@ int main()
 
         newfuncref( "Did it copy correctly?" );
 
+        newfuncref( getTesting( L ) );
+
         newfuncref = getTesting( L );
     }
 
