@@ -30,12 +30,6 @@ SOFTWARE.
 #include <memory>
 #include <lua.hpp>
 
-#if 0
-#include <iostream>
-using std::cout;
-using std::endl;
-#endif
-
 struct bind_properties {
     const char *name;
     lua_CFunction getter;
@@ -45,9 +39,10 @@ struct bind_properties {
 // B - the binding class / struct
 // T - the class you are binding to Lua.
 //
-template<typename B, typename T>
+template<class B, class T>
 struct Binding {
 
+    // Push the object on to the Lua stack
     static void push( lua_State *L, std::shared_ptr<T> sp )
     {
 
@@ -63,6 +58,7 @@ struct Binding {
         luaL_setmetatable( L, B::class_name );
     }
 
+    // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
         luaL_newmetatable( L, B::class_name );
@@ -100,6 +96,7 @@ struct Binding {
         }
     }
 
+    // Called when Lua object is indexed: obj[ndx]
     static int index( lua_State *L )
     {
         // 1 - class user data
@@ -146,6 +143,7 @@ struct Binding {
         return 1; // Not found, return nil.
     }
 
+    // Called whe Lua object index is assigned: obj[ndx] = blah
     static int newindex( lua_State *L )
     {
         // 1 - class user data
@@ -192,11 +190,12 @@ struct Binding {
         return 0;
     }
 
+    // Called when Lua object is garbage collected.
     static int destroy( lua_State *L )
     {
         void* ud = luaL_checkudata( L, 1, B::class_name );
 
-        std::shared_ptr<T> *sp = static_cast<std::shared_ptr<T>*>(ud);
+        auto sp = static_cast<std::shared_ptr<T>*>(ud);
 
         // Explicitly called, as this was 'placement new'd
         sp->~shared_ptr();
@@ -204,17 +203,22 @@ struct Binding {
         return 0;
     }
 
-    // Helpers
+    //
+    // Helpers for use in binding struct glue functions.
+    //
 
+    // Grab object shared pointer from the Lua stack
     static const std::shared_ptr<T>& fromStack( lua_State *L, int index )
     {
         void* ud = luaL_checkudata( L, index, B::class_name );
 
-        std::shared_ptr<T> *sp = static_cast<std::shared_ptr<T>*>(ud);
+        auto sp = static_cast<std::shared_ptr<T>*>(ud);
 
         return *sp;
     }
 
+    // Check the number of arguments are as expected.
+    // Throw an error if not.
     static void checkArgCount( lua_State *L, int expected )
     {
         int n = lua_gettop(L);
