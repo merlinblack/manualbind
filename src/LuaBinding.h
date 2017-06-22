@@ -232,7 +232,7 @@ struct Binding {
     // If the object at 'index' is a userdata with a metatable containing a __upcast
     // function, then replaces the userdata at 'index' in the stack with the result
     // of calling __upcast.
-    // Otherwise the object at index is replace with nil.
+    // Otherwise the object at index is replaced with nil.
     static int upCast( lua_State* L, int index )
     {
         void *p = lua_touserdata(L, index );

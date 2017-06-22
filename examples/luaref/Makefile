@@ -8,7 +8,7 @@ DEBUGOUTPUT ?=-D_DEBUGOUTPUT
 .PHONY: clean
 
 $(EXEC):	$(SRC) Makefile ../../src/LuaRef.h
-	c++ $(DEBUGOUTPUT) $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -O0 -g $(SRC) -o $(EXEC)
+	c++ $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -g $(SRC) -o $(EXEC) $(DEBUGOUTPUT)
 
 clean:
 	-rm -f $(EXEC)

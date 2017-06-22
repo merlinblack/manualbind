@@ -31,6 +31,7 @@ common/common.o:
 clean:
 	@$(MAKE) --no-print-directory -C demo clean
 	@$(MAKE) --no-print-directory -C downcast clean
+	@$(MAKE) --no-print-directory -C upcast clean
 	@$(MAKE) --no-print-directory -C guiexample clean
 	@$(MAKE) --no-print-directory -C luaref clean
 	@$(MAKE) --no-print-directory -C tables clean
