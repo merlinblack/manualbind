@@ -36,8 +36,8 @@ SOFTWARE.
  *  __arraynewindex This is called to store or otherwise use a value when assigned
  *                  to an object via a numerical index. E.g. obj[7] = a
  *
- *  __upcast        This will be called by upCast to return a shared pointer to a
- *                  parent class, allowing for polymorphic use.
+ *  __upcast        This will be called by LuaBindingUpCast to return a shared
+ *                  pointer to a parent class, allowing for polymorphic use.
  *                  See upcast in the examples.
  *
  */
@@ -229,32 +229,6 @@ struct Binding {
         return *sp;
     }
 
-    // If the object at 'index' is a userdata with a metatable containing a __upcast
-    // function, then replaces the userdata at 'index' in the stack with the result
-    // of calling __upcast.
-    // Otherwise the object at index is replaced with nil.
-    static int upCast( lua_State* L, int index )
-    {
-        void *p = lua_touserdata(L, index );
-        if( p != nullptr )
-        {
-            if( lua_getmetatable( L, index ) ) {
-                lua_getfield( L, -1, "__upcast" );
-                if( lua_type( L, -1 ) == LUA_TFUNCTION ) {
-                    // Call upcast
-                    lua_pushvalue( L, -3 );
-                    lua_call( L, 1, 1 );
-                    lua_replace( L, index );
-                    lua_pop( L, 1 ); // Remove metatable.
-                    return 1;
-                }
-            }
-        }
-        lua_pushnil( L );   // Cannot be converted.
-        lua_replace( L, index );
-        return 1;
-    }
-
     // Check the number of arguments are as expected.
     // Throw an error if not.
     static void checkArgCount( lua_State *L, int expected )
@@ -268,5 +242,31 @@ struct Binding {
     }
 
 };
+
+// If the object at 'index' is a userdata with a metatable containing a __upcast
+// function, then replaces the userdata at 'index' in the stack with the result
+// of calling __upcast.
+// Otherwise the object at index is replaced with nil.
+int LuaBindingUpCast( lua_State* L, int index )
+{
+    void *p = lua_touserdata(L, index );
+    if( p != nullptr )
+    {
+        if( lua_getmetatable( L, index ) ) {
+            lua_getfield( L, -1, "__upcast" );
+            if( lua_type( L, -1 ) == LUA_TFUNCTION ) {
+                // Call upcast
+                lua_pushvalue( L, -3 );
+                lua_call( L, 1, 1 );
+                lua_replace( L, index );
+                lua_pop( L, 1 ); // Remove metatable.
+                return 1;
+            }
+        }
+    }
+    lua_pushnil( L );   // Cannot be converted.
+    lua_replace( L, index );
+    return 1;
+}
 
 #endif // BINDING_H

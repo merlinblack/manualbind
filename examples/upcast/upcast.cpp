@@ -134,7 +134,7 @@ int StartVehicleBinding( lua_State* L )
     {
         // Will replace whatever is at index 1 with nil,
         // or the result of the __upcast call.
-        VehicleBinding::upCast( L, 1 );
+        LuaBindingUpCast( L, 1 );
     }
 
     VehiclePtr veh = VehicleBinding::fromStack( L, 1 );
