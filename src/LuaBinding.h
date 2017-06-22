@@ -25,6 +25,24 @@ SOFTWARE.
 */
 //==============================================================================
 
+/* Special members.
+ * ----------------
+ *  In addition to assigning a function to the likes of __tostring and other built
+ *  in Lua metamethods, three additional members can be used.
+ *
+ *  __arrayindex    This is called to provide a result when an object is indexed
+ *                  with a number. E.g. a = obj[5]
+ *
+ *  __arraynewindex This is called to store or otherwise use a value when assigned
+ *                  to an object via a numerical index. E.g. obj[7] = a
+ *
+ *  __upcast        This will be called by upCast to return a shared pointer to a
+ *                  parent class, allowing for polymorphic use.
+ *                  See upcast in the examples.
+ *
+ */
+
+
 #ifndef BINDING_H
 #define BINDING_H
 #include <memory>
@@ -104,8 +122,7 @@ struct Binding {
         lua_getmetatable( L, 1 );
         // 3 - class metatable
         if( lua_isnumber( L, 2 ) ) { // Array access
-            lua_pushliteral( L, "__arrayindex" );
-            lua_gettable( L, 3 );
+            lua_getfield( L, 3, "__arrayindex" );
             if( lua_type( L, 4 ) == LUA_TFUNCTION ) {
                 lua_pushvalue( L, 1 );
                 lua_pushvalue( L, 2 );
@@ -121,15 +138,13 @@ struct Binding {
             return 1;
         }
         lua_pop( L, 1 );
-        lua_pushliteral( L, "__properties" );
-        lua_gettable( L, 3 );
+        lua_getfield( L, 3, "__properties" );
         // 4 - class properties table
         lua_pushvalue( L, 2 );
         lua_gettable( L, 4 );
         // 5 - property table for key ( or nil )
         if( lua_type( L, 5 ) == LUA_TTABLE ) { // Found in properties.
-            lua_pushliteral( L, "get" );
-            lua_gettable( L, 5 );
+            lua_getfield( L, 5, "get" );
             // Call get function.
             if( lua_type( L, 6 ) == LUA_TFUNCTION ) {
                 lua_pushvalue( L, 1 );
@@ -151,8 +166,7 @@ struct Binding {
         // 3 - value
         lua_getmetatable( L, 1 );
         if( lua_isnumber( L, 2 ) ) { // Array access
-            lua_pushliteral( L, "__arraynewindex" );
-            lua_gettable( L, 4 );
+            lua_getfield( L, 4, "__arraynewindex" );
             if( lua_type( L, 5 ) == LUA_TFUNCTION ) {
                 lua_pushvalue( L, 1 );
                 lua_pushvalue( L, 2 );
@@ -164,15 +178,13 @@ struct Binding {
             return 0;
         }
         // 4 - class metatable
-        lua_pushliteral( L, "__properties" );
-        lua_gettable( L, 4 );
+        lua_getfield( L, 4, "__properties" );
         // 5 - class properties table
         lua_pushvalue( L, 2 );
         lua_gettable( L, 5 );
         // 6 - property table for key ( or nil )
         if( lua_type( L, 6 ) == LUA_TTABLE ) { // Found in properties.
-            lua_pushliteral( L, "set" );
-            lua_gettable( L, 6 );
+            lua_getfield( L, 6, "set" );
             if( lua_type( L, 7 ) == LUA_TFUNCTION ) {
                 // Call set function.
                 lua_pushvalue( L, 1 );
@@ -215,6 +227,32 @@ struct Binding {
         auto sp = static_cast<std::shared_ptr<T>*>(ud);
 
         return *sp;
+    }
+
+    // If the object at 'index' is a userdata with a metatable containing a __upcast
+    // function, then replaces the userdata at 'index' in the stack with the result
+    // of calling __upcast.
+    // Otherwise the object at index is replace with nil.
+    static int upCast( lua_State* L, int index )
+    {
+        void *p = lua_touserdata(L, index );
+        if( p != nullptr )
+        {
+            if( lua_getmetatable( L, index ) ) {
+                lua_getfield( L, -1, "__upcast" );
+                if( lua_type( L, -1 ) == LUA_TFUNCTION ) {
+                    // Call upcast
+                    lua_pushvalue( L, -3 );
+                    lua_call( L, 1, 1 );
+                    lua_replace( L, index );
+                    lua_pop( L, 1 ); // Remove metatable.
+                    return 1;
+                }
+            }
+        }
+        lua_pushnil( L );   // Cannot be converted.
+        lua_replace( L, index );
+        return 1;
     }
 
     // Check the number of arguments are as expected.

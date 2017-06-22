@@ -3,13 +3,16 @@
 
 .PHONY: common demo downcast guiexample luaref Makefile tables clean
 
-all: demo downcast guiexample luaref Makefile tables
+all: demo downcast upcast guiexample luaref Makefile tables
 
 demo:	common
 	@$(MAKE) --no-print-directory -C demo
 
 downcast:	common
 	@$(MAKE) --no-print-directory -C downcast
+
+upcast:	common
+	@$(MAKE) --no-print-directory -C upcast
 
 guiexample: common
 	@$(MAKE) --no-print-directory -C guiexample
