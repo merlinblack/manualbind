@@ -7,7 +7,7 @@ SRC=upcast.cpp
 .PHONY: clean
 
 $(EXEC):	$(SRC) Makefile ../../src/LuaBinding.h
-	c++ $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -O0 -g $(SRC) -o $(EXEC)
+	c++ $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -g $(SRC) -o $(EXEC)
 
 clean:
 	-rm -f $(EXEC)
