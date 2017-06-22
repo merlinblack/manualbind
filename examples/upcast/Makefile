@@ -1,6 +1,6 @@
 include ../config.mk
 INCLUDES=-I../../src -I../common
-LIBS=-llua ../common/common.o
+LIBS=../common/common.o
 EXEC=upcast
 SRC=upcast.cpp
 
