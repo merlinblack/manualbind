@@ -2,7 +2,7 @@ include ../config.mk
 .PHONY: clean
 
 # No debug info, so we don't have to step through common code.
-common.o:	common.cpp common.h
+common.o:	common.cpp common.h Makefile
 	c++ $(CFLAGS) -c common.cpp -I../../src
 
 clean:
