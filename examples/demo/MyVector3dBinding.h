@@ -3,9 +3,8 @@
 #include "LuaBinding.h"
 #include "MyVector3d.h"
 
-typedef std::shared_ptr<MyVector3d> MyVector3dPtr;
 
-struct MyVector3dBinding: public Binding<MyVector3dBinding, MyVector3d> {
+struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
     static constexpr const char* class_name = "MyVector3d";
 
@@ -32,15 +31,15 @@ struct MyVector3dBinding: public Binding<MyVector3dBinding, MyVector3d> {
     {
         std::cout << "Create called\n";
 
-        checkArgCount( L, 3 );
+        LuaBindingCheckArgCount( L, 3 );
 
         float x = luaL_checknumber( L, 1 );
         float y = luaL_checknumber( L, 2 );
         float z = luaL_checknumber( L, 3 );
 
-        MyVector3dPtr sp = std::make_shared<MyVector3d>( x, y, z );
+        MyVector3d vec( x, y, z );
 
-        push( L, sp );
+        push( L, vec );
 
         return 1;
     }
@@ -57,22 +56,22 @@ struct MyVector3dBinding: public Binding<MyVector3dBinding, MyVector3d> {
     // 2 - key
     static int get( lua_State *L )
     {
-        checkArgCount( L, 2 );
+        LuaBindingCheckArgCount( L, 2 );
 
-        MyVector3dPtr v = fromStack( L, 1 );
+        MyVector3d& v = fromStack( L, 1 );
 
         int which = luaL_checkoption( L, 2, NULL, MyVector3dBinding::prop_keys );
 
         switch( which )
         {
             case 0:
-                lua_pushnumber( L, v->x );
+                lua_pushnumber( L, v.x );
                 break;
             case 1:
-                lua_pushnumber( L, v->y );
+                lua_pushnumber( L, v.y );
                 break;
             case 2:
-                lua_pushnumber( L, v->z );
+                lua_pushnumber( L, v.z );
                 break;
             default:
                 luaL_argerror( L, 2, "What?" );
@@ -87,9 +86,9 @@ struct MyVector3dBinding: public Binding<MyVector3dBinding, MyVector3d> {
     // 3 - value
     static int set( lua_State *L )
     {
-        checkArgCount( L, 3 );
+        LuaBindingCheckArgCount( L, 3 );
 
-        MyVector3dPtr v = fromStack( L, 1 );
+        MyVector3d& v = fromStack( L, 1 );
 
         int which = luaL_checkoption( L, 2, NULL, MyVector3dBinding::prop_keys );
 
@@ -98,13 +97,13 @@ struct MyVector3dBinding: public Binding<MyVector3dBinding, MyVector3d> {
         switch( which )
         {
             case 0:
-                v->x = value;
+                v.x = value;
                 break;
             case 1:
-                v->y = value;
+                v.y = value;
                 break;
             case 2:
-                v->z = value;
+                v.z = value;
                 break;
             default:
                 luaL_argerror( L, 2, "What?" );
