@@ -32,7 +32,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
     {
         std::cout << "Create called\n";
 
-        checkArgCount( L, 2 );
+        LuaBindingCheckArgCount( L, 2 );
 
         const char *name = luaL_checkstring( L, 1 );
         int age = luaL_checkinteger( L, 2 );
@@ -49,7 +49,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
     static int walk( lua_State *L )
     {
-        checkArgCount( L, 1 );
+        LuaBindingCheckArgCount( L, 1 );
 
         MyActorPtr a = fromStack( L, 1 );
 
@@ -60,7 +60,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
     static int setName( lua_State *L )
     {
-        checkArgCount( L, 2 );
+        LuaBindingCheckArgCount( L, 2 );
 
         MyActorPtr a = fromStack( L, 1 );
         const char *name = lua_tostring( L, 2 );
@@ -76,7 +76,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
     // 2 - key
     static int get_age( lua_State *L )
     {
-        checkArgCount( L, 2 );
+        LuaBindingCheckArgCount( L, 2 );
 
         MyActorPtr a = fromStack( L, 1 );
 
@@ -90,7 +90,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
     // 3 - value
     static int set_age( lua_State *L )
     {
-        checkArgCount( L, 3 );
+        LuaBindingCheckArgCount( L, 3 );
 
         MyActorPtr a = fromStack( L, 1 );
 
