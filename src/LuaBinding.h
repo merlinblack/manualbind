@@ -279,7 +279,7 @@ template<class B, class T>
 struct PODBinding {
 
     // Push the object on to the Lua stack
-    static void push( lua_State *L, T value )
+    static void push( lua_State *L, T& value )
     {
         void *ud = lua_newuserdata( L, sizeof(T));
 
