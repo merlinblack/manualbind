@@ -19,12 +19,22 @@ should delete it. Class instances can be created in Lua or C++ and passed to
 the other freely, as the last one holding a reference will call the
 destructor when required.
 
-LuaRef.h / LuaException.h
-C++ management of lua data. Originally written by me, then donated to LuaBridge.
+There now is a POD or plain old data version of the binding for things like pointers or
+tiny classes and structs. These get copied around unlike the shared pointer version which 
+keeps one and only one copy.
+
+LuaRef.h 
+C++ management of lua data. A re-write of code originally written by me and then 
+donated to LuaBridge. 
 This version I have changed to use c++11 variable template arguments for
-calling Lua. NewRef.h is an experimental re-write which will have nearly the
-same functionality, more in some ways.
+calling Lua, The table element proxy is now public, and the code structure is
+re-arranged to put shared functionality between LuaRef, and TableElement in a 
+base class.
+
+LuaException.h
+Supprot for throwing on Lua errors. Used by LuaRef.
 
 LuaStack.h
-From LuaBridge. LuaRef.h was changed to use this. I didn't want to reverse
-that. Originally called Stack.h
+From LuaBridge. The original LuaRef.h was changed to use this. I didn't want to reverse
+that. Originally called Stack.h. If I wrote this myself, it would look almost the same
+anyhow. :-)
