@@ -32,7 +32,7 @@ re-arranged to put shared functionality between LuaRef, and TableElement in a
 base class.
 
 LuaException.h
-Supprot for throwing on Lua errors. Used by LuaRef.
+Support for throwing on Lua errors. Used by LuaRef.
 
 LuaStack.h
 From LuaBridge. The original LuaRef.h was changed to use this. I didn't want to reverse
