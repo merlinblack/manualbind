@@ -2,6 +2,8 @@
 //
 // 
 // E X P E R I M E N T A L !!!!
+// Ok, not quite so experimental anymore. I'm using it in one of my projects.
+// Missing some features of the old LuaRef, as I don't need them.
 
 #ifndef __LUAREF_H
 #define __LUAREF_H
