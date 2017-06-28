@@ -211,7 +211,7 @@ template<class B, class T>
 struct Binding {
 
     // Push the object on to the Lua stack
-    static void push( lua_State *L, std::shared_ptr<T> sp )
+    static void push( lua_State *L, const std::shared_ptr<T>& sp )
     {
 
         if( sp == nullptr ) {
@@ -279,7 +279,7 @@ template<class B, class T>
 struct PODBinding {
 
     // Push the object on to the Lua stack
-    static void push( lua_State *L, T& value )
+    static void push( lua_State *L, const T& value )
     {
         void *ud = lua_newuserdata( L, sizeof(T));
 
