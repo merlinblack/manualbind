@@ -15,10 +15,8 @@
 #ifdef _DEBUGOUTPUT
 #include <iostream>
 #define COUT( str, x ) std::cout << str << x << std::endl
-#define DUMP( L ) dump( L )
 #else
 #define COUT( str, x )
-#define DUMP( L  )
 #endif
 
 struct LuaNil
@@ -111,7 +109,7 @@ class LuaRefBase
     inline bool isLightUserdata () const { return type () == LUA_TLIGHTUSERDATA; }
 
     template<typename... Args>
-    LuaRef const operator()( Args... args ) const;
+    inline LuaRef const operator()( Args... args ) const;
 
     template<typename T>
     void append( T v ) const
@@ -155,10 +153,8 @@ class LuaTableElement : public LuaRefBase
         COUT( "Get ref: ", m_ref );
         LuaStack<K>::push( m_L, m_key );
         COUT( "Get key: ", m_key );
-        DUMP( m_L );
         lua_gettable( m_L, -2 );
         lua_remove( m_L, -2 );
-        DUMP( m_L );
     }
 
     // Assign a new value to this table/key.
@@ -169,7 +165,6 @@ class LuaTableElement : public LuaRefBase
         lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
         LuaStack<K>::push( m_L, m_key );
         LuaStack<T>::push( m_L, v );
-        DUMP( m_L );
         lua_settable( m_L, -3 );
         COUT( "settable", "" );
         return *this;
@@ -281,7 +276,7 @@ struct LuaStack<LuaRef>
 };
 
 template<>
-LuaRef const LuaRefBase::operator() () const
+inline LuaRef const LuaRefBase::operator() () const
 {
     push();
     LuaException::pcall (m_L, 0, 1);
@@ -289,7 +284,7 @@ LuaRef const LuaRefBase::operator() () const
 }
 
 template<typename... Args>
-LuaRef const LuaRefBase::operator()( Args... args ) const
+inline LuaRef const LuaRefBase::operator()( Args... args ) const
 {
     const int n = sizeof...(Args);
     push();
