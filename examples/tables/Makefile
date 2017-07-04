@@ -2,7 +2,7 @@ include ../config.mk
 INCLUDES=-I../../src -I../common
 LIBS=../common/common.o
 EXEC=tables
-SRC=tables.cpp
+SRC=tables.cpp ../../src/LuaBinding.cpp
 
 .PHONY: clean
 
