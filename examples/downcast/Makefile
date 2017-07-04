@@ -2,7 +2,7 @@ include ../config.mk
 INCLUDES=-I../../src -I../common
 LIBS=../common/common.o
 EXEC=downcast
-SRC=downcast.cpp
+SRC=downcast.cpp ../../src/LuaBinding.cpp
 
 .PHONY: clean
 

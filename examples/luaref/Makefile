@@ -2,7 +2,7 @@ include ../config.mk
 INCLUDES=-I../../src -I../common
 LIBS=../common/common.o
 EXEC=luaref
-SRC=luaref.cpp
+SRC=luaref.cpp ../../src/LuaBinding.cpp
 DEBUGOUTPUT ?=-D_DEBUGOUTPUT
 
 .PHONY: clean
