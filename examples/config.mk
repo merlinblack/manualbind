@@ -8,4 +8,4 @@ else
 endif
 CFLAGS+=$(shell pkg-config --cflags $(LUA) )
 LFLAGS+=$(shell pkg-config --libs   $(LUA) )
-CFLAGS+=-O3
+CFLAGS+=-O3 -Wall
