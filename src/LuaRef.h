@@ -9,6 +9,7 @@
 #define __LUAREF_H
 
 #include <string>
+#include <tuple> // For std::ignore
 #include "LuaStack.h"
 #include "LuaException.h"
 
@@ -291,6 +292,7 @@ inline LuaRef const LuaRefBase::operator()( Args... args ) const
     // Initializer expansion trick to call push for each arg.
     // https://stackoverflow.com/questions/25680461/variadic-template-pack-expansion
     int dummy[] = { 0, ( (void) LuaStack<Args>::push( m_L, std::forward<Args>(args) ), 0 ) ... };
+    std::ignore = dummy;
     LuaException::pcall( m_L, n, 1 );
     return LuaRef (m_L, FromStack ());
 }
