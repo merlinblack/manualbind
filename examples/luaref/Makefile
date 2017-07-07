@@ -1,8 +1,8 @@
 include ../config.mk
 INCLUDES=-I../../src -I../common
-LIBS=../common/common.o
+LIBS=../common/common.o ../common/LuaBinding.o
 EXEC=luaref
-SRC=luaref.cpp ../../src/LuaBinding.cpp
+SRC=luaref.cpp
 DEBUGOUTPUT ?=-D_DEBUGOUTPUT
 
 .PHONY: clean
