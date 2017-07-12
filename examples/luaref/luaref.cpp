@@ -4,6 +4,7 @@
 #include "LuaRef.h"
 
 using namespace std;
+using namespace ManualBind;
 
 LuaRef getTesting( lua_State* L )
 {

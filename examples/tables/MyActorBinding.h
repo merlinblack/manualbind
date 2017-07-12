@@ -5,6 +5,8 @@
 
 using MyActorPtr = std::shared_ptr<MyActor>;
 
+using namespace ManualBind;
+
 struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
     static constexpr const char* class_name = "MyActor";
