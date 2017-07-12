@@ -35,6 +35,8 @@ class Car: public Vehicle
 typedef std::shared_ptr<Vehicle> VehiclePtr;
 typedef std::shared_ptr<Car> CarPtr;
 
+using namespace ManualBind;
+
 struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
     
     static constexpr const char* class_name = "Vehicle";

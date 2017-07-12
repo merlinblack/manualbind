@@ -44,6 +44,8 @@ void StartVehicle( VehiclePtr veh )
 
 /****************************** Bindings ***************************/
 
+using namespace ManualBind;
+
 struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
 
     static constexpr const char* class_name = "Vehicle";

@@ -47,6 +47,8 @@ class Rectangle
 
 typedef std::shared_ptr<Rectangle> RectanglePtr;
 
+using namespace ManualBind;
+
 struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
 {
 
