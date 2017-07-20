@@ -11,6 +11,9 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
     static luaL_Reg* members()
     {
         static luaL_Reg members[] = {
+            { "__gc", destroy },        // PODs usually don't have destructors,
+                                        // but if they do then do this.
+                                        // destroy is defined in PODBinding.
             { NULL, NULL }
         };
         return members;

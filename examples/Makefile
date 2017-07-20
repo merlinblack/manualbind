@@ -23,9 +23,12 @@ luaref:	common
 tables:	common
 	@$(MAKE) --no-print-directory -C tables
 
-common:	common/common.o
+common:	common/common.o common/LuaBinding.o
 
 common/common.o:
+	@$(MAKE) --no-print-directory -C common
+
+common/LuaBinding.o:
 	@$(MAKE) --no-print-directory -C common
 
 clean:
