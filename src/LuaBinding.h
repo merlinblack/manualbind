@@ -170,8 +170,8 @@ namespace ManualBind {
                 lua_setfield( L, -2, "__index" );
                 lua_pushcfunction( L, LuaBindingNewIndex );
                 lua_setfield( L, -2, "__newindex" );
-                lua_pushcfunction( L, destroy );
-                lua_setfield( L, -2, "__gc" );
+                //lua_pushcfunction( L, destroy );  -- if you need to destruct a POD
+                //lua_setfield( L, -2, "__gc" );    -- set __gc to destory in the members.
                 lua_newtable( L ); // __properties
                 LuaBindingSetProperties( L, B::properties() );
                 lua_setfield( L, -2, "__properties" );
