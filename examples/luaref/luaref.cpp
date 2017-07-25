@@ -20,7 +20,7 @@ int main()
     run( L, "function testing( ... ) print( '> ', ... ) end" );
 
     {
-        LuaRef testing = LuaRef::getGlobal( L, "testing" );
+        LuaRef testing( L, "testing" );
         LuaRef table = LuaRef::newTable( L );
         table["testing"] = testing;
 
