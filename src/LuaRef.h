@@ -245,6 +245,19 @@ namespace ManualBind {
             lua_getglobal (L, name);
             return LuaRef (L, FromStack ());
         }
+
+        template<typename T>
+        T cast()
+        {
+            push();
+            return LuaStack<T>::get( m_L, -1 );
+        }
+
+        template<typename T>
+        operator T()
+        {
+            return cast<T>();
+        }
     };
 
     template<>
