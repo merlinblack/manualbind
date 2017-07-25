@@ -81,6 +81,14 @@ int main()
         newfuncref( getTesting( L ) );
 
         newfuncref = getTesting( L );
+
+        run( L, "text = 'This has been implicitly cast to std::string'" );
+
+        LuaRef str( L, "text" );
+
+        std::string str2 = str;
+
+        cout << str2 << endl;
     }
 
     lua_close(L);
