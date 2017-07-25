@@ -184,6 +184,12 @@ namespace ManualBind {
         {
         }
 
+        LuaRef( lua_State* L, const std::string& global ) : LuaRefBase( L, LUA_REFNIL )
+        {
+            lua_getglobal( m_L, global.c_str() );
+            m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
+        }
+
         LuaRef( LuaRef const& other ) : LuaRefBase( other.m_L, LUA_REFNIL )
         {
             other.push();
