@@ -1,9 +1,6 @@
 // Nigel's new and improved LuaRef
 //
 // 
-// E X P E R I M E N T A L !!!!
-// Ok, not quite so experimental anymore. I'm using it in one of my projects.
-// Missing some features of the old LuaRef, as I don't need them.
 
 #ifndef __LUAREF_H
 #define __LUAREF_H
@@ -12,13 +9,6 @@
 #include <tuple> // For std::ignore
 #include "LuaStack.h"
 #include "LuaException.h"
-
-#ifdef _DEBUGOUTPUT
-#include <iostream>
-#define COUT( str, x ) std::cout << str << x << std::endl
-#else
-#define COUT( str, x )
-#endif
 
 namespace ManualBind {
 
@@ -64,7 +54,6 @@ namespace ManualBind {
             LuaRefBase( lua_State* L, FromStack ) : m_L( L )
         {
             m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-            COUT( "New ref: ", m_ref );
         }
 
             LuaRefBase( lua_State* L, int ref ) : m_L( L ), m_ref( ref )
@@ -74,14 +63,12 @@ namespace ManualBind {
             ~LuaRefBase()
             {
                 luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
-                COUT( "Zap ref: ", m_ref );
             }
 
         public:
             virtual void push() const
             {
                 lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
-                COUT( "Get ref: ", m_ref );
             }
 
             std::string tostring() const
@@ -142,21 +129,16 @@ namespace ManualBind {
             : LuaRefBase( L, FromStack() )
               , m_key( key )
         {
-            COUT( "Created Table Element with key: ", key );
-            COUT( "with table ref:", m_ref );
         }
 
         ~LuaTableElement()
         {
-            COUT( "Destroying Table Element", "" );
         }
 
         void push() const override
         {
             lua_rawgeti( m_L, LUA_REGISTRYINDEX, m_ref );
-            COUT( "Get ref: ", m_ref );
             LuaStack<K>::push( m_L, m_key );
-            COUT( "Get key: ", m_key );
             lua_gettable( m_L, -2 );
             lua_remove( m_L, -2 );
         }
@@ -170,7 +152,6 @@ namespace ManualBind {
                 LuaStack<K>::push( m_L, m_key );
                 LuaStack<T>::push( m_L, v );
                 lua_settable( m_L, -3 );
-                COUT( "settable", "" );
                 return *this;
             }
 
@@ -207,26 +188,19 @@ namespace ManualBind {
         {
             other.push();
             m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-            COUT( "New ref: ", m_ref );
-            COUT( " as copy of ", other.m_ref );
         }
 
         LuaRef( LuaRef&& other ) noexcept : LuaRefBase( other.m_L, other.m_ref )
         {
             other.m_ref = LUA_REFNIL;
-            COUT( "Moved new ref: ", m_ref );
         }
 
         LuaRef& operator=( LuaRef&& other ) noexcept
         {
             if( this == &other ) return *this;
 
-            COUT( "Move assignement, swap ref: ", m_ref );
-
             std::swap( m_L, other.m_L);
             std::swap( m_ref, other.m_ref);
-
-            COUT( "With ref: ", m_ref );
 
             return *this;
         }
@@ -235,12 +209,9 @@ namespace ManualBind {
         {
             if( this == &other ) return *this;
             luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
-            COUT( "Before reassigning, zap ref: ", m_ref );
             other.push();
             m_L = other.m_L;
             m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-            COUT( "New ref: ", m_ref );
-            COUT( "as assigned copy of ", other.m_ref );
             return *this;
         }
 
