@@ -50,11 +50,9 @@ struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
         return members;
     }
 
-    static bind_properties* properties() {
-        static bind_properties properties[] = {
-            { NULL, NULL, NULL }
-        };
-        return properties;
+    static bind_properties* properties()
+    {
+        return nullptr;
     }
 
     static int create( lua_State *L )
@@ -86,11 +84,9 @@ struct CarBinding: public Binding<CarBinding, Car> {
         return members;
     }
 
-    static bind_properties* properties() {
-        static bind_properties properties[] = {
-            { NULL, NULL, NULL }
-        };
-        return properties;
+    static bind_properties* properties() 
+    {
+        return nullptr;
     }
 
     static int create( lua_State *L )
@@ -114,23 +110,20 @@ struct CarBinding: public Binding<CarBinding, Car> {
         return 1;
     }
 
-    // Defined here for easy access to CarBinding::push.
-    static int downcast( lua_State *L )
-    {
-        // Next two lines are similar to the fromStack function
-        void* ud = luaL_checkudata( L, 1, "Vehicle" );
-
-        VehiclePtr vp = *((std::shared_ptr<Vehicle>*)ud);
-
-        // This may return nullptr, if the class pointed to by vp
-        // is not a Car, and the refcount will not be updated.
-        CarPtr cp = std::dynamic_pointer_cast<Car>( vp );
-
-        push( L, cp );
-
-        return 1;
-    }
 };
+
+int downcast( lua_State *L )
+{
+    VehiclePtr vp = VehicleBinding::fromStack( L, 1 );
+
+    // This may return nullptr, if the class pointed to by vp
+    // is not a Car, and the refcount will not be updated.
+    CarPtr cp = std::dynamic_pointer_cast<Car>( vp );
+
+    CarBinding::push( L, cp );
+
+    return 1;
+}
 
 int main()
 {
@@ -139,9 +132,8 @@ int main()
 
     VehicleBinding::register_class( L );
     CarBinding::register_class( L );
-    // Separately registered so it can be called without an instance
-    // to Car.
-    lua_register( L, "downcast", CarBinding::downcast );
+
+    lua_register( L, "downcast", downcast );
 
     VehiclePtr newcar(new Car());
     

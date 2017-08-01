@@ -13,13 +13,11 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
     static luaL_Reg* members()
     {
-        static luaL_Reg members[] = {
-            { NULL, NULL }
-        };
-        return members;
+        return nullptr;
     }
 
-    static bind_properties* properties() {
+    static bind_properties* properties()
+    {
         static bind_properties properties[] = {
             { "name", get_name, NULL },
             { NULL, NULL, NULL }

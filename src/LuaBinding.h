@@ -103,7 +103,9 @@ namespace ManualBind {
             static void register_class( lua_State *L )
             {
                 luaL_newmetatable( L, B::class_name );
-                luaL_setfuncs( L, B::members(), 0 );
+                luaL_Reg* members = B::members();
+                if( members )
+                    luaL_setfuncs( L, members, 0 );
                 lua_pushcfunction( L, LuaBindingIndex );
                 lua_setfield( L, -2, "__index" );
                 lua_pushcfunction( L, LuaBindingNewIndex );
@@ -111,7 +113,9 @@ namespace ManualBind {
                 lua_pushcfunction( L, destroy );
                 lua_setfield( L, -2, "__gc" );
                 lua_newtable( L ); // __properties
-                LuaBindingSetProperties( L, B::properties() );
+                bind_properties* props = B::properties();
+                if( props )
+                    LuaBindingSetProperties( L, props );
                 lua_setfield( L, -2, "__properties" );
                 lua_pop( L, 1 );
 
@@ -165,7 +169,9 @@ namespace ManualBind {
             static void register_class( lua_State *L )
             {
                 luaL_newmetatable( L, B::class_name );
-                luaL_setfuncs( L, B::members(), 0 );
+                luaL_Reg* members = B::members();
+                if( members )
+                    luaL_setfuncs( L, members, 0 );
                 lua_pushcfunction( L, LuaBindingIndex );
                 lua_setfield( L, -2, "__index" );
                 lua_pushcfunction( L, LuaBindingNewIndex );
@@ -173,7 +179,9 @@ namespace ManualBind {
                 //lua_pushcfunction( L, destroy );  -- if you need to destruct a POD
                 //lua_setfield( L, -2, "__gc" );    -- set __gc to destory in the members.
                 lua_newtable( L ); // __properties
-                LuaBindingSetProperties( L, B::properties() );
+                bind_properties* props = B::properties();
+                if( props )
+                    LuaBindingSetProperties( L, props );
                 lua_setfield( L, -2, "__properties" );
                 lua_pop( L, 1 );
 
