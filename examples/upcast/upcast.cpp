@@ -1,5 +1,7 @@
 #include "common.h"
 #include <iostream>
+#include <vector>
+#include <memory>
 #include "LuaBinding.h"
 
 // Up casting example.
@@ -9,51 +11,67 @@
 // for example rendering different GUI elements in a list.
 // Maintains correct refcounts in the shared pointers.
 
+using namespace ManualBind;
 using std::cout;
 using std::endl;
+using std::hex;
+using std::dec;
 
-class Vehicle
+// Abstract base / interface (doesn't have to be abstract)
+class Renderable
 {
     public:
-    virtual bool Start() {
-        cout << "Engine running!" << endl;
-        return true;
-    }
-
-    virtual ~Vehicle() {
-    }
+    virtual bool Render() = 0;
 };
 
-class Car: public Vehicle
+class Square: public Renderable
 {
     public:
-    bool LoadGroceries() {
-        cout << "Grocieries have been loaded." << endl;
+    bool Render() {
+        cout << hex << this << dec << " - I'm a Square!" << endl;
         return true;
     }
 };
 
-using VehiclePtr = std::shared_ptr<Vehicle>;
-using CarPtr = std::shared_ptr<Car>;
-
-// Takes vehicles or decendants.
-void StartVehicle( VehiclePtr veh )
+class Circle: public Renderable
 {
-    veh->Start();
+    public:
+    bool Render() {
+        cout << hex << this << dec << " - I'm a Circle!" << endl;
+        return true;
+    }
+};
+
+using RenderablePtr = std::shared_ptr<Renderable>;
+using SquarePtr = std::shared_ptr<Square>;
+using CirclePtr = std::shared_ptr<Circle>;
+using RenderList = std::vector<RenderablePtr>;
+
+void RenderAll( const RenderList& rl )
+{
+    cout << "Rendering list:" << endl;
+
+    for( const auto& obj : rl )
+    {
+        obj->Render();
+    }
+}
+
+void AddObject( RenderList& rl, RenderablePtr& rp )
+{
+    rl.push_back( rp );
 }
 
 /****************************** Bindings ***************************/
 
-using namespace ManualBind;
 
-struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
+struct RenderableBinding: public Binding<RenderableBinding, Renderable> {
 
-    static constexpr const char* class_name = "Vehicle";
+    static constexpr const char* class_name = "Renderable";
 
     static luaL_Reg* members()
     {
         static luaL_Reg members[] = {
-            { "Start", Start },
             { NULL, NULL }
         };
         return members;
@@ -68,27 +86,17 @@ struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
 
     static int create( lua_State *L )
     {
-        VehiclePtr vp = std::make_shared<Vehicle>();
-        push( L, vp );
-        return 1;
-    }
-
-    static int Start( lua_State *L )
-    {
-        VehiclePtr vp = fromStack( L, 1 );
-        lua_pushboolean( L, vp->Start() );
-        return 1;
+        return luaL_error( L, "Can not create an instance of an abstract class." );
     }
 };
 
-struct CarBinding: public Binding<CarBinding, Car> {
+struct SquareBinding: public Binding<SquareBinding, Square> {
 
-    static constexpr const char* class_name = "Car";
+    static constexpr const char* class_name = "Square";
 
     static luaL_Reg* members()
     {
         static luaL_Reg members[] = {
-            { "Start", Start },
             { "__upcast", upcast },
             { NULL, NULL }
         };
@@ -104,45 +112,87 @@ struct CarBinding: public Binding<CarBinding, Car> {
 
     static int create( lua_State *L )
     {
-        CarPtr cp = std::make_shared<Car>();
-        push( L, cp );
-        return 1;
-    }
-
-    static int Start( lua_State *L )
-    {
-        CarPtr cp = fromStack( L, 1 );
-        lua_pushboolean( L, cp->Start() );
+        SquarePtr p = std::make_shared<Square>();
+        push( L, p );
         return 1;
     }
 
     static int upcast( lua_State *L )
     {
-        CarPtr cp = fromStack( L, 1 );
+        SquarePtr p = fromStack( L, 1 );
 
-        VehiclePtr vp = std::dynamic_pointer_cast<Vehicle>( cp );
+        RenderablePtr rp = std::dynamic_pointer_cast<Renderable>( p );
 
-        VehicleBinding::push( L, vp );
+        RenderableBinding::push( L, rp );
 
         return 1;
     }
 };
 
-int StartVehicleBinding( lua_State* L )
-{
-    // Get vehicle ptr from index 1.
-    // It could be a 'VehiclePtr' or 'CarPtr'
-    if( !luaL_testudata( L, 1, VehicleBinding::class_name ) )
+struct CircleBinding: public Binding<CircleBinding, Circle> {
+
+    static constexpr const char* class_name = "Circle";
+
+    static luaL_Reg* members()
     {
-        // Will replace whatever is at index 1 with nil,
-        // or the result of the __upcast call.
-        LuaBindingUpCast( L, 1 );
+        static luaL_Reg members[] = {
+            { "__upcast", upcast },
+            { NULL, NULL }
+        };
+        return members;
     }
 
-    VehiclePtr veh = VehicleBinding::fromStack( L, 1 );
-    StartVehicle( veh );
-    return 0;
+    static bind_properties* properties() {
+        static bind_properties properties[] = {
+            { NULL, NULL, NULL }
+        };
+        return properties;
+    }
 
+    static int create( lua_State *L )
+    {
+        CirclePtr p = std::make_shared<Circle>();
+        push( L, p );
+        return 1;
+    }
+
+    static int upcast( lua_State *L )
+    {
+        CirclePtr p = fromStack( L, 1 );
+
+        RenderablePtr rp = std::dynamic_pointer_cast<Renderable>( p );
+
+        RenderableBinding::push( L, rp );
+
+        return 1;
+    }
+};
+
+// Lua render list operations on a global list...
+// Normally the list would not be global but in the interest 
+// of making this example smaller...
+
+RenderList gRenderList;
+
+int lua_render_all( lua_State* L )
+{
+    RenderAll( gRenderList );
+    return 0;
+}
+
+int lua_add_object( lua_State* L )
+{
+    // We are expecting an object with an __upcast function
+    // returning a Renderable.
+    LuaBindingUpCast( L, 1 );
+
+    // Here you could check for nil, meaning the upcast failed.
+    
+    RenderablePtr rp = RenderableBinding::fromStack( L, 1 );
+
+    AddObject( gRenderList, rp );
+
+    return 0;
 }
 
 int main()
@@ -150,33 +200,21 @@ int main()
     lua_State* L = luaL_newstate();
     luaL_openlibs( L );
 
-    VehicleBinding::register_class( L );
-    CarBinding::register_class( L );
-    lua_register( L, "StartEngine", StartVehicleBinding );
+    RenderableBinding::register_class( L );
+    SquareBinding::register_class( L );
+    CircleBinding::register_class( L );
 
-    CarPtr newcar(new Car());
+    lua_register( L, "add", lua_add_object );
+    lua_register( L, "render", lua_render_all );
 
-    CarBinding::push( L, newcar );
-    lua_setglobal( L, "newcar" );
+    run( L, "print 'Upcast Example'" );
+    run( L, "add( Square() )" );
+    run( L, "add( Circle() )" );
+    run( L, "add( Circle() )" );
+    run( L, "add( Square() )" );
+    run( L, "render()" );
 
-    run( L, "StartEngine(newcar)" );
-    cout << "Newcar use count (should be 3): " << newcar.use_count() << endl;
-    cout << "Garbage collect temporary up casted object" << endl;
-    lua_gc( L, LUA_GCCOLLECT, 0 );
-    cout << "Newcar use count (should be 2): " << newcar.use_count() << endl;
-
-    VehiclePtr motorbike(new Vehicle());
-    VehicleBinding::push( L, motorbike );
-    lua_setglobal( L, "motorbike" );
-
-    run( L, "StartEngine(motorbike)" );
-    cout << "Motorbike use count (should be 2): " << motorbike.use_count() << endl;
-
-    cout << "Shut down Lua" << endl;
     lua_close(L);
-    // Both of these should be back down to 1.
-    cout << "Newcar use count: " << newcar.use_count() << endl;
-    cout << "Motorbike use count: " << motorbike.use_count() << endl;
 
     return 0;
 }
