@@ -71,17 +71,12 @@ struct RenderableBinding: public Binding<RenderableBinding, Renderable> {
 
     static luaL_Reg* members()
     {
-        static luaL_Reg members[] = {
-            { NULL, NULL }
-        };
-        return members;
+        return nullptr;
     }
 
-    static bind_properties* properties() {
-        static bind_properties properties[] = {
-            { NULL, NULL, NULL }
-        };
-        return properties;
+    static bind_properties* properties()
+    {
+        return nullptr;
     }
 
     static int create( lua_State *L )
@@ -103,11 +98,9 @@ struct SquareBinding: public Binding<SquareBinding, Square> {
         return members;
     }
 
-    static bind_properties* properties() {
-        static bind_properties properties[] = {
-            { NULL, NULL, NULL }
-        };
-        return properties;
+    static bind_properties* properties()
+    {
+        return nullptr;
     }
 
     static int create( lua_State *L )
@@ -142,11 +135,9 @@ struct CircleBinding: public Binding<CircleBinding, Circle> {
         return members;
     }
 
-    static bind_properties* properties() {
-        static bind_properties properties[] = {
-            { NULL, NULL, NULL }
-        };
-        return properties;
+    static bind_properties* properties()
+    {
+        return nullptr;
     }
 
     static int create( lua_State *L )
