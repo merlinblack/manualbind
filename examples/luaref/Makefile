@@ -7,7 +7,7 @@ SRC=luaref.cpp
 .PHONY: clean
 
 $(EXEC):	$(SRC) Makefile ../../src/LuaRef.h
-	c++ $(CFLAGS) $(INCLUDES) $(LIBS) $(LFLAGS) -g $(SRC) -o $(EXEC)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LIBS) $(LDFLAGS) -g $(SRC) -o $(EXEC)
 
 clean:
 	-rm -f $(EXEC)
