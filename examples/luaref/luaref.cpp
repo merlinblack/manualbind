@@ -12,6 +12,11 @@ LuaRef getTesting( lua_State* L )
     return LuaRef::fromStack(L);
 }
 
+void printString( const std::string& str )
+{
+    cout << str << endl;
+}
+
 int main()
 {
     lua_State* L = luaL_newstate();
@@ -59,7 +64,6 @@ int main()
 
         testing();
         testing( 1, 2, 3 );
-        testing( "Hello" );
         testing( "Hello", "World" );
 
         testing( "Hello", "World", 1, 2, 3, testing );
@@ -78,9 +82,9 @@ int main()
 
         newfuncref( "Did it copy correctly?" );
 
-        newfuncref( getTesting( L ) );
+        newfuncref( getTesting( L ) ); // Check move semantics
 
-        newfuncref = getTesting( L );
+        newfuncref = getTesting( L ); // Check move semantics
 
         run( L, "text = 'This has been implicitly cast to std::string'" );
 
@@ -88,15 +92,11 @@ int main()
 
         std::string str1 = luaStr1;
 
-        cout << str1 << endl;
+        printString( str1 );
 
         run( L, "a.text = text" );
 
-        auto luaStr2 = table["text"];
-
-        std::string str2 = luaStr2;
-
-        cout << str2 << endl;
+        printString( table["text"] );
 
     }
 
