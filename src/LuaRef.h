@@ -1,6 +1,29 @@
-// Nigel's new and improved LuaRef
-//
-// 
+//------------------------------------------------------------------------------
+/*
+
+   Copyright 2017, Nigel Atkinson
+
+License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+//==============================================================================
 
 #ifndef __LUAREF_H
 #define __LUAREF_H
@@ -52,13 +75,13 @@ namespace ManualBind {
             // class should not be used directly.
 
             LuaRefBase( lua_State* L, FromStack ) : m_L( L )
-        {
-            m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
-        }
+            {
+                m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
+            }
 
             LuaRefBase( lua_State* L, int ref ) : m_L( L ), m_ref( ref )
-        {
-        }
+            {
+            }
 
             ~LuaRefBase()
             {
@@ -100,16 +123,29 @@ namespace ManualBind {
             inline bool isLightUserdata () const { return type () == LUA_TLIGHTUSERDATA; }
 
             template<typename... Args>
-                inline LuaRef const operator()( Args... args ) const;
+            inline LuaRef const operator()( Args... args ) const;
 
             template<typename T>
-                void append( T v ) const
-                {
-                    push();
-                    LuaStack<T>::push( m_L, v );
-                    luaL_ref( m_L, -2 );
-                    lua_pop( m_L, 1 );
-                }
+            void append( T v ) const
+            {
+                push();
+                LuaStack<T>::push( m_L, v );
+                luaL_ref( m_L, -2 );
+                lua_pop( m_L, 1 );
+            }
+
+        template<typename T>
+        T cast()
+        {
+            push();
+            return LuaStack<T>::get( m_L, -1 );
+        }
+
+        template<typename T>
+        operator T()
+        {
+            return cast<T>();
+        }
     };
 
     template<typename K>
@@ -128,10 +164,6 @@ namespace ManualBind {
         LuaTableElement( lua_State* L, K key ) 
             : LuaRefBase( L, FromStack() )
               , m_key( key )
-        {
-        }
-
-        ~LuaTableElement()
         {
         }
 
@@ -164,13 +196,13 @@ namespace ManualBind {
     };
 
     template<typename K>
-        struct LuaStack<LuaTableElement<K> >
+    struct LuaStack<LuaTableElement<K> >
+    {
+        static inline void push( lua_State* L, LuaTableElement<K> const& e )
         {
-            static inline void push( lua_State* L, LuaTableElement<K> const& e )
-            {
-                e.push();
-            }
-        };
+            e.push();
+        }
+    };
 
     class LuaRef : public LuaRefBase
     {
@@ -222,11 +254,11 @@ namespace ManualBind {
         }
 
         template<typename K>
-            LuaTableElement<K> operator[]( K key ) const
-            {
-                push();
-                return LuaTableElement<K>( m_L, key );
-            }
+        LuaTableElement<K> operator[]( K key ) const
+        {
+            push();
+            return LuaTableElement<K>( m_L, key );
+        }
 
         static LuaRef fromStack( lua_State* L, int index = -1 )
         {
@@ -245,50 +277,37 @@ namespace ManualBind {
             lua_getglobal (L, name);
             return LuaRef (L, FromStack ());
         }
+    };
 
-        template<typename T>
-        T cast()
+    template<>
+    struct LuaStack<LuaRef>
+    {
+        static inline void push( lua_State* L, LuaRef const& r )
         {
-            push();
-            return LuaStack<T>::get( m_L, -1 );
-        }
-
-        template<typename T>
-        operator T()
-        {
-            return cast<T>();
+            r.push();
         }
     };
 
     template<>
-        struct LuaStack<LuaRef>
-        {
-            static inline void push( lua_State* L, LuaRef const& r )
-            {
-                r.push();
-            }
-        };
-
-    template<>
-        inline LuaRef const LuaRefBase::operator() () const
-        {
-            push();
-            LuaException::pcall (m_L, 0, 1);
-            return LuaRef (m_L, FromStack ());
-        }
+    inline LuaRef const LuaRefBase::operator() () const
+    {
+        push();
+        LuaException::pcall (m_L, 0, 1);
+        return LuaRef (m_L, FromStack ());
+    }
 
     template<typename... Args>
-        inline LuaRef const LuaRefBase::operator()( Args... args ) const
-        {
-            const int n = sizeof...(Args);
-            push();
-            // Initializer expansion trick to call push for each arg.
-            // https://stackoverflow.com/questions/25680461/variadic-template-pack-expansion
-            int dummy[] = { 0, ( (void) LuaStack<Args>::push( m_L, std::forward<Args>(args) ), 0 ) ... };
-            std::ignore = dummy;
-            LuaException::pcall( m_L, n, 1 );
-            return LuaRef (m_L, FromStack ());
-        }
+    inline LuaRef const LuaRefBase::operator()( Args... args ) const
+    {
+        const int n = sizeof...(Args);
+        push();
+        // Initializer expansion trick to call push for each arg.
+        // https://stackoverflow.com/questions/25680461/variadic-template-pack-expansion
+        int dummy[] = { 0, ( (void) LuaStack<Args>::push( m_L, std::forward<Args>(args) ), 0 ) ... };
+        std::ignore = dummy;
+        LuaException::pcall( m_L, n, 1 );
+        return LuaRef (m_L, FromStack ());
+    }
 
 }; // namespace ManualBind 
 
