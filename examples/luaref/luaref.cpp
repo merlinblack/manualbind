@@ -84,11 +84,20 @@ int main()
 
         run( L, "text = 'This has been implicitly cast to std::string'" );
 
-        LuaRef str( L, "text" );
+        LuaRef luaStr1( L, "text" );
 
-        std::string str2 = str;
+        std::string str1 = luaStr1;
+
+        cout << str1 << endl;
+
+        run( L, "a.text = text" );
+
+        auto luaStr2 = table["text"];
+
+        std::string str2 = luaStr2;
 
         cout << str2 << endl;
+
     }
 
     lua_close(L);
