@@ -149,7 +149,7 @@ namespace ManualBind {
         };
 
     // Plain Old Data POD version.
-    // Use this for simpler classes/stuctures where coping is fairly cheap, and
+    // Use this for simpler classes/structures where coping is fairly cheap, and
     // C++ and Lua do not need to operate on the same instance.
     // Think of this as "by Value"
     template<class B, class T>
