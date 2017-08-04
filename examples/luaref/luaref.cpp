@@ -31,11 +31,11 @@ int main()
         run( L, "a.b = {}" );
         run( L, "a.b.c = {}" );
 
-        cout << "Is table a table? " 
+        cout << "Is table a table? "
              << (table.isTable() ? "true" : "false" )
              << endl;
-        cout << "Is table[\"b\"] a table? " 
-             << (table["b"].isTable() ? "true" : "false" ) 
+        cout << "Is table[\"b\"] a table? "
+             << (table["b"].isTable() ? "true" : "false" )
              << endl;
 
         table["b"]["c"]["hello"] = "World!";
@@ -66,7 +66,7 @@ int main()
 
         testing( "Nigel", "Alara", "Aldora", "Ayna",
                  "Sarah", "Gavin", "Joe",    "Linda",
-                 "Tom",   "Sonja", "Greg",   "Trish" 
+                 "Tom",   "Sonja", "Greg",   "Trish"
                );
 
         table["testing"](testing,3,2,1,"Calling array element");

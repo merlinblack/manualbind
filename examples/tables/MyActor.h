@@ -4,7 +4,7 @@
 
 class MyActor {
 
-    public:
+public:
 
     std::string _name;
 

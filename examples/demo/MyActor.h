@@ -3,15 +3,15 @@
 #include <iostream>
 
 class MyActor {
-    protected:
+protected:
 
     std::string _name;
 
-    public:
+public:
 
     int _age;
 
-    public:
+public:
 
     MyActor( std::string name, int age ) : _name(name), _age(age)
     {

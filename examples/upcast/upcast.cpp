@@ -5,7 +5,7 @@
 #include "LuaBinding.h"
 
 // Up casting example.
-// Needed when you need to call methods or functions expecting 
+// Needed when you need to call methods or functions expecting
 // a base class with a derived class. You might do this when
 // you need to process different derived classes in the same way,
 // for example rendering different GUI elements in a list.
@@ -20,13 +20,13 @@ using std::dec;
 // Abstract base / interface (doesn't have to be abstract)
 class Renderable
 {
-    public:
+public:
     virtual bool Render() = 0;
 };
 
 class Square: public Renderable
 {
-    public:
+public:
     bool Render() {
         cout << hex << this << dec << " - I'm a Square!" << endl;
         return true;
@@ -35,7 +35,7 @@ class Square: public Renderable
 
 class Circle: public Renderable
 {
-    public:
+public:
     bool Render() {
         cout << hex << this << dec << " - I'm a Circle!" << endl;
         return true;
@@ -160,7 +160,7 @@ struct CircleBinding: public Binding<CircleBinding, Circle> {
 };
 
 // Lua render list operations on a global list...
-// Normally the list would not be global but in the interest 
+// Normally the list would not be global but in the interest
 // of making this example smaller...
 
 RenderList gRenderList;
@@ -178,7 +178,7 @@ int lua_add_object( lua_State* L )
     LuaBindingUpCast( L, 1 );
 
     // Here you could check for nil, meaning the upcast failed.
-    
+
     RenderablePtr rp = RenderableBinding::fromStack( L, 1 );
 
     AddObject( gRenderList, rp );

@@ -50,168 +50,168 @@ SOFTWARE.
 
 namespace ManualBind {
 
-    struct bind_properties {
-        const char *name;
-        lua_CFunction getter;
-        lua_CFunction setter;
-    };
+struct bind_properties {
+    const char *name;
+    lua_CFunction getter;
+    lua_CFunction setter;
+};
 
 
-    // Called when Lua object is indexed: obj[ndx]
-    int LuaBindingIndex( lua_State *L );
-    // Called whe Lua object index is assigned: obj[ndx] = blah
-    int LuaBindingNewIndex( lua_State *L );
+// Called when Lua object is indexed: obj[ndx]
+int LuaBindingIndex( lua_State *L );
+// Called whe Lua object index is assigned: obj[ndx] = blah
+int LuaBindingNewIndex( lua_State *L );
 
-    void LuaBindingSetProperties( lua_State *L, bind_properties* properties );
+void LuaBindingSetProperties( lua_State *L, bind_properties* properties );
 
-    // If the object at 'index' is a userdata with a metatable containing a __upcast
-    // function, then replaces the userdata at 'index' in the stack with the result
-    // of calling __upcast.
-    // Otherwise the object at index is replaced with nil.
-    int LuaBindingUpCast( lua_State* L, int index );
+// If the object at 'index' is a userdata with a metatable containing a __upcast
+// function, then replaces the userdata at 'index' in the stack with the result
+// of calling __upcast.
+// Otherwise the object at index is replaced with nil.
+int LuaBindingUpCast( lua_State* L, int index );
 
-    // Check the number of arguments are as expected.
-    // Throw an error if not.
-    void LuaBindingCheckArgCount( lua_State *L, int expected );
+// Check the number of arguments are as expected.
+// Throw an error if not.
+void LuaBindingCheckArgCount( lua_State *L, int expected );
 
-    // B - the binding class / struct
-    // T - the class you are binding to Lua.
+// B - the binding class / struct
+// T - the class you are binding to Lua.
 
-    // Shared pointer version
-    // Use this for classes that need to be shared between C++ and Lua,
-    // or are expensive to copy. Think of it as like "by Reference".
-    template<class B, class T>
-        struct Binding {
+// Shared pointer version
+// Use this for classes that need to be shared between C++ and Lua,
+// or are expensive to copy. Think of it as like "by Reference".
+template<class B, class T>
+struct Binding {
 
-            // Push the object on to the Lua stack
-            static void push( lua_State *L, const std::shared_ptr<T>& sp )
-            {
+    // Push the object on to the Lua stack
+    static void push( lua_State *L, const std::shared_ptr<T>& sp )
+    {
 
-                if( sp == nullptr ) {
-                    lua_pushnil( L );
-                    return;
-                }
+        if( sp == nullptr ) {
+            lua_pushnil( L );
+            return;
+        }
 
-                void *ud = lua_newuserdata( L, sizeof(std::shared_ptr<T>));
+        void *ud = lua_newuserdata( L, sizeof(std::shared_ptr<T>));
 
-                new(ud) std::shared_ptr<T>( sp );
+        new(ud) std::shared_ptr<T>( sp );
 
-                luaL_setmetatable( L, B::class_name );
-            }
+        luaL_setmetatable( L, B::class_name );
+    }
 
-            // Create metatable and register Lua constructor
-            static void register_class( lua_State *L )
-            {
-                luaL_newmetatable( L, B::class_name );
-                luaL_Reg* members = B::members();
-                if( members )
-                    luaL_setfuncs( L, members, 0 );
-                lua_pushcfunction( L, LuaBindingIndex );
-                lua_setfield( L, -2, "__index" );
-                lua_pushcfunction( L, LuaBindingNewIndex );
-                lua_setfield( L, -2, "__newindex" );
-                lua_pushcfunction( L, destroy );
-                lua_setfield( L, -2, "__gc" );
-                lua_newtable( L ); // __properties
-                bind_properties* props = B::properties();
-                if( props )
-                    LuaBindingSetProperties( L, props );
-                lua_setfield( L, -2, "__properties" );
-                lua_pop( L, 1 );
+    // Create metatable and register Lua constructor
+    static void register_class( lua_State *L )
+    {
+        luaL_newmetatable( L, B::class_name );
+        luaL_Reg* members = B::members();
+        if( members )
+            luaL_setfuncs( L, members, 0 );
+        lua_pushcfunction( L, LuaBindingIndex );
+        lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, LuaBindingNewIndex );
+        lua_setfield( L, -2, "__newindex" );
+        lua_pushcfunction( L, destroy );
+        lua_setfield( L, -2, "__gc" );
+        lua_newtable( L ); // __properties
+        bind_properties* props = B::properties();
+        if( props )
+            LuaBindingSetProperties( L, props );
+        lua_setfield( L, -2, "__properties" );
+        lua_pop( L, 1 );
 
-                lua_register( L, B::class_name, B::create );
-            }
+        lua_register( L, B::class_name, B::create );
+    }
 
-            //
-            // Called when Lua object is garbage collected.
-            static int destroy( lua_State *L )
-            {
-                void* ud = luaL_checkudata( L, 1, B::class_name );
+    //
+    // Called when Lua object is garbage collected.
+    static int destroy( lua_State *L )
+    {
+        void* ud = luaL_checkudata( L, 1, B::class_name );
 
-                auto sp = static_cast<std::shared_ptr<T>*>(ud);
+        auto sp = static_cast<std::shared_ptr<T>*>(ud);
 
-                // Explicitly called, as this was 'placement new'd
-                sp->~shared_ptr();
+        // Explicitly called, as this was 'placement new'd
+        sp->~shared_ptr();
 
-                return 0;
-            }
+        return 0;
+    }
 
-            // Grab object shared pointer from the Lua stack
-            static const std::shared_ptr<T>& fromStack( lua_State *L, int index )
-            {
-                void* ud = luaL_checkudata( L, index, B::class_name );
+    // Grab object shared pointer from the Lua stack
+    static const std::shared_ptr<T>& fromStack( lua_State *L, int index )
+    {
+        void* ud = luaL_checkudata( L, index, B::class_name );
 
-                auto sp = static_cast<std::shared_ptr<T>*>(ud);
+        auto sp = static_cast<std::shared_ptr<T>*>(ud);
 
-                return *sp;
-            }
+        return *sp;
+    }
 
-        };
+};
 
-    // Plain Old Data POD version.
-    // Use this for simpler classes/structures where coping is fairly cheap, and
-    // C++ and Lua do not need to operate on the same instance.
-    // Think of this as "by Value"
-    template<class B, class T>
-        struct PODBinding {
+// Plain Old Data POD version.
+// Use this for simpler classes/structures where coping is fairly cheap, and
+// C++ and Lua do not need to operate on the same instance.
+// Think of this as "by Value"
+template<class B, class T>
+struct PODBinding {
 
-            // Push the object on to the Lua stack
-            static void push( lua_State *L, const T& value )
-            {
-                void *ud = lua_newuserdata( L, sizeof(T));
+    // Push the object on to the Lua stack
+    static void push( lua_State *L, const T& value )
+    {
+        void *ud = lua_newuserdata( L, sizeof(T));
 
-                new(ud) T( value );
+        new(ud) T( value );
 
-                luaL_setmetatable( L, B::class_name );
-            }
+        luaL_setmetatable( L, B::class_name );
+    }
 
-            // Create metatable and register Lua constructor
-            static void register_class( lua_State *L )
-            {
-                luaL_newmetatable( L, B::class_name );
-                luaL_Reg* members = B::members();
-                if( members )
-                    luaL_setfuncs( L, members, 0 );
-                lua_pushcfunction( L, LuaBindingIndex );
-                lua_setfield( L, -2, "__index" );
-                lua_pushcfunction( L, LuaBindingNewIndex );
-                lua_setfield( L, -2, "__newindex" );
-                //lua_pushcfunction( L, destroy );  -- if you need to destruct a POD
-                //lua_setfield( L, -2, "__gc" );    -- set __gc to destory in the members.
-                lua_newtable( L ); // __properties
-                bind_properties* props = B::properties();
-                if( props )
-                    LuaBindingSetProperties( L, props );
-                lua_setfield( L, -2, "__properties" );
-                lua_pop( L, 1 );
+    // Create metatable and register Lua constructor
+    static void register_class( lua_State *L )
+    {
+        luaL_newmetatable( L, B::class_name );
+        luaL_Reg* members = B::members();
+        if( members )
+            luaL_setfuncs( L, members, 0 );
+        lua_pushcfunction( L, LuaBindingIndex );
+        lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, LuaBindingNewIndex );
+        lua_setfield( L, -2, "__newindex" );
+        //lua_pushcfunction( L, destroy );  -- if you need to destruct a POD
+        //lua_setfield( L, -2, "__gc" );    -- set __gc to destory in the members.
+        lua_newtable( L ); // __properties
+        bind_properties* props = B::properties();
+        if( props )
+            LuaBindingSetProperties( L, props );
+        lua_setfield( L, -2, "__properties" );
+        lua_pop( L, 1 );
 
-                lua_register( L, B::class_name, B::create );
-            }
+        lua_register( L, B::class_name, B::create );
+    }
 
-            // Called when Lua object is garbage collected.
-            static int destroy( lua_State *L )
-            {
-                void* ud = luaL_checkudata( L, 1, B::class_name );
+    // Called when Lua object is garbage collected.
+    static int destroy( lua_State *L )
+    {
+        void* ud = luaL_checkudata( L, 1, B::class_name );
 
-                auto p = static_cast<T*>(ud);
+        auto p = static_cast<T*>(ud);
 
-                // Explicitly called, as this was 'placement new'd
-                p->~T();
+        // Explicitly called, as this was 'placement new'd
+        p->~T();
 
-                return 0;
-            }
+        return 0;
+    }
 
-            // Grab object pointer from the Lua stack
-            static T& fromStack( lua_State *L, int index )
-            {
-                void* ud = luaL_checkudata( L, index, B::class_name );
+    // Grab object pointer from the Lua stack
+    static T& fromStack( lua_State *L, int index )
+    {
+        void* ud = luaL_checkudata( L, index, B::class_name );
 
-                auto p = static_cast<T*>(ud);
+        auto p = static_cast<T*>(ud);
 
-                return *p;
-            }
+        return *p;
+    }
 
-        };
+};
 
 
 }; // namespace ManualBind

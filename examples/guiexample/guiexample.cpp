@@ -18,7 +18,7 @@ class Rectangle
 {
     int _x, _y, _width, _height;
 
-    public:
+public:
     Rectangle( int x, int y, int w, int h ) : _x(x), _y(y), _width(w), _height(h)
     {
         cout << "Created Rectangle" << endl;
@@ -39,7 +39,7 @@ class Rectangle
 
         return true;
     }
-    virtual ~Rectangle() 
+    virtual ~Rectangle()
     {
         cout << "Destroyed Rectangle" << endl;
     }
@@ -98,7 +98,7 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
         int x = luaL_checkinteger( L, 2 );
         int y = luaL_checkinteger( L, 3 );
 
-        lua_pushboolean( L, rect->isInside( x, y ) ); 
+        lua_pushboolean( L, rect->isInside( x, y ) );
         return 1;
     }
 

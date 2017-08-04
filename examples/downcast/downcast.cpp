@@ -3,7 +3,7 @@
 #include "LuaBinding.h"
 
 // Down casting example.
-// Not often needed, but here is how to do it, while maintaining 
+// Not often needed, but here is how to do it, while maintaining
 // correct refcounts in the shared pointers.
 
 using std::cout;
@@ -11,19 +11,19 @@ using std::endl;
 
 class Vehicle
 {
-    public:
+public:
     virtual bool Start() {
         cout << "Engine running!" << endl;
         return true;
     }
- 
+
     virtual ~Vehicle() {
     }
 };
 
 class Car: public Vehicle
 {
-    public:
+public:
     bool LoadGroceries() {
         cout << "Grocieries have been loaded." << endl;
         return true;
@@ -38,7 +38,7 @@ typedef std::shared_ptr<Car> CarPtr;
 using namespace ManualBind;
 
 struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
-    
+
     static constexpr const char* class_name = "Vehicle";
 
     static luaL_Reg* members()
@@ -71,7 +71,7 @@ struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
 };
 
 struct CarBinding: public Binding<CarBinding, Car> {
-    
+
     static constexpr const char* class_name = "Car";
 
     static luaL_Reg* members()
@@ -84,7 +84,7 @@ struct CarBinding: public Binding<CarBinding, Car> {
         return members;
     }
 
-    static bind_properties* properties() 
+    static bind_properties* properties()
     {
         return nullptr;
     }
@@ -136,7 +136,7 @@ int main()
     lua_register( L, "downcast", downcast );
 
     VehiclePtr newcar(new Car());
-    
+
     VehicleBinding::push( L, newcar );
     lua_setglobal( L, "newcar" );
 
@@ -163,7 +163,7 @@ int main()
     run( L, "p = downcast( motorbike )" );
     cout << "Motorbike use count: " << motorbike.use_count() << endl;
 
-    run( L, "if p == nil then print( 'Motorbike is not a car. Can not load groceries. Go have fun instead.' ) end" );    
+    run( L, "if p == nil then print( 'Motorbike is not a car. Can not load groceries. Go have fun instead.' ) end" );
     run( L, "print(p)" );
 
     lua_close(L);
