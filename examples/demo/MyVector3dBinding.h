@@ -12,8 +12,8 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
     {
         static luaL_Reg members[] = {
             { "__gc", destroy },        // PODs usually don't have destructors,
-                                        // but if they do then do this.
-                                        // destroy is defined in PODBinding.
+            // but if they do then do this.
+            // destroy is defined in PODBinding.
             { NULL, NULL }
         };
         return members;
@@ -67,18 +67,18 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
         switch( which )
         {
-            case 0:
-                lua_pushnumber( L, v.x );
-                break;
-            case 1:
-                lua_pushnumber( L, v.y );
-                break;
-            case 2:
-                lua_pushnumber( L, v.z );
-                break;
-            default:
-                luaL_argerror( L, 2, "What?" );
-                break;
+        case 0:
+            lua_pushnumber( L, v.x );
+            break;
+        case 1:
+            lua_pushnumber( L, v.y );
+            break;
+        case 2:
+            lua_pushnumber( L, v.z );
+            break;
+        default:
+            luaL_argerror( L, 2, "What?" );
+            break;
         }
 
         return 1;
@@ -99,18 +99,18 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
         switch( which )
         {
-            case 0:
-                v.x = value;
-                break;
-            case 1:
-                v.y = value;
-                break;
-            case 2:
-                v.z = value;
-                break;
-            default:
-                luaL_argerror( L, 2, "What?" );
-                break;
+        case 0:
+            v.x = value;
+            break;
+        case 1:
+            v.y = value;
+            break;
+        case 2:
+            v.z = value;
+            break;
+        default:
+            luaL_argerror( L, 2, "What?" );
+            break;
         }
         return 0;
     }

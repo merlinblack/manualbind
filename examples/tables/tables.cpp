@@ -25,7 +25,7 @@ MyActorList createList()
 void pushToLua( lua_State* L, MyActorList list )
 {
     lua_newtable( L );
-    
+
     for( const auto& actor : list ) {
         MyActorBinding::push( L, actor );
         luaL_ref( L, -2 );
@@ -62,14 +62,14 @@ int main()
     luaL_openlibs( L );
 
     MyActorBinding::register_class( L );
-    
+
     {
         cout << "Pushing actor list to Lua." << endl;
         MyActorList actors = createList();
         pushToLua( L, actors );
         lua_setglobal( L, "actors" );
     }
-    
+
     run( L, "for k,v in pairs(actors) do print( k, v.name ) end" );
 
     cout << "Editing actor list..." << endl;

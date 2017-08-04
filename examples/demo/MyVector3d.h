@@ -9,7 +9,7 @@ using std::dec;
 
 class MyVector3d
 {
-    public:
+public:
     float x, y, z;
 
     MyVector3d( float nx, float ny, float nz ) : x(nx), y(ny), z(nz)
