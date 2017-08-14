@@ -68,6 +68,14 @@ int LuaBindingIndex( lua_State *L )
         }
         return 1;
     }
+    lua_pop( L, 2 ); // __properties
+    lua_pushvalue( L, 1 );
+    lua_rawget( L, LUA_REGISTRYINDEX );
+    if( lua_type( L, 4 ) == LUA_TTABLE ) {  // Has added instance vars
+        lua_pushvalue( L, 2 );
+        lua_gettable( L, 4 );
+        return 1;   // Return whatever was found, possibly nil.
+    }
 
     lua_pushnil( L );
     return 1; // Not found, return nil.
@@ -93,6 +101,17 @@ int LuaBindingNewIndex( lua_State *L )
         return 0;
     }
     // 4 - class metatable
+    // If it's in the metatable, then update it.
+    lua_pushvalue( L, 2 );
+    lua_gettable( L, 4 );
+    if( lua_type( L, 5 ) != LUA_TNIL ) {    // Found in metatable.
+        lua_pushvalue( L, 2 );
+        lua_pushvalue( L, 3 );
+        lua_settable( L, 4 );
+        return 0;
+    }
+    lua_pop( L, 1 );
+
     lua_getfield( L, 4, "__properties" );
     // 5 - class properties table
     lua_pushvalue( L, 2 );
@@ -110,10 +129,24 @@ int LuaBindingNewIndex( lua_State *L )
         return 0;
     }
 
-    // set in class metatable
+    // set in per instance table
+    lua_pushvalue( L, 1 );
+    lua_gettable( L, LUA_REGISTRYINDEX );
+    if( lua_type( L, 7 ) != LUA_TTABLE ) {  // No added instance table yet
+        // Create instance table and story in the registry,
+        // indexed with the objects userdata.
+        lua_pop( L, 1 );
+        lua_newtable( L );
+
+        lua_pushvalue( L, 1 );
+        lua_pushvalue( L, 7 );
+        lua_settable( L, LUA_REGISTRYINDEX );
+    }
+
+    // Set the value in the instance table.
     lua_pushvalue( L, 2 );
     lua_pushvalue( L, 3 );
-    lua_rawset( L, 4 );
+    lua_settable( L, 7 );
     return 0;
 }
 

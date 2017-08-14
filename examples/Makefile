@@ -29,7 +29,7 @@ common:	common/common.o common/LuaBinding.o
 common/common.o:
 	@$(MAKE) --no-print-directory -C common
 
-common/LuaBinding.o:
+common/LuaBinding.o: ../src/LuaBinding.cpp
 	@$(MAKE) --no-print-directory -C common
 
 clean:
