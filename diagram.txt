@@ -1,0 +1,30 @@
+
+ C function registered in Lua as "Class" --> Creates a class instance.
+
+ +-USERDATA----------------+                 +-METATABLE----------------+
+ | Class userdata.         |                 | Class metatable.         |
+ +-------------------------+                 +--------------------------+
+ | Represents an instance  |                 | Represents a class       |
+ |                         |                 |                          |
+ |                         |                 | __gc                     |--> C function to destroy or clean up class
+ | shared meta table       +---------------->+ __upcast                 |--> Optional C function to cast class up to a base class
+ |                         |                 | __properties             |--+
+ +-------------------------+                 | user def members...      |  |
+                                             +--------------------------+  |
+ +-TABLE-------------------+                                               |
+ | Table of properties     |<----------------------------------------------+
+ |                         |
+ |                         |     +-TABLE------+
+ | Each entry is a table   |---->| get        |--> C function to get the prop
+ +-------------------------+     | set        |--> Optional C function to set the prop
+                                 +------------+
+
+ +-TABLE (C access only)---+
+ | LUA REGISTRY            |
+ |                         |
+ | class userdata          |----> Optional (auto created on use) Lua table of per instance extra elements
+ |                         |
+ +-------------------------+
+
+Depending on the binding type, the userdata memory will contain either a
+shared pointer to the C++ class instance, or the value itself (POD).
