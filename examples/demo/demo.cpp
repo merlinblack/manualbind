@@ -22,6 +22,7 @@ int main(int argc, char **argv )
     run( L, "a:walk()" );
     run( L, "b = a" );
     run( L, "a:setName('Awesome Chick')" );
+    run( L, "a.extra = 'Coffee!'" );
 
     {
         lua_getglobal( L, "b" );
@@ -43,6 +44,8 @@ int main(int argc, char **argv )
         run( L, "actor.age = actor.age + 1 print( 'Happy Birthday')" );
         run( L, "print( actor.age )" );
         cout << actor->_age << endl;
+        // Should print Coffee, nil as 'added' members/properties are per instance.
+        run( L, "print( a.extra, actor.extra )" ); 
     }
 
     run( L, "b = MyActor( 'Short lived', 0 )" );
@@ -62,6 +65,7 @@ int main(int argc, char **argv )
     }
 
     // Override (for all instances) a method, while calling the old implementation
+    // This updates the metatable because 'walk' is already defined there.
     run( L, "local old = actor.walk actor.walk = function(self) old(self) print( 'RUN!' ) end" );
     run( L, "actor:walk()" );
 
