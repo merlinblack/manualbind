@@ -1,0 +1,5 @@
+Classes with extra members, i.e. thier userdata is a key in the registry,
+will never get garbage collected.
+
+TODO. Make a table in the registry to hold these 'extra' tables with weak
+keys.
