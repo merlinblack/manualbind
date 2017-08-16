@@ -6,7 +6,7 @@
 
 // Up casting example.
 // Needed when you need to call methods or functions expecting
-// a base class with a derived class. You might do this when
+// a base class when you have a derived class. You might do this when
 // you need to process different derived classes in the same way,
 // for example rendering different GUI elements in a list.
 // Maintains correct refcounts in the shared pointers.
@@ -17,7 +17,7 @@ using std::endl;
 using std::hex;
 using std::dec;
 
-// Abstract base / interface (doesn't have to be abstract)
+// base / interface (doesn't have to be abstract)
 class Renderable
 {
 public:
@@ -173,6 +173,11 @@ int lua_render_all( lua_State* L )
 
 int lua_add_object( lua_State* L )
 {
+    // Before upcast'ing, you may want to check if the 
+    // class is the type you want already.
+    // In this example the base is abstract so it will
+    // not happen.
+    
     // We are expecting an object with an __upcast function
     // returning a Renderable.
     LuaBindingUpCast( L, 1 );
