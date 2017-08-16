@@ -29,6 +29,23 @@ SOFTWARE.
 
 namespace ManualBind {
 
+// Creates (on demand) the table for storing 'extra' values per class.
+// Table has weak keys as to not prevent garbage collection of the instances.
+// Leaves the new table at the top of the stack.
+int createExtraValueStore( lua_State* L )
+{
+    lua_newtable( L );
+    lua_newtable( L );
+    lua_pushliteral( L, "__mode" );
+    lua_pushliteral( L, "k" );
+    lua_settable( L, -3 );
+    lua_setmetatable( L, -2 );
+    lua_pushcfunction( L, createExtraValueStore ); // Use function as GUID
+    lua_pushvalue( L, -2 );
+    lua_settable( L, LUA_REGISTRYINDEX );
+    return 1;
+}
+
 // Called when Lua object is indexed: obj[ndx]
 int LuaBindingIndex( lua_State *L )
 {
@@ -69,12 +86,16 @@ int LuaBindingIndex( lua_State *L )
         return 1;
     }
     lua_pop( L, 2 ); // __properties
-    lua_pushvalue( L, 1 );
-    lua_rawget( L, LUA_REGISTRYINDEX );
-    if( lua_type( L, 4 ) == LUA_TTABLE ) {  // Has added instance vars
-        lua_pushvalue( L, 2 );
+    lua_pushcfunction( L, createExtraValueStore );
+    lua_gettable( L, LUA_REGISTRYINDEX );
+    if( lua_type( L, 4 ) == LUA_TTABLE ) {
+        lua_pushvalue( L, 1 );
         lua_gettable( L, 4 );
-        return 1;   // Return whatever was found, possibly nil.
+        if( lua_type( L, 5 ) == LUA_TTABLE ) {  // Has added instance vars
+            lua_pushvalue( L, 2 );
+            lua_gettable( L, 5 );
+            return 1;   // Return whatever was found, possibly nil.
+        }
     }
 
     lua_pushnil( L );
@@ -128,25 +149,30 @@ int LuaBindingNewIndex( lua_State *L )
         }
         return 0;
     }
+    lua_settop( L, 3 );
 
     // set in per instance table
-    lua_pushvalue( L, 1 );
+    lua_pushcfunction( L, createExtraValueStore );
     lua_gettable( L, LUA_REGISTRYINDEX );
-    if( lua_type( L, 7 ) != LUA_TTABLE ) {  // No added instance table yet
-        // Create instance table and story in the registry,
-        // indexed with the objects userdata.
+    if( lua_type( L, 4 ) != LUA_TTABLE ) {
+        lua_pop( L, 1 );
+        createExtraValueStore( L );
+    }
+    lua_pushvalue( L, 1 );
+    lua_gettable( L, 4 );
+    if( lua_type( L, 5 ) != LUA_TTABLE ) {  // No added instance table yet
         lua_pop( L, 1 );
         lua_newtable( L );
 
         lua_pushvalue( L, 1 );
-        lua_pushvalue( L, 7 );
-        lua_settable( L, LUA_REGISTRYINDEX );
+        lua_pushvalue( L, 5 );
+        lua_settable( L, 4 );
     }
 
     // Set the value in the instance table.
     lua_pushvalue( L, 2 );
     lua_pushvalue( L, 3 );
-    lua_settable( L, 7 );
+    lua_settable( L, 5 );
     return 0;
 }
 
