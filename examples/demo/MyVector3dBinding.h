@@ -34,7 +34,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
     {
         std::cout << "Create called\n";
 
-        LuaBindingCheckArgCount( L, 3 );
+        CheckArgCount( L, 3 );
 
         float x = luaL_checknumber( L, 1 );
         float y = luaL_checknumber( L, 2 );
@@ -59,7 +59,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
     // 2 - key
     static int get( lua_State *L )
     {
-        LuaBindingCheckArgCount( L, 2 );
+        CheckArgCount( L, 2 );
 
         MyVector3d& v = fromStack( L, 1 );
 
@@ -89,7 +89,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
     // 3 - value
     static int set( lua_State *L )
     {
-        LuaBindingCheckArgCount( L, 3 );
+        CheckArgCount( L, 3 );
 
         MyVector3d& v = fromStack( L, 1 );
 

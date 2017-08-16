@@ -30,7 +30,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
     {
         std::cout << "Create called\n";
 
-        LuaBindingCheckArgCount( L, 1 );
+        CheckArgCount( L, 1 );
 
         const char *name = luaL_checkstring( L, 1 );
 
@@ -45,7 +45,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
     static int get_name( lua_State *L )
     {
-        LuaBindingCheckArgCount( L, 2 );
+        CheckArgCount( L, 2 );
         MyActorPtr a = fromStack( L, 1 );
         lua_pushstring( L, a->_name.c_str() );
         return 1;
