@@ -224,7 +224,7 @@ int LuaBindingUpCast( lua_State* L, int index )
 
 // Check the number of arguments are as expected.
 // Throw an error if not.
-void LuaBindingCheckArgCount( lua_State *L, int expected )
+void CheckArgCount( lua_State *L, int expected )
 {
     int n = lua_gettop(L);
     if( n != expected ) {

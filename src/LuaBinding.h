@@ -72,7 +72,7 @@ int LuaBindingUpCast( lua_State* L, int index );
 
 // Check the number of arguments are as expected.
 // Throw an error if not.
-void LuaBindingCheckArgCount( lua_State *L, int expected );
+void CheckArgCount( lua_State *L, int expected );
 
 // B - the binding class / struct
 // T - the class you are binding to Lua.

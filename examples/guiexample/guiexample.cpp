@@ -73,7 +73,7 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
     {
         std::cout << "Create called\n";
 
-        LuaBindingCheckArgCount( L, 4 );
+        CheckArgCount( L, 4 );
 
         int x = luaL_checkinteger( L, 1 );
         int y = luaL_checkinteger( L, 2 );
@@ -92,7 +92,7 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
 
     static int isInside( lua_State *L )
     {
-        LuaBindingCheckArgCount( L, 3 );
+        CheckArgCount( L, 3 );
 
         RectanglePtr rect = fromStack( L, 1 );
         int x = luaL_checkinteger( L, 2 );
