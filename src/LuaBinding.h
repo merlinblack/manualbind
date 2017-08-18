@@ -62,6 +62,9 @@ int LuaBindingIndex( lua_State *L );
 // Called whe Lua object index is assigned: obj[ndx] = blah
 int LuaBindingNewIndex( lua_State *L );
 
+// Gets the table of extra values assigned to an instance.
+int LuaBindGetExtraValuesTable( lua_State* L, int index );
+
 void LuaBindingSetProperties( lua_State *L, bind_properties* properties );
 
 // If the object at 'index' is a userdata with a metatable containing a __upcast

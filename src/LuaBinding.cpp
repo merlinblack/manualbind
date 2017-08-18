@@ -102,6 +102,22 @@ int LuaBindingIndex( lua_State *L )
     return 1; // Not found, return nil.
 }
 
+// Get the table holding any extra values for the class metatable
+// at index. Returns nil if there has not been any assigned, and
+// no table yet exists.
+int LuaBindGetExtraValuesTable( lua_State* L, int index )
+{
+    index = lua_absindex( L, index );
+    lua_pushcfunction( L, createExtraValueStore );
+    lua_gettable( L, LUA_REGISTRYINDEX );
+    if( lua_type( L, -1 ) == LUA_TTABLE ) {
+        lua_pushvalue( L, index );
+        lua_gettable( L, -2 );
+        lua_remove( L, -2 );
+    }
+    return 1;
+}
+
 // Called whe Lua object index is assigned: obj[ndx] = blah
 int LuaBindingNewIndex( lua_State *L )
 {
