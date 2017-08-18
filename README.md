@@ -180,7 +180,7 @@ int width = settings["display"]["width"];
 settings["flux"]["capacitor"] = true;
 
 // Grab a ref to the print function
-LuaRef print = LuaRef::getGlobal( L, "print" );
+LuaRef print = LuaRef( L, "print" );
 // Use it like a C/C++ varadic function.
 print( 1, 2, "Hello", width, tbl );
 ```
