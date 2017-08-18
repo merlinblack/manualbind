@@ -5,6 +5,7 @@
 #include "MyActorBinding.h"
 #include "MyVector3d.h"
 #include "MyVector3dBinding.h"
+#include "LuaRef.h"
 
 using std::cout;
 using std::endl;
@@ -46,6 +47,14 @@ int main(int argc, char **argv )
         cout << actor->_age << endl;
         // Should print Coffee, nil as 'added' members/properties are per instance.
         run( L, "print( a.extra, actor.extra )" ); 
+    }
+
+    {
+        lua_getglobal( L, "a" );
+        LuaBindGetExtraValuesTable( L, -1 );
+        LuaRef extras = LuaRef::fromStack( L, -1 );
+        lua_pop( L, 2 );    // "a", and the table.
+        cout << extras["extra"].tostring() << endl;
     }
 
     run( L, "b = MyActor( 'Short lived', 0 )" );
