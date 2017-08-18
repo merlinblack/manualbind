@@ -10,7 +10,7 @@ There are several examples, which show various parts or techniques.
 - Demo. Runs LuaBinding.h through it's paces.
 - Downcast. How to cast a Lua held class instance to another class that is lower in the hierarchy.
 - Upcast. Opposite of downcast. Useful if you are storing instances in a C++ container.
-- Gui Example. How a simple GUI might be implemented in Lua, given a simple rectangle class binding.
+- GUI Example. How a simple GUI might be implemented in Lua, given a simple rectangle class binding.
 - LuaRef. Exercises the new LuaRef code.
 - Tables. How to push / pull a C++ container to a Lua table.
 
@@ -163,7 +163,7 @@ const char* ColorBinding::prop_keys[] = { "r", "g", "b", "a", nullptr };
 
 LuaRef.h
 --------
-C++ management of lua data. A re-write of code originally written by me and then 
+C++ management of Lua data. A re-write of code originally written by me and then 
 donated to LuaBridge. 
 This version I have changed to use c++11 variable template arguments for
 calling Lua, The table element proxy is now public, and the code structure is
@@ -173,7 +173,7 @@ base class.
 Allows you to write things like this in C++
 ```c++
 // Grab a ref to settings table.
-LuaRef settings = LuaRef::getGlobal( L, "settings" );
+LuaRef settings = LuaRef( L, "settings" );
 // Get the value of 'settings.display.width'
 int width = settings["display"]["width"];
 // Set a setting
@@ -181,7 +181,7 @@ settings["flux"]["capacitor"] = true;
 
 // Grab a ref to the print function
 LuaRef print = LuaRef::getGlobal( L, "print" );
-// Use it like a C++ varadic function.
+// Use it like a C/C++ varadic function.
 print( 1, 2, "Hello", width, tbl );
 ```
 

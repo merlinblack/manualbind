@@ -1,35 +1,42 @@
-Tables and objects used in Bindings.
-------------------------------------
+Lua Tables and objects used in Bindings.
+─────────────────────────────────────────
 
- C function registered in Lua as "Class" --> Creates a class instance.
+ C function registered in Lua as "ClassName" ──> Creates a class instance.
+ I.e. a binding for a "Widget" class, will have a function called "Widget".
 
- +-USERDATA----------------+                 +-TABLE--------------------+
- | Class userdata.         |                 | Class metatable.         |
- +-------------------------+                 +--------------------------+
- | Represents an instance  |                 | Represents a class       |
- |                         |                 |                          |
- |                         |                 | __gc                     |--> C function to destroy or clean up class
- | shared meta table       +----Metatable--->+ __upcast                 |--> Optional C function to cast class up to a base class
- |                         |                 | __properties             |--+
- +-------------------------+                 | user def members...      |  |
-                                             +--------------------------+  |
- +-TABLE-------------------+                                               |
- | Table of properties     |<----------------------------------------------+
- +-------------------------+
- |                         |     +-TABLE------+
- | Each entry is a table   |---->| get        |--> C function to get the prop
- +-------------------------+     | set        |--> Optional C function to set the prop
-                                 +------------+
+ ┌─USERDATA────────────────┐            ┌─TABLE────────────────────┐
+ │ Class userdata.         │            │ Class metatable.         │
+ ├─────────────────────────┤            ├──────────────────────────┤
+ │ Represents an instance  │            │ Represents a class       │
+ │                         │            │                          │
+ │                         │            │ __gc                     ├──> C function to destroy
+ │                         │            │                          │    or clean up class
+ │                         │            │                          │
+ │ shared meta table       ├─Metatable─>│ __upcast                 ├──> Optional C function to
+ │                         │            │                          │    cast class up to a base
+ │                         │            │                          │    class
+ │                         │            │ __properties             ├──┐
+ │                         │            │                          │  │
+ └─────────────────────────┘            │ user def members...      │  │
+                                        │                          │  │
+                                        └──────────────────────────┘  │
+ ┌─TABLE───────────────────┐                                          │
+ │ Table of properties     │<─────────────────────────────────────────┘
+ ├─────────────────────────┤
+ │                         │     ┌─TABLE──────┐
+ │ Each entry is a table   ├────>│ get        ├──> C function to get the prop
+ └─────────────────────────┘     │ set        ├──> Optional C function to set the prop
+                                 └────────────┘
 
- LUA_REGISTRY ---+
-                 |  
- +-TABLE-----------------------+       +-TABLE------------------------+
- | Per instance extra elements |       | extra elements               |
- +-----------------------------+       +------------------------------+
- | class userdata              |------>| Created on first use.        |
- |                             |       +------------------------------+
- | created on first use        |
- +-----------------------------+
+ LUA_REGISTRY ───┐
+                 │  
+ ┌─TABLE───────────────────────┐       ┌─TABLE────────────────────────┐
+ │ Per instance extra elements │       │ extra elements               │
+ ├─────────────────────────────┤       ├──────────────────────────────┤
+ │ class userdata              ├──────>│ Created on first use.        │
+ │                             │       └──────────────────────────────┘
+ │ created on first use        │
+ └─────────────────────────────┘
 
 Depending on the binding type, the userdata memory will contain either a
 shared pointer to the C++ class instance, or the value itself (POD).
