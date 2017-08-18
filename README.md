@@ -2,7 +2,7 @@ ManualBind
 ==========
 
 Semi-manual binding between C++ and Lua.
-See headers files for author and license info.
+See header files and LICENSE for author and license info.
 
 Examples
 --------
@@ -35,6 +35,17 @@ destructor when required.
 There is a POD (plain old data) version of the binding for things like pointers or
 tiny classes and structs. These get copied around unlike the shared pointer version which 
 keeps one and only one copy.
+
+Extra elements can be assigned to a class instance as long as they do not conflict with an existing
+function or property. A table will be created for each class instance on the first value assigned, so
+if this feature is not used - no extra memory is required for a class instance.
+
+Methods can be overridden on a class in Lua code, however unlike extra elements, this will affect 
+**all** instances, both existing and new.
+
+**Speed**
+Method lookup is the fastest, followed by properties, extra elements and finally the case of not found.
+Each case requires progressively more table lookups in addition to the order they are done.
 
 Example binding
 ---------------
