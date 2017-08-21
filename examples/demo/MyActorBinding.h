@@ -16,7 +16,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
         static luaL_Reg members[] = {
             { "walk", walk },
             { "setName", setName },
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }
@@ -24,7 +24,7 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
     static bind_properties* properties() {
         static bind_properties properties[] = {
             { "age", get_age, set_age },
-            { NULL, NULL, NULL }
+            { nullptr, nullptr, nullptr }
         };
         return properties;
     }

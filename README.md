@@ -49,6 +49,9 @@ Each case requires progressively more table lookups in addition to the order the
 
 Example binding
 ---------------
+This is real life code taken from my game. In this instance Allegro colors are treated
+as POD, i.e. they do not get shared, but copied around.  Also there are no member functions
+however there are 4 properties. Each property uses the same get and set functions.
 ```c++
 #ifndef LB_COLOR_H
 #define LB_COLOR_H
@@ -62,10 +65,7 @@ struct ColorBinding : public PODBinding<ColorBinding,ALLEGRO_COLOR>
 
     static luaL_Reg* members()
     {
-        static luaL_Reg members[] = {
-            { nullptr, nullptr }
-        };
-        return members;
+        return nullptr; // No members for this class.
     }
 
     static bind_properties* properties()
@@ -106,7 +106,7 @@ struct ColorBinding : public PODBinding<ColorBinding,ALLEGRO_COLOR>
 
         al_unmap_rgba( c, &r, &g, &b, &a );
 
-        int which = luaL_checkoption( L, 2, NULL, ColorBinding::prop_keys );
+        int which = luaL_checkoption( L, 2, nullptr, ColorBinding::prop_keys );
 
         switch( which )
         {
@@ -137,7 +137,7 @@ struct ColorBinding : public PODBinding<ColorBinding,ALLEGRO_COLOR>
 
         ALLEGRO_COLOR& c = fromStack( L, 1 );
 
-        int which = luaL_checkoption( L, 2, NULL, ColorBinding::prop_keys );
+        int which = luaL_checkoption( L, 2, nullptr, ColorBinding::prop_keys );
 
         al_unmap_rgba( c, &r, &g, &b, &a );
 

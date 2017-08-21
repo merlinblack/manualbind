@@ -58,7 +58,7 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
     {
         static luaL_Reg members[] = {
             { "isInside", isInside },
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }
