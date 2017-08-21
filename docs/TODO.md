@@ -1,4 +1,4 @@
-[License](LICENSE) | [Read Me](/)
+[License](LICENSE) | [Read Me](/manunalbind)
 
 TODO List
 =========
