@@ -1,4 +1,4 @@
-(LICENSE)[Licence] (TODO)[Todo List]
+[Licence](LICENSE) [Todo List](TODO)
 
 ManualBind
 ==========
