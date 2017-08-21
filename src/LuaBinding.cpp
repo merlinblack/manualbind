@@ -195,7 +195,7 @@ int LuaBindingNewIndex( lua_State *L )
 void LuaBindingSetProperties( lua_State *L, bind_properties* properties )
 {
     // Assumes table at top of the stack for the properties.
-    while( properties->name != NULL ) {
+    while( properties->name != nullptr ) {
 
         lua_newtable( L );
 

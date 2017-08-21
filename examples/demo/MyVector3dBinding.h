@@ -3,6 +3,7 @@
 #include "LuaBinding.h"
 #include "MyVector3d.h"
 
+using namespace ManualBind;
 
 struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
@@ -14,7 +15,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
             { "__gc", destroy },        // PODs usually don't have destructors,
             // but if they do then do this.
             // destroy is defined in PODBinding.
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }
@@ -24,7 +25,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
             { "x", get, set },
             { "y", get, set },
             { "z", get, set },
-            { NULL, NULL, NULL }
+            { nullptr, nullptr, nullptr }
         };
         return properties;
     }
@@ -63,7 +64,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
         MyVector3d& v = fromStack( L, 1 );
 
-        int which = luaL_checkoption( L, 2, NULL, MyVector3dBinding::prop_keys );
+        int which = luaL_checkoption( L, 2, nullptr, MyVector3dBinding::prop_keys );
 
         switch( which )
         {
@@ -93,7 +94,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
         MyVector3d& v = fromStack( L, 1 );
 
-        int which = luaL_checkoption( L, 2, NULL, MyVector3dBinding::prop_keys );
+        int which = luaL_checkoption( L, 2, nullptr, MyVector3dBinding::prop_keys );
 
         float value = lua_tonumber( L, 3 );
 
@@ -117,6 +118,6 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
 
 };
 
-const char *MyVector3dBinding::prop_keys[] = { "x", "y", "z", NULL };
+const char *MyVector3dBinding::prop_keys[] = { "x", "y", "z", nullptr };
 
 #endif // __MYVECTOR3DBINDING_H

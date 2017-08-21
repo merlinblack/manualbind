@@ -45,7 +45,7 @@ struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
     {
         static luaL_Reg members[] = {
             { "Start", Start },
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }
@@ -79,7 +79,7 @@ struct CarBinding: public Binding<CarBinding, Car> {
         static luaL_Reg members[] = {
             { "Start", Start },
             { "LoadGroceries", LoadGroceries },
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }

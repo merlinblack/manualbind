@@ -93,7 +93,7 @@ struct SquareBinding: public Binding<SquareBinding, Square> {
     {
         static luaL_Reg members[] = {
             { "__upcast", upcast },
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }
@@ -130,7 +130,7 @@ struct CircleBinding: public Binding<CircleBinding, Circle> {
     {
         static luaL_Reg members[] = {
             { "__upcast", upcast },
-            { NULL, NULL }
+            { nullptr, nullptr }
         };
         return members;
     }

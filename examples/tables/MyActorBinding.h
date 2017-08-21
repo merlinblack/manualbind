@@ -19,8 +19,8 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
     static bind_properties* properties()
     {
         static bind_properties properties[] = {
-            { "name", get_name, NULL },
-            { NULL, NULL, NULL }
+            { "name", get_name, nullptr },
+            { nullptr, nullptr, nullptr }
         };
         return properties;
     }
