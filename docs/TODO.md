@@ -1,4 +1,4 @@
-[License](LICENSE) | [Read Me](/manualbind)
+[Diagram](diagram.txt) | [Read Me](/manualbind)
 
 TODO List
 =========
