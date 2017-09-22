@@ -200,13 +200,36 @@ struct PODBinding {
         luaL_setmetatable( L, B::class_name );
     }
 
+    static void setMembers( lua_State* L, std::true_type )
+    {
+        luaL_setfuncs( L, B::members(), 0 );
+    }
+
+    static void setMembers( lua_State* L, std::false_type )
+    {
+        // Nada.
+    }
+
+    static void setProperties( lua_State* L, std::true_type )
+    {
+        bind_properties* props = B::properties();
+        LuaBindingSetProperties( L, props );
+    }
+
+    static void setProperties( lua_State* L, std::false_type )
+    {
+        // Nada.
+    }
+
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
+        has_members<B> membersTrait;
+        has_properties<B> propTrait;
+
         luaL_newmetatable( L, B::class_name );
-        luaL_Reg* members = B::members();
-        if( members )
-            luaL_setfuncs( L, members, 0 );
+        setMembers( L, membersTrait );
         lua_pushcfunction( L, LuaBindingIndex );
         lua_setfield( L, -2, "__index" );
         lua_pushcfunction( L, LuaBindingNewIndex );
@@ -214,9 +237,7 @@ struct PODBinding {
         //lua_pushcfunction( L, destroy );  -- if you need to destruct a POD
         //lua_setfield( L, -2, "__gc" );    -- set __gc to destory in the members.
         lua_newtable( L ); // __properties
-        bind_properties* props = B::properties();
-        if( props )
-            LuaBindingSetProperties( L, props );
+        setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
         lua_pop( L, 1 );
 
