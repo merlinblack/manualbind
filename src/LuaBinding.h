@@ -52,15 +52,24 @@ SOFTWARE.
 namespace ManualBind {
 
 // traits
+
+// members
 template <typename T>
 using members_t = decltype(std::declval<T>().members());
 template <typename T>
 using has_members = detect<T, members_t>;
 
+// properties
 template <typename T>
 using properties_t = decltype(std::declval<T>().properties());
 template <typename T>
 using has_properties = detect<T, properties_t>;
+
+// any other stuff you might want to add to the metatable.
+template <typename T>
+using extras_t = decltype(std::declval<T>().setExtraMeta());
+template <typename T>
+using has_extras = detect<T, extras_t>;
 
 // helper struct
 struct bind_properties {
@@ -135,11 +144,22 @@ struct Binding {
         // Nada.
     }
 
+    static void setExtras( lua_State* L, std::true_type )
+    {
+        B::setExtraMeta( L );
+    }
+
+    static void setExtras( lua_State*, std::false_type )
+    {
+        // Nada.
+    }
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
         has_members<B> membersTrait;
         has_properties<B> propTrait;
+        has_extras<B> extrasTrait;
 
         luaL_newmetatable( L, B::class_name );
         setMembers( L, membersTrait );
@@ -152,6 +172,7 @@ struct Binding {
         lua_newtable( L ); // __properties
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
+        setExtras( L, extrasTrait );
         lua_pop( L, 1 );
 
         lua_register( L, B::class_name, B::create );
@@ -205,7 +226,7 @@ struct PODBinding {
         luaL_setfuncs( L, B::members(), 0 );
     }
 
-    static void setMembers( lua_State* L, std::false_type )
+    static void setMembers( lua_State*, std::false_type )
     {
         // Nada.
     }
@@ -216,17 +237,27 @@ struct PODBinding {
         LuaBindingSetProperties( L, props );
     }
 
-    static void setProperties( lua_State* L, std::false_type )
+    static void setProperties( lua_State*, std::false_type )
     {
         // Nada.
     }
 
+    static void setExtras( lua_State* L, std::true_type )
+    {
+        B::setExtraMeta( L );
+    }
+
+    static void setExtras( lua_State*, std::false_type )
+    {
+        // Nada.
+    }
 
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
         has_members<B> membersTrait;
         has_properties<B> propTrait;
+        has_extras<B> extrasTrait;
 
         luaL_newmetatable( L, B::class_name );
         setMembers( L, membersTrait );
@@ -239,6 +270,7 @@ struct PODBinding {
         lua_newtable( L ); // __properties
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
+        setExtras( L, extrasTrait );
         lua_pop( L, 1 );
 
         lua_register( L, B::class_name, B::create );
