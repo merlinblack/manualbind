@@ -50,11 +50,6 @@ struct VehicleBinding: public Binding<VehicleBinding, Vehicle> {
         return members;
     }
 
-    static bind_properties* properties()
-    {
-        return nullptr;
-    }
-
     static int create( lua_State *L )
     {
         VehiclePtr vp = std::make_shared<Vehicle>();
@@ -82,11 +77,6 @@ struct CarBinding: public Binding<CarBinding, Car> {
             { nullptr, nullptr }
         };
         return members;
-    }
-
-    static bind_properties* properties()
-    {
-        return nullptr;
     }
 
     static int create( lua_State *L )

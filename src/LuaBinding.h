@@ -47,15 +47,27 @@ SOFTWARE.
 #define BINDING_H
 #include <memory>
 #include <lua.hpp>
+#include "n4502.h"
 
 namespace ManualBind {
 
+// traits
+template <typename T>
+using members_t = decltype(std::declval<T>().members());
+template <typename T>
+using has_members = detect<T, members_t>;
+
+template <typename T>
+using properties_t = decltype(std::declval<T>().properties());
+template <typename T>
+using has_properties = detect<T, properties_t>;
+
+// helper struct
 struct bind_properties {
     const char *name;
     lua_CFunction getter;
     lua_CFunction setter;
 };
-
 
 // Called when Lua object is indexed: obj[ndx]
 int LuaBindingIndex( lua_State *L );
@@ -102,13 +114,35 @@ struct Binding {
         luaL_setmetatable( L, B::class_name );
     }
 
+    static void setMembers( lua_State* L, std::true_type )
+    {
+        luaL_setfuncs( L, B::members(), 0 );
+    }
+
+    static void setMembers( lua_State* L, std::false_type )
+    {
+        // Nada.
+    }
+
+    static void setProperties( lua_State* L, std::true_type )
+    {
+        bind_properties* props = B::properties();
+        LuaBindingSetProperties( L, props );
+    }
+
+    static void setProperties( lua_State* L, std::false_type )
+    {
+        // Nada.
+    }
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
+        has_members<B> membersTrait;
+        has_properties<B> propTrait;
+
         luaL_newmetatable( L, B::class_name );
-        luaL_Reg* members = B::members();
-        if( members )
-            luaL_setfuncs( L, members, 0 );
+        setMembers( L, membersTrait );
         lua_pushcfunction( L, LuaBindingIndex );
         lua_setfield( L, -2, "__index" );
         lua_pushcfunction( L, LuaBindingNewIndex );
@@ -116,9 +150,7 @@ struct Binding {
         lua_pushcfunction( L, destroy );
         lua_setfield( L, -2, "__gc" );
         lua_newtable( L ); // __properties
-        bind_properties* props = B::properties();
-        if( props )
-            LuaBindingSetProperties( L, props );
+        setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
         lua_pop( L, 1 );
 

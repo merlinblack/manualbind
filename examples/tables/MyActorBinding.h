@@ -11,11 +11,6 @@ struct MyActorBinding: public Binding<MyActorBinding, MyActor> {
 
     static constexpr const char* class_name = "MyActor";
 
-    static luaL_Reg* members()
-    {
-        return nullptr;
-    }
-
     static bind_properties* properties()
     {
         static bind_properties properties[] = {
