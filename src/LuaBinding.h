@@ -67,7 +67,7 @@ using has_properties = detect<T, properties_t>;
 
 // any other stuff you might want to add to the metatable.
 template <typename T>
-using extras_t = decltype(std::declval<T>().setExtraMeta());
+using extras_t = decltype(std::declval<T>().setExtraMeta(std::declval<lua_State*>()));
 template <typename T>
 using has_extras = detect<T, extras_t>;
 

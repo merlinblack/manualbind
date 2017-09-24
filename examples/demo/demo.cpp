@@ -83,6 +83,7 @@ int main(int argc, char **argv )
     run( L, "v = MyVector3d( 1, 2, 3 )" );
     run( L, "v.x = 4" );
     run( L, "print( v.x, v.y, v.z )" );
+    run( L, "print( v.ZERO )" );
 
     cout << "Closing Lua\n";
     lua_close( L );
