@@ -30,6 +30,15 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
         return properties;
     }
 
+    static void setExtraMeta( lua_State* L )
+    {
+        MyVector3d zero = MyVector3d( 0, 0, 0 );
+
+        push( L, zero );
+        lua_setfield( L, -2, "ZERO" ); // Class's meta table
+        return;
+    }
+
     // Lua constructor
     static int create( lua_State *L )
     {
