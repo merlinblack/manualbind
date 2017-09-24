@@ -154,12 +154,24 @@ struct Binding {
         // Nada.
     }
 
+    static int construct( lua_State* L )
+    {
+        // Remove table from stack.
+        lua_remove( L, 1 );
+        // Call create.
+        return B::create( L );
+    }
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
         has_members<B> membersTrait;
         has_properties<B> propTrait;
         has_extras<B> extrasTrait;
+
+        lua_newtable( L );  // Class access
+
+        lua_newtable( L );  // Class access metatable
 
         luaL_newmetatable( L, B::class_name );
         setMembers( L, membersTrait );
@@ -173,9 +185,14 @@ struct Binding {
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
         setExtras( L, extrasTrait );
-        lua_pop( L, 1 );
 
-        lua_register( L, B::class_name, B::create );
+        lua_setfield( L, -2, "__index" );
+
+        lua_pushcfunction( L, construct );
+        lua_setfield( L, -2, "__call" );
+
+        lua_setmetatable( L, -2 );
+        lua_setglobal( L, B::class_name );
     }
 
     //
@@ -252,12 +269,24 @@ struct PODBinding {
         // Nada.
     }
 
+    static int construct( lua_State* L )
+    {
+        // Remove table from stack.
+        lua_remove( L, 1 );
+        // Call create.
+        return B::create( L );
+    }
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
         has_members<B> membersTrait;
         has_properties<B> propTrait;
         has_extras<B> extrasTrait;
+
+        lua_newtable( L );  // Class access
+
+        lua_newtable( L );  // Class access metatable
 
         luaL_newmetatable( L, B::class_name );
         setMembers( L, membersTrait );
@@ -271,9 +300,14 @@ struct PODBinding {
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
         setExtras( L, extrasTrait );
-        lua_pop( L, 1 );
 
-        lua_register( L, B::class_name, B::create );
+        lua_setfield( L, -2, "__index" );
+
+        lua_pushcfunction( L, construct );
+        lua_setfield( L, -2, "__call" );
+
+        lua_setmetatable( L, -2 );
+        lua_setglobal( L, B::class_name );
     }
 
     // Called when Lua object is garbage collected.
