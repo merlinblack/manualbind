@@ -162,6 +162,14 @@ struct Binding {
         return B::create( L );
     }
 
+    static int pairs( lua_State* L )
+    {
+        lua_getglobal( L, "pairs" );
+        luaL_getmetatable( L, B::class_name );
+        lua_pcall( L, 1, LUA_MULTRET, 0 );
+        return 3;
+    }
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
@@ -170,7 +178,6 @@ struct Binding {
         has_extras<B> extrasTrait;
 
         lua_newtable( L );  // Class access
-
         lua_newtable( L );  // Class access metatable
 
         luaL_newmetatable( L, B::class_name );
@@ -186,10 +193,13 @@ struct Binding {
         lua_setfield( L, -2, "__properties" );
         setExtras( L, extrasTrait );
 
-        lua_setfield( L, -2, "__index" );
+        lua_setfield( L, -2, "__index" ); // Set metatable as index table.
 
         lua_pushcfunction( L, construct );
         lua_setfield( L, -2, "__call" );
+
+        lua_pushcfunction( L, pairs );
+        lua_setfield( L, -2, "__pairs" );
 
         lua_setmetatable( L, -2 );
         lua_setglobal( L, B::class_name );
@@ -277,6 +287,14 @@ struct PODBinding {
         return B::create( L );
     }
 
+    static int pairs( lua_State* L )
+    {
+        lua_getglobal( L, "pairs" );
+        luaL_getmetatable( L, B::class_name );
+        lua_pcall( L, 1, LUA_MULTRET, 0 );
+        return 3;
+    }
+
     // Create metatable and register Lua constructor
     static void register_class( lua_State *L )
     {
@@ -285,7 +303,6 @@ struct PODBinding {
         has_extras<B> extrasTrait;
 
         lua_newtable( L );  // Class access
-
         lua_newtable( L );  // Class access metatable
 
         luaL_newmetatable( L, B::class_name );
@@ -306,11 +323,15 @@ struct PODBinding {
         lua_pushcfunction( L, construct );
         lua_setfield( L, -2, "__call" );
 
+        lua_pushcfunction( L, pairs );
+        lua_setfield( L, -2, "__pairs" );
+
         lua_setmetatable( L, -2 );
         lua_setglobal( L, B::class_name );
     }
 
-    // Called when Lua object is garbage collected.
+    // This is still here should a POD really need 
+    // destructing. Shouldn't be a common case.
     static int destroy( lua_State *L )
     {
         void* ud = luaL_checkudata( L, 1, B::class_name );
