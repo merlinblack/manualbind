@@ -48,8 +48,8 @@ ycm: .ycm_extra_conf.py
 .ycm_extra_conf.py:
 	@echo "def FlagsForFile( filename, **kwargs ):" > .ycm_extra_conf.py
 	@echo "    return { " >> .ycm_extra_conf.py 
-	@echo -n "        'flags': [ '-x', 'c++', '-I$(shell realpath ../src)', '-I$(shell realpath common)', " >> .ycm_extra_conf.py
-	@echo -n $(foreach flag, $(CXXFLAGS), "'$(flag)', " ) >> .ycm_extra_conf.py
+	@printf %s "        'flags': [ '-x', 'c++', '-I$(shell realpath ../src)', '-I$(shell realpath common)', " >> .ycm_extra_conf.py
+	@printf %s $(foreach flag, $(CXXFLAGS), "'$(flag)', " ) >> .ycm_extra_conf.py
 	@echo "]," >> .ycm_extra_conf.py
 	@echo "    }" >> .ycm_extra_conf.py
 	@echo "Generated YouCompeteMe configuration."
