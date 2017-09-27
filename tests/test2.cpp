@@ -3,15 +3,9 @@
 
 using namespace ManualBind;
 
-bool gTest2DestructorCalled;
-
 class Basic
 {
     public:
-    ~Basic()
-    {
-        gTest2DestructorCalled = true;
-    }
 };
 
 // A very basic opaque pointer binding.
@@ -49,32 +43,47 @@ TEST_CASE( "Binding maintains shared pointer to same class instance." ) {
     lua_close( L );
 }
 
-TEST_CASE( "Garbage collection calls class destructor." ) {
+TEST_CASE( "Garbage collection calls shared pointer destructor." ) {
 
     lua_State* L = luaL_newstate();
 
     BasicBinding::register_class( L );
 
-    gTest2DestructorCalled = false;
+    BasicPtr bp = std::make_shared<Basic>();
 
-    {
-        BasicPtr bp = std::make_shared<Basic>();
+    REQUIRE( bp.use_count() == 1 );
 
-        // Give Lua a copy.
-        BasicBinding::push( L, bp );
-        lua_setglobal( L, "bp" );
+    // Give Lua a copy.
+    BasicBinding::push( L, bp );
+    lua_setglobal( L, "bp" );
 
-        // bp going out of scope and decrease ref count to 1
-    }
-
-    REQUIRE( gTest2DestructorCalled != true );
+    REQUIRE( bp.use_count() == 2 );
 
     // Garbage collect Lua's pointer.
     lua_pushnil( L );
     lua_setglobal( L, "bp" );
     lua_gc( L, LUA_GCCOLLECT, 0 );
 
-    REQUIRE( gTest2DestructorCalled == true );
+    REQUIRE( bp.use_count() == 1 );
 
     lua_close( L );
+}
+
+TEST_CASE( "Closing Lua state calls shared pointer destructor." ) {
+
+    lua_State* L = luaL_newstate();
+
+    BasicBinding::register_class( L );
+
+    BasicPtr bp = std::make_shared<Basic>();
+
+    REQUIRE( bp.use_count() == 1 );
+
+    // Give Lua a copy.
+    BasicBinding::push( L, bp );
+    lua_setglobal( L, "bp" );
+
+    lua_close( L );
+
+    REQUIRE( bp.use_count() == 1 );
 }
