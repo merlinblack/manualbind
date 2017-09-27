@@ -38,4 +38,6 @@ TEST_CASE( "Basic POD binding retains identical pointer value." ) {
     REQUIRE( bp == fromLua );
 
     lua_close( L );
+
+    delete bp;
 }
