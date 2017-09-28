@@ -1,7 +1,7 @@
 include ../examples/config.mk
 INCLUDES=-I../src
 VPATH=../src
-SRCS=main.cpp test1.cpp test2.cpp test_properties.cpp LuaBinding.cpp
+SRCS=main.cpp test1.cpp test2.cpp test_properties.cpp test_calling.cpp LuaBinding.cpp
 OBJS=$(SRCS:.cpp=.o)
 
 .PHONY: clean ycm all

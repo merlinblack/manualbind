@@ -7,14 +7,13 @@ class Basic
 {
 };
 
-// A very basic opaque pointer binding.
 struct BasicBinding : public Binding<BasicBinding,Basic>
 {
     static constexpr const char* class_name = "Basic";
 
     static int create( lua_State* L )
     {
-        return luaL_error( L, "Can not create an instance to opaque pointer" );
+        return luaL_error( L, "Can not create an instance." );
     }
 };
 
@@ -28,7 +27,7 @@ TEST_CASE( "Binding maintains shared pointer to same class instance." ) {
 
     BasicPtr bp = std::make_shared<Basic>();
 
-    // Give Lua a copy.
+    // Give
     BasicBinding::push( L, bp );
     lua_setglobal( L, "bp" );
 
@@ -52,7 +51,6 @@ TEST_CASE( "Garbage collection calls shared pointer destructor." ) {
 
     REQUIRE( bp.use_count() == 1 );
 
-    // Give Lua a copy.
     BasicBinding::push( L, bp );
     lua_setglobal( L, "bp" );
 
@@ -78,7 +76,6 @@ TEST_CASE( "Closing Lua state calls shared pointer destructor." ) {
 
     REQUIRE( bp.use_count() == 1 );
 
-    // Give Lua a copy.
     BasicBinding::push( L, bp );
     lua_setglobal( L, "bp" );
 

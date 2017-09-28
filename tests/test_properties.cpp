@@ -64,7 +64,6 @@ TEST_CASE( "Lua can get and set properties." ) {
 
     PersonPtr pp = std::make_shared<Person>();
 
-    // Give Lua a copy.
     PersonBinding::push( L, pp );
     lua_setglobal( L, "person" );
 
