@@ -1,18 +1,18 @@
 include ../examples/config.mk
 INCLUDES=-I../src
+VPATH=../src
+SRCS=main.cpp test1.cpp test2.cpp test_properties.cpp LuaBinding.cpp
+OBJS=$(SRCS:.cpp=.o)
 
-.PHONY: clean all
+.PHONY: clean ycm all
 
 all:	test ycm
 
-test:	test1.cpp test2.cpp test_properties.cpp Makefile ../src/LuaBinding.h catch.hpp main.o LuaBinding.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LIBS) $(LDFLAGS) main.o LuaBinding.o test1.cpp test2.cpp test_properties.cpp -o test
+test:	$(OBJS) Makefile ../src/LuaBinding.h catch.hpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LIBS) $(LDFLAGS) $(OBJS) -o test
 
-main.o:	main.cpp catch.hpp
-	$(CXX) $(CXXFLAGS) -c main.cpp
-
-LuaBinding.o:	../src/LuaBinding.cpp ../src/LuaBinding.h
-	$(CXX) $(CXXFLAGS) -I../src -c ../src/LuaBinding.cpp
+%.o:	%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< 
 
 clean:
 	-rm -f test

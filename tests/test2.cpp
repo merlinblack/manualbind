@@ -5,7 +5,6 @@ using namespace ManualBind;
 
 class Basic
 {
-    public:
 };
 
 // A very basic opaque pointer binding.
@@ -82,6 +81,8 @@ TEST_CASE( "Closing Lua state calls shared pointer destructor." ) {
     // Give Lua a copy.
     BasicBinding::push( L, bp );
     lua_setglobal( L, "bp" );
+
+    REQUIRE( bp.use_count() == 2 );
 
     lua_close( L );
 
