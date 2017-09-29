@@ -27,7 +27,7 @@ int main(int argc, char **argv )
 
     {
         lua_getglobal( L, "b" );
-        MyActorPtr b = MyActorBinding::fromStack( L, -1 );
+        MyActorPtr b = MyActorBinding::fromStackThrow( L, -1 );
         lua_pop( L, 1 );
 
         cout << "Use count is now: " << b.use_count() << endl;

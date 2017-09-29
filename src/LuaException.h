@@ -40,13 +40,15 @@ private:
 
 public:
     //----------------------------------------------------------------------------
-    /**
-      Construct a LuaException after a lua_pcall().
-      */
     LuaException (lua_State* L, int /*code*/)
         : m_L (L)
     {
         whatFromStack ();
+    }
+
+    LuaException( std::string what ) : m_L(nullptr)
+    {
+        m_what = what;
     }
 
     //----------------------------------------------------------------------------

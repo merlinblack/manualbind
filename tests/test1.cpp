@@ -27,7 +27,7 @@ TEST_CASE( "Basic POD binding retains identical pointer value." ) {
 
     // Retrieve
     lua_getglobal( L, "bp" );
-    Basic* fromLua = BasicPODbinding::fromStack( L, 1 );
+    Basic* fromLua = BasicPODbinding::fromStackThrow( L, 1 );
     lua_pop( L, 1 );
 
     REQUIRE( bp == fromLua );
