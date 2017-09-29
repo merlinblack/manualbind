@@ -27,11 +27,6 @@ struct PersonBinding : public Binding<PersonBinding,Person>
         return properties;
     }
 
-    static int create( lua_State* L )
-    {
-        return luaL_error( L, "Can not create an instance to opaque pointer" );
-    }
-
     static int getName( lua_State* L )
     {
         PersonPtr p = fromStack( L, 1 );

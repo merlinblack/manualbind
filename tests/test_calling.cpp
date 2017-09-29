@@ -34,11 +34,6 @@ struct WidgetBinding : public Binding<WidgetBinding,Widget>
         return members;
     }
 
-    static int create( lua_State* L )
-    {
-        return luaL_error( L, "Can not create an instance." );
-    }
-
     static int callSetThings( lua_State* L )
     {
         WidgetPtr p = fromStack( L, 1 );

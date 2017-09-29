@@ -11,8 +11,12 @@ all:	test ycm
 test:	$(OBJS) Makefile ../src/LuaBinding.h catch.hpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LIBS) $(LDFLAGS) $(OBJS) -o test
 
-%.o:	%.cpp
+%.o:	%.cpp ../src/LuaBinding.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< 
+
+main.o:	main.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< 
+
 
 clean:
 	-rm -f test
