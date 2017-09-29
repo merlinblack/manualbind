@@ -49,6 +49,9 @@ SOFTWARE.
 #include <lua.hpp>
 #include "n4502.h"
 
+template< bool cond, typename U >
+using enable_if_t = typename std::enable_if< cond, U >::type;
+
 namespace ManualBind {
 
 // traits
@@ -70,6 +73,12 @@ template <typename T>
 using extras_t = decltype(std::declval<T>().setExtraMeta(std::declval<lua_State*>()));
 template <typename T>
 using has_extras = detect<T, extras_t>;
+
+// constructor
+template <typename T>
+using create_t = decltype(std::declval<T>().create(std::declval<lua_State*>()));
+template <typename T>
+using has_create = detect<T, create_t>;
 
 // helper struct
 struct bind_properties {
@@ -154,12 +163,19 @@ struct Binding {
         // Nada.
     }
 
-    static int construct( lua_State* L )
+    template<typename R = int>
+    static enable_if_t< has_create<B>::value, R> construct( lua_State* L )
     {
         // Remove table from stack.
         lua_remove( L, 1 );
         // Call create.
         return B::create( L );
+    }
+
+    template<typename R = int>
+    static enable_if_t< !has_create<B>::value, R> construct( lua_State* L )
+    {
+        return luaL_error( L, "Can not create an instance of %s.", B::class_name );
     }
 
     static int pairs( lua_State* L )
@@ -279,13 +295,21 @@ struct PODBinding {
         // Nada.
     }
 
-    static int construct( lua_State* L )
+    template<typename R = int>
+    static enable_if_t< has_create<B>::value, R> construct( lua_State* L )
     {
         // Remove table from stack.
         lua_remove( L, 1 );
         // Call create.
         return B::create( L );
     }
+
+    template<typename R = int>
+    static enable_if_t< !has_create<B>::value, R> construct( lua_State* L )
+    {
+        return luaL_error( L, "Can not create an instance of %s.", B::class_name );
+    }
+
 
     static int pairs( lua_State* L )
     {
