@@ -153,14 +153,12 @@ struct Binding {
         // Nada.
     }
 
-    template<typename R = void>
-    static enable_if_t< has_extras<B>::value, R> setExtras( lua_State* L )
+    static void setExtras( lua_State* L, std::true_type )
     {
         B::setExtraMeta( L );
     }
 
-    template<typename R = void>
-    static enable_if_t< !has_extras<B>::value, R> setExtras( lua_State* )
+    static void setExtras( lua_State*, std::false_type )
     {
         // Nada.
     }
@@ -197,6 +195,7 @@ struct Binding {
     {
         has_members<B> membersTrait;
         has_properties<B> propTrait;
+        has_extras<B> extrasTrait;
 
         lua_newtable( L );  // Class access
         lua_newtable( L );  // Class access metatable
@@ -212,7 +211,7 @@ struct Binding {
         lua_newtable( L ); // __properties
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
-        setExtras( L );
+        setExtras( L, extrasTrait );
 
         lua_setfield( L, -2, "__index" ); // Set metatable as index table.
 
