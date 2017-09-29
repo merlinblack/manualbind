@@ -10,11 +10,6 @@ class Basic
 struct BasicBinding : public Binding<BasicBinding,Basic>
 {
     static constexpr const char* class_name = "Basic";
-
-    static int create( lua_State* L )
-    {
-        return luaL_error( L, "Can not create an instance." );
-    }
 };
 
 using BasicPtr = std::shared_ptr<Basic>;
