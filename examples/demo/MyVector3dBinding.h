@@ -40,7 +40,7 @@ struct MyVector3dBinding: public PODBinding<MyVector3dBinding, MyVector3d> {
     }
 
     // Lua constructor
-    static int create( lua_State *L )
+    static int create( lua_State* L )
     {
         std::cout << "Create called\n";
 

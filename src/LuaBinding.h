@@ -56,6 +56,12 @@ namespace ManualBind {
 
 // traits
 
+// constructor
+template <typename T>
+using create_t = decltype(std::declval<T>().create(std::declval<lua_State*>()));
+template <typename T>
+using has_create = detect<T, create_t>;
+
 // members
 template <typename T>
 using members_t = decltype(std::declval<T>().members());
@@ -73,12 +79,6 @@ template <typename T>
 using extras_t = decltype(std::declval<T>().setExtraMeta(std::declval<lua_State*>()));
 template <typename T>
 using has_extras = detect<T, extras_t>;
-
-// constructor
-template <typename T>
-using create_t = decltype(std::declval<T>().create(std::declval<lua_State*>()));
-template <typename T>
-using has_create = detect<T, create_t>;
 
 // helper struct
 struct bind_properties {
@@ -153,18 +153,19 @@ struct Binding {
         // Nada.
     }
 
-    static void setExtras( lua_State* L, std::true_type )
+    template<typename R = void>
+    static enable_if_t< has_extras<B>::value, R> setExtras( lua_State* L )
     {
         B::setExtraMeta( L );
     }
 
-    static void setExtras( lua_State*, std::false_type )
+    template<typename R = void>
+    static enable_if_t< !has_extras<B>::value, R> setExtras( lua_State* )
     {
         // Nada.
     }
 
-    template<typename R = int>
-    static enable_if_t< has_create<B>::value, R> construct( lua_State* L )
+    static int construct( lua_State* L, std::true_type )
     {
         // Remove table from stack.
         lua_remove( L, 1 );
@@ -172,10 +173,15 @@ struct Binding {
         return B::create( L );
     }
 
-    template<typename R = int>
-    static enable_if_t< !has_create<B>::value, R> construct( lua_State* L )
+    static int construct( lua_State* L, std::false_type )
     {
-        return luaL_error( L, "Can not create an instance of %s.", B::class_name );
+        return luaL_error( L, "Can not create an instance of %s.", B::class_name);
+    }
+
+    static int construct( lua_State* L )
+    {
+        has_create<B> createTrait;
+        return construct( L, createTrait);
     }
 
     static int pairs( lua_State* L )
@@ -191,7 +197,6 @@ struct Binding {
     {
         has_members<B> membersTrait;
         has_properties<B> propTrait;
-        has_extras<B> extrasTrait;
 
         lua_newtable( L );  // Class access
         lua_newtable( L );  // Class access metatable
@@ -207,7 +212,7 @@ struct Binding {
         lua_newtable( L ); // __properties
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
-        setExtras( L, extrasTrait );
+        setExtras( L );
 
         lua_setfield( L, -2, "__index" ); // Set metatable as index table.
 
@@ -295,8 +300,7 @@ struct PODBinding {
         // Nada.
     }
 
-    template<typename R = int>
-    static enable_if_t< has_create<B>::value, R> construct( lua_State* L )
+    static int construct( lua_State* L, std::true_type )
     {
         // Remove table from stack.
         lua_remove( L, 1 );
@@ -304,12 +308,16 @@ struct PODBinding {
         return B::create( L );
     }
 
-    template<typename R = int>
-    static enable_if_t< !has_create<B>::value, R> construct( lua_State* L )
+    static int construct( lua_State* L, std::false_type )
     {
-        return luaL_error( L, "Can not create an instance of %s.", B::class_name );
+        return luaL_error( L, "Can not create an instance of %s.", B::class_name);
     }
 
+    static int construct( lua_State* L )
+    {
+        has_create<B> createTrait;
+        return construct( L, createTrait);
+    }
 
     static int pairs( lua_State* L )
     {

@@ -63,11 +63,6 @@ struct RectangleBinding: public Binding<RectangleBinding, Rectangle>
         return members;
     }
 
-    static bind_properties* properties()
-    {
-        return nullptr;
-    }
-
     // Lua constructor
     static int create( lua_State *L )
     {
