@@ -69,10 +69,6 @@ struct RenderableBinding: public Binding<RenderableBinding, Renderable> {
 
     static constexpr const char* class_name = "Renderable";
 
-    static int create( lua_State *L )
-    {
-        return luaL_error( L, "Can not create an instance of an abstract class." );
-    }
 };
 
 struct SquareBinding: public Binding<SquareBinding, Square> {
