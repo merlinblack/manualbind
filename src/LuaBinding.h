@@ -48,6 +48,7 @@ SOFTWARE.
 #include <memory>
 #include <lua.hpp>
 #include "n4502.h"
+#include "LuaException.h"
 
 template< bool cond, typename U >
 using enable_if_t = typename std::enable_if< cond, U >::type;
@@ -249,6 +250,18 @@ struct Binding {
         return *sp;
     }
 
+    static const std::shared_ptr<T>& fromStackThrow( lua_State *L, int index )
+    {
+        void* ud = luaL_testudata( L, index, B::class_name );
+
+        if( ud == nullptr )
+            throw LuaException( "Unexpected item on Lua stack." );
+
+        auto sp = static_cast<std::shared_ptr<T>*>(ud);
+
+        return *sp;
+    }
+
 };
 
 // Plain Old Data POD version.
@@ -385,6 +398,17 @@ struct PODBinding {
         return *p;
     }
 
+    static T& fromStackThrow( lua_State *L, int index )
+    {
+        void* ud = luaL_testudata( L, index, B::class_name );
+
+        if( ud == nullptr )
+            throw LuaException( "Unexpected item on Lua stack." );
+
+        auto p = static_cast<T*>(ud);
+
+        return *p;
+    }
 };
 
 

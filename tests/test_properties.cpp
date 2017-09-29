@@ -71,9 +71,9 @@ TEST_CASE( "Lua can get and set properties." ) {
     run( L, "name = person.name" );
 
     lua_getglobal( L, "name" );
-    const char* name = luaL_checkstring( L, -1 );
+    std::string name (luaL_checkstring( L, -1 ));
 
-    REQUIRE( std::string(name) == "Jane" );
+    REQUIRE( name == "Jane" );
 
     lua_close( L );
 }

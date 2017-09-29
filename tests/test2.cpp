@@ -28,7 +28,7 @@ TEST_CASE( "Binding maintains shared pointer to same class instance." ) {
 
     // Retrieve
     lua_getglobal( L, "bp" );
-    BasicPtr fromLua = BasicBinding::fromStack( L, 1 );
+    BasicPtr fromLua = BasicBinding::fromStackThrow( L, 1 );
     lua_pop( L, 1 );
 
     REQUIRE( bp == fromLua );
