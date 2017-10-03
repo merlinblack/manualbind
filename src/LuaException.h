@@ -30,6 +30,8 @@ SOFTWARE.
 #ifndef __LUAEXCEPTION_H
 #define __LUAEXCEPTION_H
 
+#include<string>
+
 namespace ManualBind {
 
 class LuaException : public std::exception
