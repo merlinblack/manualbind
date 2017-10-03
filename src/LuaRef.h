@@ -28,6 +28,7 @@ SOFTWARE.
 #ifndef __LUAREF_H
 #define __LUAREF_H
 
+#include <lua.hpp>
 #include <string>
 #include <tuple> // For std::ignore
 #include "LuaStack.h"
