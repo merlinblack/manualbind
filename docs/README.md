@@ -67,11 +67,6 @@ struct ColorBinding : public PODBinding<ColorBinding,ALLEGRO_COLOR>
 {
     static constexpr const char* class_name = "AllegroColor";
 
-    static luaL_Reg* members()
-    {
-        return nullptr; // No members for this class.
-    }
-
     static bind_properties* properties()
     {
         static bind_properties properties[] = {
