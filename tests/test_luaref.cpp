@@ -30,3 +30,23 @@ TEST_CASE( "Can call lua functions with LuaRef" ) {
 
     lua_close( L );
 }
+
+TEST_CASE( "LuaRef can index and access tables." ) {
+
+    lua_State* L = luaL_newstate();
+
+    {
+        LuaRef table = LuaRef::newTable( L );
+        table.push();
+        lua_setglobal( L, "t" );
+
+        run( L, "for i = 1, 100 do t[i] = i end" );
+
+        REQUIRE( (int)table[25] == 25 );
+        REQUIRE( (int)table[1] == 1 );
+        REQUIRE( (int)table[100] == 100 );
+        REQUIRE( table[1000].isNil() == true );
+    }
+
+    lua_close( L );
+}
