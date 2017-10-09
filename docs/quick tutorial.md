@@ -106,7 +106,7 @@ struct WidgetBinding : public ManualBind::Binding<WidgetBinding, Widget>
 
 ```
 
-This construction function will automatically found by template magic and added to the binding. For this reason in must be called 'create'. Unlike most Lua Binding libraries, all 'glue' functions, i.e. this create and other functions we will write soon, need some familiarity with working with the Lua stack and Lua's C API. I've done this intentionally. This allows to allows you all the power of the Lua C API.
+This construction function will be automatically found by template magic and added to the binding. For this reason it must be called 'create'. Unlike most Lua Binding libraries, all 'glue' functions, i.e. this create and other functions we will write soon, need some familiarity with working with the Lua stack and Lua's C API. I've done this intentionally. This allows to allows you all the power of the Lua C API.
 
 Here we are simply grabbing each parameter from the Lua stack and using them to create a shared pointer to a brand new Widget. Then we push that pointer onto the Lua stack and return '1' as in the count of return values this function returns to Lua. The push function is the same one we saw earlier, albeit without the 'WidgetBinding::' qualifier.
 
@@ -118,7 +118,7 @@ Now in Lua code we can do this:
 
 Now that we can make Widgets from Lua, it would be nice to be able to call the 'show' method.
 
-We do this by added another static function to the binding to override the default one which has no bound functions. We also need a small 'glue' function to marshal any parameters.
+We do this by adding another static function to the binding to override the default one which has no bound functions. We also need a small 'glue' function to marshal any parameters.
 ```c++
 
 struct WidgetBinding : public ManualBind::Binding<WidgetBinding, Widget>
