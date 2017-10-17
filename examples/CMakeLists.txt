@@ -5,14 +5,16 @@ find_package( Lua )
 include_directories( 
     ../src
     common
-    ${LUA_INCLUDE_PREFIX}
+    ${LUA_INCLUDE_DIR}
 )
 
-add_library( common common/common.cpp ../src/LuaBinding.cpp )
+add_library( common common/common.cpp common/common.h ../src/LuaBinding.cpp )
 
-function( example NAME SRC )
+function( example NAME DIR )
 
-    add_executable( ${NAME} ${SRC} )
+    file( GLOB SRCS "${DIR}/*.cpp" "${DIR}/*.h" "${DIR}/*.lua" )
+
+    add_executable( ${NAME} ${SRCS} )
 
     target_link_libraries( ${NAME}
         common
@@ -25,12 +27,12 @@ function( example NAME SRC )
 
 endfunction()
 
-example( exdemo demo/demo.cpp )
-example( exluaref luaref/luaref.cpp )
-example( exdowncast downcast/downcast.cpp )
-example( exupcast upcast/upcast.cpp )
-example( extables tables/tables.cpp )
-example( exgui guiexample/guiexample.cpp )
+example( exdemo demo )
+example( exluaref luaref )
+example( exdowncast downcast )
+example( exupcast upcast )
+example( extables tables )
+example( exgui guiexample )
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gui.lua"

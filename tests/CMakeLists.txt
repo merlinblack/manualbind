@@ -7,7 +7,7 @@ file( GLOB TEST_SRCS *.cpp )
 
 include_directories( 
     ../src
-    ${LUA_INCLUDE_PREFIX}
+    ${LUA_INCLUDE_DIR}
  )
 
 add_executable( tests ${TEST_SRCS} ../src/LuaBinding.cpp )
