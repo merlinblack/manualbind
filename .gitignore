@@ -2,3 +2,4 @@
 *.swp
 *.dSYM
 .ycm_extra_conf.py
+build

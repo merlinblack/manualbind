@@ -107,7 +107,7 @@ void test( lua_State* L )
 {
     RectangleBinding::register_class( L );
 
-    if( luaL_dofile( L, "test.lua" ) )
+    if( luaL_dofile( L, "gui.lua" ) )
     {
         cout << lua_tostring( L, -1 ) << endl;
         lua_pop( L, 1 );
