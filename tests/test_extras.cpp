@@ -25,7 +25,6 @@ struct ExtraBinding : public Binding<ExtraBinding,Extra>
 TEST_CASE( "Can set extra elements in class meta table." ) {
 
     lua_State* L = luaL_newstate();
-    luaL_openlibs( L );
 
     ExtraBinding::register_class( L );
 
@@ -43,3 +42,35 @@ TEST_CASE( "Can set extra elements in class meta table." ) {
 
     lua_close( L );
 }
+
+TEST_CASE( "Lua can assign extra elements per instance." ) {
+
+    lua_State* L = luaL_newstate();
+
+    ExtraBinding::register_class( L );
+
+    ExtraPtr p1 = std::make_shared<Extra>();
+    ExtraBinding::push( L, p1 );
+    lua_setglobal( L, "p1" );
+
+    ExtraPtr p2 = std::make_shared<Extra>();
+    ExtraBinding::push( L, p2 );
+    lua_setglobal( L, "p2" );
+
+    run( L, "p1.perinstance = 'Nigel'" );
+
+    run( L, "name = p1.perinstance" );
+
+    lua_getglobal( L, "name" );
+    std::string name( lua_tostring( L, -1 ) );
+
+    REQUIRE( name == "Nigel" );
+
+    run( L, "name = p2.perinstance" );
+
+    lua_getglobal( L, "name" );
+
+    REQUIRE( lua_type( L, -1 ) == LUA_TNIL );
+
+    lua_close( L );
+};
