@@ -10,12 +10,14 @@ include_directories(
     ${LUA_INCLUDE_DIR}
  )
 
-add_executable( tests ${TEST_SRCS} ../src/LuaBinding.cpp )
+add_executable( runtests ${TEST_SRCS} ../src/LuaBinding.cpp )
 
-target_link_libraries( tests
+target_link_libraries( runtests
     ${LUA_LIBRARY}
     ${LUA_MATH_LIBRARY}
 )
 
-set_property( TARGET tests PROPERTY CXX_STANDARD 11 )
-set_property( TARGET tests PROPERTY CXX_STANDARD_REQUIRED ON )
+add_test( tests runtests )
+
+set_property( TARGET runtests PROPERTY CXX_STANDARD 11 )
+set_property( TARGET runtests PROPERTY CXX_STANDARD_REQUIRED ON )
