@@ -1,6 +1,7 @@
 #ifndef __MYACTOR_H
 #define __MYACTOR_H
 #include <iostream>
+#include <string>
 
 class MyActor {
 protected:
