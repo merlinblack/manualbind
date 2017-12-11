@@ -8,3 +8,4 @@ enable_testing()
 add_subdirectory( examples )
 add_subdirectory( tests )
 
+message( STATUS "Lua Library: ${LUA_LIBRARY}" )
