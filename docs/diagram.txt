@@ -1,13 +1,18 @@
 Lua Tables and objects used in Bindings.
 ─────────────────────────────────────────
 
- C function registered in Lua as "ClassName" ──> Creates a class instance.
- I.e. a binding for a "Widget" class, will have a function called "Widget".
+ A table stored globally as "ClassName" represents each class. This table
+ has a __call metametod C function that creates a class instance.
+ This table also provides a __pairs metamethod for class introspection
+ and the __index field is set to the metatable.
+
+
+ A class instance looks like the following:
 
  ┌─USERDATA────────────────┐            ┌─TABLE────────────────────┐
  │ Class userdata.         │            │ Class metatable.         │
  ├─────────────────────────┤            ├──────────────────────────┤
- │ Represents an instance  │            │ Represents a class       │
+ │ Represents an instance  │            │                          │
  │                         │            │                          │
  │                         │            │ __gc                     ├──> C function to destroy
  │                         │            │                          │    or clean up class
