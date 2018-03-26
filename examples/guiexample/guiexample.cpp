@@ -45,7 +45,7 @@ public:
     }
 };
 
-typedef std::shared_ptr<Rectangle> RectanglePtr;
+using RectanglePtr = std::shared_ptr<Rectangle>;
 
 using namespace ManualBind;
 

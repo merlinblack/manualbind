@@ -32,8 +32,8 @@ public:
 
 /****************************** Bindings ***************************/
 
-typedef std::shared_ptr<Vehicle> VehiclePtr;
-typedef std::shared_ptr<Car> CarPtr;
+using VehiclePtr = std::shared_ptr<Vehicle>;
+using CarPtr = std::shared_ptr<Car>;
 
 using namespace ManualBind;
 
