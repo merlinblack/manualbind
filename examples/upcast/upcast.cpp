@@ -31,6 +31,8 @@ public:
         cout << hex << this << dec << " - I'm a Square!" << endl;
         return true;
     }
+    virtual ~Square() {
+    }
 };
 
 class Circle: public Renderable
@@ -39,6 +41,8 @@ public:
     bool Render() {
         cout << hex << this << dec << " - I'm a Circle!" << endl;
         return true;
+    }
+    virtual ~Circle() {
     }
 };
 
