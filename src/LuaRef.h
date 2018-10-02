@@ -142,6 +142,9 @@ public:
     template<typename... Args>
     inline LuaRef const operator()( Args... args ) const;
 
+    template<typename... Args>
+    inline void call( int ret, Args... args ) const;
+
     template<typename T>
     void append( T v ) const
     {
@@ -324,6 +327,27 @@ inline LuaRef const LuaRefBase::operator()( Args... args ) const
     std::ignore = dummy;
     LuaException::pcall( m_L, n, 1 );
     return LuaRef (m_L, FromStack ());
+}
+
+template<>
+inline void LuaRefBase::call( int ret ) const
+{
+    push();
+    LuaException::pcall (m_L, 0, ret);
+    return; // Return values, if any, are left on the Lua stack.
+}
+
+template<typename... Args>
+inline void LuaRefBase::call( int ret, Args... args ) const
+{
+    const int n = sizeof...(Args);
+    push();
+    // Initializer expansion trick to call push for each arg.
+    // https://stackoverflow.com/questions/25680461/variadic-template-pack-expansion
+    int dummy[] = { 0, ( (void) LuaStack<Args>::push( m_L, std::forward<Args>(args) ), 0 ) ... };
+    std::ignore = dummy;
+    LuaException::pcall( m_L, n, ret );
+    return; // Return values, if any, are left on the Lua stack.
 }
 
 }; // namespace ManualBind
