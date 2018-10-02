@@ -73,6 +73,9 @@ int main()
                  "Tom",   "Sonja", "Greg",   "Trish"
                );
 
+        // No return value
+        testing.call( 0, "No return value." );
+
         table["testing"](testing,3,2,1,"Calling array element");
         table["testing"]();
 
