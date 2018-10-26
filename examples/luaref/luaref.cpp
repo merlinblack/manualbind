@@ -44,6 +44,24 @@ int main()
              << endl;
 
         table["b"]["c"]["hello"] = "World!";
+        // A lot happens here behind the scenes.
+        // The previous line is effectively the same as:
+        // {
+        //   temp = table["b"];
+        //   temp2 = temp["c"];
+        //   temp3 = temp2["hello"];
+        //   temp3 = "World!"; // Calls overloaded = operator.
+        //   // Here temps go out of scope and are destructed.
+        // }
+        //
+        // Each temp is a pair of luaL_ref and luaL_unref's.
+        //
+        // If you are in a tight loop you will want to do this...
+        // auto hello = table["b"]["c"]["hello"];
+        // for( ... ) {
+        //   hello = something( ..., ..., ... );
+        //   whatever( hello );
+        // }
 
         run( L, "print( a.b.c.hello )" );
 
