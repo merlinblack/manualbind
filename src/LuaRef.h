@@ -274,6 +274,26 @@ public:
     }
 
     template<typename K>
+    LuaRef& operator=( LuaTableElement<K>&& other ) noexcept
+    {
+        luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
+        other.push();
+        m_L = other.m_L;
+        m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
+        return *this;
+    }
+
+    template<typename K>
+    LuaRef& operator=( LuaTableElement<K> const& other )
+    {
+        luaL_unref( m_L, LUA_REGISTRYINDEX, m_ref );
+        other.push();
+        m_L = other.m_L;
+        m_ref = luaL_ref( m_L, LUA_REGISTRYINDEX );
+        return *this;
+    }
+
+    template<typename K>
     LuaTableElement<K> operator[]( K key ) const
     {
         push();
@@ -348,6 +368,13 @@ inline void LuaRefBase::call( int ret, Args... args ) const
     std::ignore = dummy;
     LuaException::pcall( m_L, n, ret );
     return; // Return values, if any, are left on the Lua stack.
+}
+
+template<>
+inline LuaRef LuaRefBase::cast()
+{
+    push();
+    return LuaRef( m_L, FromStack() );
 }
 
 }; // namespace ManualBind
