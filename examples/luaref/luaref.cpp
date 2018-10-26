@@ -47,11 +47,14 @@ int main()
 
         run( L, "print( a.b.c.hello )" );
 
-        auto b = table["b"];
+        auto b = table["b"]; // returns a LuaTableElement
         b[3] = "Index 3";
+
+        LuaRef faster_b = b; // Convert LuaTableElement to LuaRef for faster pushing 
+
         for( int i = 1; i < 5; i++ )
         {
-            b.append( i );
+            faster_b.append( i );
         }
         b[1] = LuaNil();
         b.append( "Add more." );
