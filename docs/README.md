@@ -8,6 +8,9 @@ ManualBind
 Semi-manual binding between C++ and Lua.
 See header files and LICENSE for author and license info.
 
+*Update December 2020.*
+I've checked this still works with Lua 5.4. All tests pass, and the examples are working.
+
 Examples
 --------
 There are several examples, which show various parts or techniques.
