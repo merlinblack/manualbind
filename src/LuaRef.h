@@ -138,6 +138,9 @@ public:
     inline bool isLightUserdata () const {
         return type () == LUA_TLIGHTUSERDATA;
     }
+    inline bool isBool() const {
+        return type () == LUA_TBOOLEAN;
+    }
 
     template<typename... Args>
     inline LuaRef const operator()( Args... args ) const;
