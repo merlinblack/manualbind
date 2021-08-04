@@ -1,6 +1,8 @@
 #include "catch.hpp"
 #include "LuaBinding.h"
 
+void run( lua_State* L, const char* code );
+
 using namespace ManualBind;
 
 class Basic
@@ -79,4 +81,33 @@ TEST_CASE( "Closing Lua state calls shared pointer destructor." ) {
     lua_close( L );
 
     REQUIRE( bp.use_count() == 1 );
+}
+
+TEST_CASE( "Lua object going out of scope with close annotation resets shared pointer." ) {
+
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+
+    BasicBinding::register_class( L );
+
+    run(L, "function scope(bp) local lbp <close> = bp coroutine.yield() end");
+    run(L, "co = coroutine.wrap(scope)");
+
+    BasicPtr bp = std::make_shared<Basic>();
+
+    REQUIRE( bp.use_count() == 1 );
+
+    int nResults, ret;
+    lua_getglobal( L, "co" );
+    BasicBinding::push( L, bp );
+    ret = lua_resume( L, nullptr, 1, &nResults);
+
+    REQUIRE( bp.use_count() == 2 );
+
+    lua_getglobal( L, "co" );
+    ret = lua_resume( L, nullptr, 0, &nResults);
+
+    REQUIRE( bp.use_count() == 1 );
+
+    lua_close( L );
 }

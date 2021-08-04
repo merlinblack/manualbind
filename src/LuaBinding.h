@@ -209,6 +209,8 @@ struct Binding {
         lua_setfield( L, -2, "__newindex" );
         lua_pushcfunction( L, destroy );
         lua_setfield( L, -2, "__gc" );
+        lua_pushcfunction( L, close );
+        lua_setfield( L, -2, "__close" );
         lua_newtable( L ); // __properties
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
@@ -226,7 +228,6 @@ struct Binding {
         lua_setglobal( L, B::class_name );
     }
 
-    //
     // Called when Lua object is garbage collected.
     static int destroy( lua_State *L )
     {
@@ -236,6 +237,18 @@ struct Binding {
 
         // Explicitly called, as this was 'placement new'd
         sp->~shared_ptr();
+
+        return 0;
+    }
+
+    // Called when Lua object goes out of scope with the <close> annotation
+    static int close( lua_State *L )
+    {
+        void* ud = luaL_checkudata( L, 1, B::class_name );
+
+        auto sp = static_cast<std::shared_ptr<T>*>(ud);
+
+        sp->reset();
 
         return 0;
     }
