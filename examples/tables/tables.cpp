@@ -1,5 +1,6 @@
 #include "common.h"
 #include "LuaBinding.h"
+#include "LuaRef.h"
 #include <iostream>
 #include <vector>
 #include "MyActor.h"
@@ -25,10 +26,11 @@ MyActorList createList()
 void pushToLua( lua_State* L, MyActorList list )
 {
     lua_newtable( L );
+    int i = 1;
 
     for( const auto& actor : list ) {
         MyActorBinding::push( L, actor );
-        luaL_ref( L, -2 );
+        lua_rawseti( L, -2, i++);
     }
 }
 

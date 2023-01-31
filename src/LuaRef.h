@@ -152,8 +152,9 @@ public:
     void append( T v ) const
     {
         push();
+        size_t len = lua_rawlen( m_L, -1);
         LuaStack<T>::push( m_L, v );
-        luaL_ref( m_L, -2 );
+        lua_rawseti( m_L, -2, ++len );
         lua_pop( m_L, 1 );
     }
 
