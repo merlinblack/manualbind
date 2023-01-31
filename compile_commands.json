@@ -1,1 +1,82 @@
-build/compile_commands.json
+[
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/exgui.dir/guiexample/guiexample.cpp.o -c /home/nigel/prog/manualbind/examples/guiexample/guiexample.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/guiexample/guiexample.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/exupcast.dir/upcast/upcast.cpp.o -c /home/nigel/prog/manualbind/examples/upcast/upcast.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/upcast/upcast.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/exdowncast.dir/downcast/downcast.cpp.o -c /home/nigel/prog/manualbind/examples/downcast/downcast.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/downcast/downcast.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/extables.dir/tables/tables.cpp.o -c /home/nigel/prog/manualbind/examples/tables/tables.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/tables/tables.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/exluaref.dir/luaref/luaref.cpp.o -c /home/nigel/prog/manualbind/examples/luaref/luaref.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/luaref/luaref.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/exdemo.dir/demo/demo.cpp.o -c /home/nigel/prog/manualbind/examples/demo/demo.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/demo/demo.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/common.dir/common/common.cpp.o -c /home/nigel/prog/manualbind/examples/common/common.cpp",
+  "file": "/home/nigel/prog/manualbind/examples/common/common.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/examples",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/examples/../src -I/home/nigel/prog/manualbind/examples/common -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/common.dir/__/src/LuaBinding.cpp.o -c /home/nigel/prog/manualbind/src/LuaBinding.cpp",
+  "file": "/home/nigel/prog/manualbind/src/LuaBinding.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/main.cpp.o -c /home/nigel/prog/manualbind/tests/main.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/main.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/test1.cpp.o -c /home/nigel/prog/manualbind/tests/test1.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/test1.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/test2.cpp.o -c /home/nigel/prog/manualbind/tests/test2.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/test2.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/test_calling.cpp.o -c /home/nigel/prog/manualbind/tests/test_calling.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/test_calling.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/test_extras.cpp.o -c /home/nigel/prog/manualbind/tests/test_extras.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/test_extras.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/test_luaref.cpp.o -c /home/nigel/prog/manualbind/tests/test_luaref.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/test_luaref.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/test_properties.cpp.o -c /home/nigel/prog/manualbind/tests/test_properties.cpp",
+  "file": "/home/nigel/prog/manualbind/tests/test_properties.cpp"
+},
+{
+  "directory": "/home/nigel/prog/manualbind/build/tests",
+  "command": "/usr/bin/c++   -I/home/nigel/prog/manualbind/tests/../src -I/home/nigel/prog/lua-5.4.0/src  -g   -std=gnu++11 -o CMakeFiles/runtests.dir/__/src/LuaBinding.cpp.o -c /home/nigel/prog/manualbind/src/LuaBinding.cpp",
+  "file": "/home/nigel/prog/manualbind/src/LuaBinding.cpp"
+}
+]

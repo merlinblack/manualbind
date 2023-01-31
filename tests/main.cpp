@@ -1,5 +1,4 @@
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 #include <lua.hpp>
 
 void run( lua_State* L, const char* code )

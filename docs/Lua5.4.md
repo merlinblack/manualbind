@@ -4,7 +4,7 @@ Lua 5.4
 Lua 5.4 allows you to annotate local varibles to either make them const, or const and closing.
 Closing varibles when they go out of scope will call thier __close metamethod.
 
-The binding now handles __close in addition to __gc, by resetting the shared pointer, effectively releasing that refcount for the object. This allows you to have more deterministic releasing of resources, with out having to force garbage collections.
+The binding now handles __close in addition to __gc, by resetting the shared pointer, effectively releasing that refcount for the object. This allows you to have more deterministic releasing of resources, without having to force garbage collections.
 
 Example
 ----------

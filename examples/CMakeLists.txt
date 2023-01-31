@@ -10,7 +10,7 @@ include_directories(
 
 add_library( common common/common.cpp common/common.h ../src/LuaBinding.cpp )
 
-set_property( TARGET common PROPERTY CXX_STANDARD 11 )
+set_property( TARGET common PROPERTY CXX_STANDARD 20 )
 set_property( TARGET common PROPERTY CXX_STANDARD_REQUIRED ON )
 
 function( example NAME DIR )
@@ -25,7 +25,7 @@ function( example NAME DIR )
         ${LUA_MATH_LIBRARY}
     )
 
-    set_property( TARGET ${NAME} PROPERTY CXX_STANDARD 11 )
+    set_property( TARGET ${NAME} PROPERTY CXX_STANDARD 20 )
     set_property( TARGET ${NAME} PROPERTY CXX_STANDARD_REQUIRED ON )
 
 endfunction()
