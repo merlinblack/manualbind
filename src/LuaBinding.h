@@ -215,6 +215,8 @@ struct Binding {
         setProperties( L, propTrait );
         lua_setfield( L, -2, "__properties" );
         setExtras( L, extrasTrait );
+        lua_pushcfunction( L, pairs );
+        lua_setfield( L, -2, "__pairs" );
 
         lua_setfield( L, -2, "__index" ); // Set metatable as index table.
 
