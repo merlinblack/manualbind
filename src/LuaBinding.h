@@ -94,7 +94,7 @@ int LuaBindingIndex( lua_State *L );
 int LuaBindingNewIndex( lua_State *L );
 
 // Gets the table of extra values assigned to an instance.
-int LuaBindGetExtraValuesTable( lua_State* L, int index );
+int LuaBindingGetExtraValuesTable( lua_State* L, int index );
 
 void LuaBindingSetProperties( lua_State *L, bind_properties* properties );
 
@@ -277,6 +277,11 @@ struct Binding {
         return *sp;
     }
 
+    static bool isType( lua_State *L, int index)
+    {
+        return luaL_testudata( L, index, B::class_name) != nullptr;
+    }
+
 };
 
 // Plain Old Data POD version.
@@ -424,6 +429,12 @@ struct PODBinding {
 
         return *p;
     }
+
+    static bool isType( lua_State *L, int index)
+    {
+        return luaL_testudata( L, index, B::class_name) != nullptr;
+    }
+
 };
 
 

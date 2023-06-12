@@ -36,3 +36,30 @@ TEST_CASE( "Basic POD binding retains identical pointer value." ) {
 
     delete bp;
 }
+
+TEST_CASE( "Basic POD binding can test for type." ) {
+
+    lua_State* L = luaL_newstate();
+
+    BasicPODbinding::register_class( L );
+
+    Basic* bp = new Basic();
+
+    // Give Lua a copy.
+    BasicPODbinding::push( L, bp );
+    lua_setglobal( L, "bp" );
+
+    // Check the 'type'
+    lua_getglobal( L, "bp" );
+    REQUIRE( BasicPODbinding::isType(L, -1) == true );
+    lua_pop( L, 1 );
+
+    // Checl for false positive
+    lua_pushinteger(L, 42);
+    REQUIRE( BasicPODbinding::isType(L, -1) == false );
+    lua_pop( L, 1 );
+
+    lua_close( L );
+
+    delete bp;
+}

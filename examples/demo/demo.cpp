@@ -51,7 +51,7 @@ int main(int argc, char **argv )
 
     {
         lua_getglobal( L, "a" );
-        LuaBindGetExtraValuesTable( L, -1 );
+        LuaBindingGetExtraValuesTable( L, -1 );
         LuaRef extras = LuaRef::fromStack( L, -1 );
         lua_pop( L, 2 );    // "a", and the table.
         cout << extras["extra"].tostring() << endl;

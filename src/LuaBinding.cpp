@@ -105,7 +105,7 @@ int LuaBindingIndex( lua_State *L )
 // Get the table holding any extra values for the class metatable
 // at index. Returns nil if there has not been any assigned, and
 // no table yet exists.
-int LuaBindGetExtraValuesTable( lua_State* L, int index )
+int LuaBindingGetExtraValuesTable( lua_State* L, int index )
 {
     index = lua_absindex( L, index );
     lua_pushcfunction( L, createExtraValueStore );
