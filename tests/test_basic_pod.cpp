@@ -54,7 +54,7 @@ TEST_CASE( "Basic POD binding can test for type." ) {
     REQUIRE( BasicPODbinding::isType(L, -1) == true );
     lua_pop( L, 1 );
 
-    // Checl for false positive
+    // Check for false positive
     lua_pushinteger(L, 42);
     REQUIRE( BasicPODbinding::isType(L, -1) == false );
     lua_pop( L, 1 );
