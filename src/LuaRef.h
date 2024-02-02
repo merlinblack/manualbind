@@ -161,6 +161,7 @@ public:
     template<typename T>
     T cast()
     {
+        StackPopper p(m_L);
         push();
         return LuaStack<T>::get( m_L, -1 );
     }

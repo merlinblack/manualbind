@@ -50,3 +50,25 @@ TEST_CASE( "LuaRef can index and access tables." ) {
 
     lua_close( L );
 }
+
+TEST_CASE( "Accessing table elements leaves luaTop at the same place." ) {
+
+    lua_State* L = luaL_newstate();
+
+    {
+        LuaRef table = LuaRef::newTable( L );
+        table.push();
+        lua_setglobal( L, "t");
+
+        run( L, "t[5] = 123");
+
+        int top = lua_gettop( L );
+
+        int number = table[5];
+
+        int topAfter = lua_gettop( L );
+
+        REQUIRE(number == 123);
+        REQUIRE(top == topAfter);
+    }
+}
