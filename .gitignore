@@ -6,3 +6,4 @@ build
 xcode
 .vs
 .vscode
+.cache
