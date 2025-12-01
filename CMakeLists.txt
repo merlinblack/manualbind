@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.0...3.31 )
 project( ManualBind )
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )

@@ -1,5 +1,5 @@
 # Bulid tests
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required( VERSION 3.0...3.31 )
 
 find_package( Lua )
 
@@ -7,7 +7,7 @@ add_subdirectory(Catch2)
 
 file( GLOB TEST_SRCS *.cpp )
 
-include_directories( 
+include_directories(
     ../src
     ${LUA_INCLUDE_DIR}
 )

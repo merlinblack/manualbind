@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0...3.31)
 
 find_package( Lua )
 
-include_directories( 
+include_directories(
     ../src
     common
     ${LUA_INCLUDE_DIR}
@@ -15,18 +15,18 @@ set_property( TARGET common PROPERTY CXX_STANDARD_REQUIRED ON )
 
 function( example NAME DIR )
 
-    file( GLOB SRCS "${DIR}/*.cpp" "${DIR}/*.h" "${DIR}/*.lua" )
+  file( GLOB SRCS "${DIR}/*.cpp" "${DIR}/*.h" "${DIR}/*.lua" )
 
-    add_executable( ${NAME} ${SRCS} )
+  add_executable( ${NAME} ${SRCS} )
 
-    target_link_libraries( ${NAME}
+  target_link_libraries( ${NAME}
         common
         ${LUA_LIBRARY}
         ${LUA_MATH_LIBRARY}
-    )
+  )
 
-    set_property( TARGET ${NAME} PROPERTY CXX_STANDARD 20 )
-    set_property( TARGET ${NAME} PROPERTY CXX_STANDARD_REQUIRED ON )
+  set_property( TARGET ${NAME} PROPERTY CXX_STANDARD 20 )
+  set_property( TARGET ${NAME} PROPERTY CXX_STANDARD_REQUIRED ON )
 
 endfunction()
 
