@@ -64,123 +64,135 @@ Each case requires progressively more table lookups in addition to the order the
 Example binding
 ---------------
 
-This is real life code taken from my game. In this instance Allegro colors are treated
-as POD, i.e. they do not get shared, but copied around.  Also there are no member functions
-however there are 4 properties. Each property uses the same get and set functions.
+This is a binding from my 'disorganiser' project. It binds a class representing a rounded rectangle,
+to be drawn by SDL. This can be 'upcast' to it's base class 'Renderable' so that it can be added to
+a render list which may contain other graphic elements which all share Renderable as a base.
+
+No properties used on this one as I had no need to retreive values, however note that the last
+parameter (fillColor) of the constructor is optional.
+
+The tostring member function is used for debugging.
 
 ```c++
-#ifndef LB_COLOR_H
-#define LB_COLOR_H
+#ifndef __LB_ROUNDED_RECTANGLE_H
+#define __LB_ROUNDED_RECTANGLE_H
 
-#include <allegro5/allegro.h>
 #include "LuaBinding.h"
+#include "LuaRef.h"
+#include "bindings.h"
+#include "rounded_rectangle.h"
+#include "lb_renderlist.h"
+#include "lb_color.h"
+#include <sstream>
 
-struct ColorBinding : public PODBinding<ColorBinding,ALLEGRO_COLOR>
+struct RoundedRectangleBinding : public ManualBind::Binding<RoundedRectangleBinding,RoundedRectangle>
 {
-    static constexpr const char* class_name = "AllegroColor";
+ static constexpr const char* class_name = "RoundedRectangle";
 
-    static bind_properties* properties()
-    {
-        static bind_properties properties[] = {
-            { "r", get_rgba, set_rgba },
-            { "g", get_rgba, set_rgba },
-            { "b", get_rgba, set_rgba },
-            { "a", get_rgba, set_rgba },
-            { nullptr, nullptr, nullptr }
-        };
-        return properties;
-    }
+ static luaL_Reg* members()
+ {
+  static luaL_Reg members[] = {
+   { "__upcast", upcast },
+   { "__tostring", tostring },
+   { "setDest", setDest },
+   { "setColor", setColor },
+   { "setFill", setFill },
+   { "setRadius", setRadius },
+   { nullptr, nullptr }
+  };
+  return members;
+ }
 
-    static int create( lua_State* L )
-    {
-        unsigned char r, g, b, a;
+ static int create(lua_State *L)
+ {
+  using ManualBind::LuaRef;
 
-        r = luaL_checkinteger( L, 1 );
-        g = luaL_checkinteger( L, 2 );
-        b = luaL_checkinteger( L, 3 );
-        a = luaL_checkinteger( L, 4 );
+  SDL_Color &color = ColorBinding::fromStack(L, 1);
+  SDL_Rect dest = getRectFromTable(L, 2);
+  int radius = lua_tointeger(L, 3);
 
-        ALLEGRO_COLOR c = al_map_rgba( r, g, b, a );
+  if (lua_isnoneornil( L, 4))
+  {
+   RoundedRectanglePtr rectangle = std::make_shared<RoundedRectangle>(color, dest, radius);
 
-        push( L, c );
+   push(L, rectangle);
+   return 1;
+  }
 
-        return 1;
-    }
+  SDL_Color &fillColor = ColorBinding::fromStack(L, 4);
 
-    static const char* prop_keys[];
+  RoundedRectanglePtr rectangle = std::make_shared<RoundedRectangle>(color, dest, radius, fillColor);
 
-    static int get_rgba( lua_State* L )
-    {
-        unsigned char r, g, b, a;
+  push(L, rectangle);
 
-        ALLEGRO_COLOR& c = fromStack( L, 1 );
+  return 1;
+ }
 
-        al_unmap_rgba( c, &r, &g, &b, &a );
+ static int upcast( lua_State *L )
+ {
+  RoundedRectanglePtr p = fromStack( L, 1 );
 
-        int which = luaL_checkoption( L, 2, nullptr, ColorBinding::prop_keys );
+  RenderablePtr rp = std::dynamic_pointer_cast<Renderable>( p );
 
-        switch( which )
-        {
-            case 0:
-                lua_pushinteger( L, r );
-                break;
+  RenderableBinding::push( L, rp );
 
-            case 1:
-                lua_pushinteger( L, g );
-                break;
+  return 1;
+ }
 
-            case 2:
-                lua_pushinteger( L, b );
-                break;
+ static int tostring( lua_State* L )
+ {
+  RoundedRectanglePtr r = fromStack( L, 1 );
+  std::stringstream ss;
 
-            case 3:
-                lua_pushinteger( L, a );
-                break;
+  ss << "Rounded Rectangle: " << std::hex << r.get() << std::dec;
+  ss << " dest: { ";
+  SDL_Rect rect = r->getDest();
+  ss << rect.x << ", " << rect.y << ", " << rect.w << ", " << rect.h;
+  ss << "}";
 
-        }
+  lua_pushstring( L, ss.str().c_str() );
 
-        return 1;
-    }
+  return 1;
+ }
 
-    static int set_rgba( lua_State* L )
-    {
-        unsigned char r, g, b, a;
+ static int setDest( lua_State* L )
+ {
+  RoundedRectanglePtr p = fromStack( L, 1 );
+  SDL_Rect r = getRectFromTable( L, 2 );
 
-        ALLEGRO_COLOR& c = fromStack( L, 1 );
+  p->setDest(r);
+  return 0;
+ }
 
-        int which = luaL_checkoption( L, 2, nullptr, ColorBinding::prop_keys );
+ static int setColor( lua_State* L )
+ {
+  RoundedRectanglePtr p = fromStack( L, 1 );
+  SDL_Color& c = ColorBinding::fromStack( L, 2 );
 
-        al_unmap_rgba( c, &r, &g, &b, &a );
+  p->setColor(c);
+  return 0;
+ }
 
-        switch( which )
-        {
-            case 0:
-                r = luaL_checkinteger( L, 3 );
-                break;
+ static int setFill( lua_State* L )
+ {
+  RoundedRectanglePtr p = fromStack( L, 1 );
+  bool fill = lua_toboolean( L, 2 );
 
-            case 1:
-                g = luaL_checkinteger( L, 3 );
-                break;
+  p->setFill(fill);
+  return 0;
+ }
 
-            case 2:
-                b = luaL_checkinteger( L, 3 );
-                break;
+ static int setRadius( lua_State* L )
+ {
+  RoundedRectanglePtr p = fromStack( L, 1 );
+  int radius = lua_tointeger( L, 2 );
 
-            case 3:
-                a = luaL_checkinteger( L, 3 );
-                break;
-        }
-
-        c = al_map_rgba( r, g, b, a );
-
-        return 0;
-    }
-
+  p->setRadius(radius);
+  return 0;
+ }
 };
 
-const char* ColorBinding::prop_keys[] = { "r", "g", "b", "a", nullptr };
-
-#endif //LB_COLOR_H
+#endif //__LB_ROUNDED_RECTANGLE_H
 ```
 
 LuaRef.h
