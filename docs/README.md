@@ -1,19 +1,25 @@
-[Licence](../LICENSE) | [Tutorial](quick%20tutorial) | [Todo List](TODO)
-
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-
 ManualBind
 ==========
 
+[Licence](../LICENSE) | [Tutorial](quick%20tutorial) | [Todo List](TODO)
+
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+
 Semi-manual binding between C++ and Lua.
 See header files and LICENSE for author and license info.
+
+*Update December 2025.*
+I've checked this still works with Lua 5.5 rc4. All tests pass, and the examples are working.
+I'm still using this library a lot, mainly with my 'disorganiser' project.
 
 *Update December 2020.*
 I've checked this still works with Lua 5.4. All tests pass, and the examples are working.
 
 Examples
 --------
+
 There are several examples, which show various parts or techniques.
+
 - Demo. Runs LuaBinding.h through it's paces.
 - Downcast. How to cast a Lua held class instance to another class that is lower in the hierarchy.
 - Upcast. Opposite of downcast. Useful if you are storing instances in a C++ container.
@@ -23,6 +29,7 @@ There are several examples, which show various parts or techniques.
 
 LuaBinding.h
 ------------
+
 Basically this makes the boring and difficult stuff easier, but leaving the more fun
 not so hard stuff to do. :-)
 
@@ -40,14 +47,14 @@ the other freely, as the last one holding a reference will call the
 destructor when required.
 
 There is a POD (plain old data) version of the binding for things like pointers or
-tiny classes and structs. These get copied around unlike the shared pointer version which 
+tiny classes and structs. These get copied around unlike the shared pointer version which
 keeps one and only one copy.
 
 Extra elements can be assigned to a class instance as long as they do not conflict with an existing
 function or property. A table will be created for each class instance on the first value assigned, so
 if this feature is not used - no extra memory is required for a class instance.
 
-Methods can be overridden on a class in Lua code, however unlike extra elements, this will affect 
+Methods can be overridden on a class in Lua code, however unlike extra elements, this will affect
 **all** instances, both existing and new.
 
 **Speed**
@@ -56,9 +63,11 @@ Each case requires progressively more table lookups in addition to the order the
 
 Example binding
 ---------------
+
 This is real life code taken from my game. In this instance Allegro colors are treated
 as POD, i.e. they do not get shared, but copied around.  Also there are no member functions
 however there are 4 properties. Each property uses the same get and set functions.
+
 ```c++
 #ifndef LB_COLOR_H
 #define LB_COLOR_H
@@ -176,14 +185,16 @@ const char* ColorBinding::prop_keys[] = { "r", "g", "b", "a", nullptr };
 
 LuaRef.h
 --------
-C++ management of Lua data. A re-write of code originally written by me and then 
-donated to LuaBridge. 
+
+C++ management of Lua data. A re-write of code originally written by me and then
+donated to LuaBridge.
 This version I have changed to use c++11 variable template arguments for
 calling Lua, The table element proxy is now public, and the code structure is
-re-arranged to put shared functionality between LuaRef, and TableElement in a 
+re-arranged to put shared functionality between LuaRef, and TableElement in a
 base class.
 
 Allows you to write things like this in C++
+
 ```c++
 // Grab a ref to settings table.
 LuaRef settings = LuaRef( L, "settings" );
@@ -200,10 +211,12 @@ print( 1, 2, "Hello", width, tbl );
 
 LuaException.h
 --------------
+
 Support for throwing on Lua errors. Used by LuaRef.
 
 LuaStack.h
 ----------
+
 From LuaBridge. The original LuaRef.h was changed to use this. I didn't want to reverse
 that. Originally called Stack.h. If I wrote this myself, it would look almost the same
 anyhow. :-)
