@@ -200,8 +200,9 @@ LuaRef.h
 
 C++ management of Lua data. A re-write of code originally written by me and then
 donated to LuaBridge.
-This version I have changed to use c++11 variable template arguments for
-calling Lua, The table element proxy is now public, and the code structure is
+This version I have changed to use varidict template arguments and template pack
+folding for calling Lua, This means at least C++17 is required.
+The table element proxy is now public, and the code structure is
 re-arranged to put shared functionality between LuaRef, and TableElement in a
 base class.
 
