@@ -1,68 +1,63 @@
 #include <catch2/catch_test_macros.hpp>
 #include "LuaBinding.h"
 
-void run( lua_State* L, const char* code );
+void run(lua_State* L, const char* code);
 
 using namespace ManualBind;
 
-class Widget
-{
-    public:
-    std::string stringy;
-    int numbery;
+class Widget {
+ public:
+  std::string stringy;
+  int numbery;
 
-    void setThings( std::string str, int num )
-    {
-        stringy = str;
-        numbery = num;
-    }
+  void setThings(std::string str, int num)
+  {
+    stringy = str;
+    numbery = num;
+  }
 };
 
 using WidgetPtr = std::shared_ptr<Widget>;
 
-struct WidgetBinding : public Binding<WidgetBinding,Widget>
-{
-    static constexpr const char* class_name = "Widget";
+struct WidgetBinding : public Binding<WidgetBinding, Widget> {
+  static constexpr const char* class_name = "Widget";
 
-    static luaL_Reg* members()
-    {
-        static luaL_Reg members[] =
-        {
-            { "setThings", callSetThings },
-            { nullptr, nullptr }
-        };
-        return members;
-    }
+  static luaL_Reg* members()
+  {
+    static luaL_Reg members[] = {{"setThings", callSetThings},
+                                 {nullptr, nullptr}};
+    return members;
+  }
 
-    static int callSetThings( lua_State* L )
-    {
-        WidgetPtr p = fromStack( L, 1 );
+  static int callSetThings(lua_State* L)
+  {
+    WidgetPtr p = fromStack(L, 1);
 
-        std::string str( luaL_checkstring( L, 2 ) );
-        int num = luaL_checkinteger( L, 3 );
+    std::string str(luaL_checkstring(L, 2));
+    int num = luaL_checkinteger(L, 3);
 
-        p->setThings( str, num );
-        
-        return 1;
-    }
+    p->setThings(str, num);
+
+    return 1;
+  }
 };
 
-TEST_CASE( "Lua can call member functions." ) {
+TEST_CASE("Lua can call member functions.")
+{
+  lua_State* L = luaL_newstate();
 
-    lua_State* L = luaL_newstate();
+  WidgetBinding::register_class(L);
 
-    WidgetBinding::register_class( L );
+  WidgetPtr p = std::make_shared<Widget>();
 
-    WidgetPtr p = std::make_shared<Widget>();
+  WidgetBinding::push(L, p);
+  lua_setglobal(L, "widget");
 
-    WidgetBinding::push( L, p );
-    lua_setglobal( L, "widget" );
+  run(L, "widget:setThings( 'Hello World', 42 )");
 
-    run( L, "widget:setThings( 'Hello World', 42 )" );
+  REQUIRE(p->stringy == "Hello World");
 
-    REQUIRE( p->stringy == "Hello World" );
+  REQUIRE(p->numbery == 42);
 
-    REQUIRE( p->numbery == 42 );
-
-    lua_close( L );
+  lua_close(L);
 }

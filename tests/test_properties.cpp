@@ -1,79 +1,73 @@
 #include <catch2/catch_test_macros.hpp>
 #include "LuaBinding.h"
 
-void run( lua_State* L, const char* code );
+void run(lua_State* L, const char* code);
 
 using namespace ManualBind;
 
-class Person
-{
-    public:
-    std::string name;
+class Person {
+ public:
+  std::string name;
 };
 
 using PersonPtr = std::shared_ptr<Person>;
 
-struct PersonBinding : public Binding<PersonBinding,Person>
-{
-    static constexpr const char* class_name = "Person";
+struct PersonBinding : public Binding<PersonBinding, Person> {
+  static constexpr const char* class_name = "Person";
 
-    static bind_properties* properties()
-    {
-        static bind_properties properties[] =
-        {
-            { "name", getName, setName },
-            { nullptr, nullptr, nullptr }
-        };
-        return properties;
-    }
+  static bind_properties* properties()
+  {
+    static bind_properties properties[] = {{"name", getName, setName},
+                                           {nullptr, nullptr, nullptr}};
+    return properties;
+  }
 
-    static int getName( lua_State* L )
-    {
-        PersonPtr p = fromStack( L, 1 );
+  static int getName(lua_State* L)
+  {
+    PersonPtr p = fromStack(L, 1);
 
-        lua_pushstring( L, p->name.c_str() );
-        
-        return 1;
-    }
+    lua_pushstring(L, p->name.c_str());
 
-    static int setName( lua_State* L )
-    {
-        PersonPtr p = fromStack( L, 1 );
+    return 1;
+  }
 
-        // 2 is the property name
+  static int setName(lua_State* L)
+  {
+    PersonPtr p = fromStack(L, 1);
 
-        const char* name = luaL_checkstring( L, 3 );
+    // 2 is the property name
 
-        p->name = name;
+    const char* name = luaL_checkstring(L, 3);
 
-        return 0;
-    }
+    p->name = name;
 
+    return 0;
+  }
 };
 
-TEST_CASE( "Lua can get and set properties." ) {
+TEST_CASE("Lua can get and set properties.")
+{
+  lua_State* L = luaL_newstate();
 
-    lua_State* L = luaL_newstate();
+  PersonBinding::register_class(L);
 
-    PersonBinding::register_class( L );
+  PersonPtr pp = std::make_shared<Person>();
 
-    PersonPtr pp = std::make_shared<Person>();
+  PersonBinding::push(L, pp);
+  lua_setglobal(L, "person");
 
-    PersonBinding::push( L, pp );
-    lua_setglobal( L, "person" );
+  run(L, "person.name ='Bob'");
 
-    run( L, "person.name ='Bob'" );
+  REQUIRE(pp->name == "Bob");
 
-    REQUIRE( pp->name == "Bob" );
+  pp->name = "Jane";
 
-    pp->name = "Jane";
+  run(L, "name = person.name");
 
-    run( L, "name = person.name" );
+  lua_getglobal(L, "name");
+  std::string name(luaL_checkstring(L, -1));
 
-    lua_getglobal( L, "name" );
-    std::string name (luaL_checkstring( L, -1 ));
+  REQUIRE(name == "Jane");
 
-    REQUIRE( name == "Jane" );
-
-    lua_close( L );
+  lua_close(L);
 }

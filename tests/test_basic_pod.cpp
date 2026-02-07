@@ -1,7 +1,7 @@
-#include "LuaBinding.h"
-#include "lauxlib.h"
 #include <catch2/catch_test_macros.hpp>
 #include <string>
+#include "LuaBinding.h"
+#include "lauxlib.h"
 
 #include <iostream>
 
@@ -10,17 +10,17 @@ using namespace ManualBind;
 class Basic {};
 
 // A very basic opaque pointer binding.
-struct BasicPODbinding : public PODBinding<BasicPODbinding, Basic *> {
-  static constexpr const char *class_name = "Basic";
+struct BasicPODbinding : public PODBinding<BasicPODbinding, Basic*> {
+  static constexpr const char* class_name = "Basic";
 };
 
-TEST_CASE("Basic POD binding retains identical pointer value.") {
-
-  lua_State *L = luaL_newstate();
+TEST_CASE("Basic POD binding retains identical pointer value.")
+{
+  lua_State* L = luaL_newstate();
 
   BasicPODbinding::register_class(L);
 
-  Basic *bp = new Basic();
+  Basic* bp = new Basic();
 
   // Give Lua a copy.
   BasicPODbinding::push(L, bp);
@@ -28,7 +28,7 @@ TEST_CASE("Basic POD binding retains identical pointer value.") {
 
   // Retrieve
   lua_getglobal(L, "bp");
-  Basic *fromLua = BasicPODbinding::fromStackThrow(L, 1);
+  Basic* fromLua = BasicPODbinding::fromStackThrow(L, 1);
   lua_pop(L, 1);
 
   REQUIRE(bp == fromLua);
@@ -38,13 +38,13 @@ TEST_CASE("Basic POD binding retains identical pointer value.") {
   delete bp;
 }
 
-TEST_CASE("Basic POD binding can test for type.") {
-
-  lua_State *L = luaL_newstate();
+TEST_CASE("Basic POD binding can test for type.")
+{
+  lua_State* L = luaL_newstate();
 
   BasicPODbinding::register_class(L);
 
-  Basic *bp = new Basic();
+  Basic* bp = new Basic();
 
   // Give Lua a copy.
   BasicPODbinding::push(L, bp);
@@ -66,9 +66,9 @@ TEST_CASE("Basic POD binding can test for type.") {
 }
 
 TEST_CASE(
-    "Lua calling create on binding without create function gives lua error.") {
-
-  lua_State *L = luaL_newstate();
+    "Lua calling create on binding without create function gives lua error.")
+{
+  lua_State* L = luaL_newstate();
 
   BasicPODbinding::register_class(L);
 

@@ -4,7 +4,7 @@
 
 #include <lua.hpp>
 
-void dump( lua_State* L );
-void run( lua_State* L, const char* code );
+void dump(lua_State* L);
+void run(lua_State* L, const char* code);
 
-#endif // COMMON_H
+#endif  // COMMON_H
