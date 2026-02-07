@@ -8,12 +8,17 @@ ManualBind
 Semi-manual binding between C++ and Lua.
 See header files and LICENSE for author and license info.
 
+*Update February 2026*
+The binding code has now been simplified a little using C++20 concepts.
+You will now need at least C++20 capable compiler to compile.
+
 *Update December 2025.*
-I've checked this still works with Lua 5.5 rc4. All tests pass, and the examples are working.
-I'm still using this library a lot, mainly with my 'disorganiser' project.
+I've checked this still works with Lua 5.5 rc4. All tests pass, and the examples
+are working. I'm still using this library a lot, mainly with my 'disorganiser' project.
 
 *Update December 2020.*
-I've checked this still works with Lua 5.4. All tests pass, and the examples are working.
+I've checked this still works with Lua 5.4. All tests pass, and the examples are
+working.
 
 Examples
 --------
@@ -21,17 +26,19 @@ Examples
 There are several examples, which show various parts or techniques.
 
 - Demo. Runs LuaBinding.h through it's paces.
-- Downcast. How to cast a Lua held class instance to another class that is lower in the hierarchy.
+- Downcast. How to cast a Lua held class instance to another class that is lower
+  in the hierarchy.
 - Upcast. Opposite of downcast. Useful if you are storing instances in a C++ container.
-- GUI Example. How a simple GUI might be implemented in Lua, given a simple rectangle class binding.
+- GUI Example. How a simple GUI might be implemented in Lua, given a simple
+  rectangle class binding.
 - LuaRef. Exercises the new LuaRef code.
 - Tables. How to push / pull a C++ container to a Lua table.
 
 LuaBinding.h
 ------------
 
-Basically this makes the boring and difficult stuff easier, but leaving the more fun
-not so hard stuff to do. :-)
+Basically this makes the boring and difficult stuff easier, but leaving the more
+fun not so hard stuff to do. :-)
 
 The memory management, life-cycle, and method despatch is the same for each
 bound class, only the glue functions that marshal the parameters are
@@ -46,30 +53,33 @@ should delete it. Class instances can be created in Lua or C++ and passed to
 the other freely, as the last one holding a reference will call the
 destructor when required.
 
-There is a POD (plain old data) version of the binding for things like pointers or
-tiny classes and structs. These get copied around unlike the shared pointer version which
-keeps one and only one copy.
+There is a POD (plain old data) version of the binding for things like pointers
+or tiny classes and structs. These get copied around unlike the shared pointer
+version which keeps one and only one copy.
 
-Extra elements can be assigned to a class instance as long as they do not conflict with an existing
-function or property. A table will be created for each class instance on the first value assigned, so
-if this feature is not used - no extra memory is required for a class instance.
+Extra elements can be assigned to a class instance as long as they do not
+conflict with an existing function or property. A table will be created for
+each class instance on the first value assigned, so if this feature is not used
+no extra memory is required for a class instance.
 
-Methods can be overridden on a class in Lua code, however unlike extra elements, this will affect
-**all** instances, both existing and new.
+Methods can be overridden on a class in Lua code, however unlike extra elements,
+this will affect **all** instances, both existing and new.
 
 **Speed**
-Method lookup is the fastest, followed by properties, extra elements and finally the case of not found.
-Each case requires progressively more table lookups in addition to the order they are done.
+Method lookup is the fastest, followed by properties, extra elements and finally
+the case of not found. Each case requires progressively more table lookups in
+addition to the order they are done.
 
 Example binding
 ---------------
 
-This is a binding from my 'disorganiser' project. It binds a class representing a rounded rectangle,
-to be drawn by SDL. This can be 'upcast' to it's base class 'Renderable' so that it can be added to
-a render list which may contain other graphic elements which all share Renderable as a base.
+This is a binding from my 'disorganiser' project. It binds a class representing
+a rounded rectangle, to be drawn by SDL. This can be 'upcast' to it's base
+class 'Renderable' so that it can be added to a render list which may contain
+other graphic elements which all share Renderable as a base.
 
-No properties used on this one as I had no need to retreive values, however note that the last
-parameter (fillColor) of the constructor is optional.
+No properties used on this one as I had no need to retrieve values, however note
+that the last parameter (fillColor) of the constructor is optional.
 
 The tostring member function is used for debugging.
 
@@ -230,6 +240,6 @@ Support for throwing on Lua errors. Used by LuaRef.
 LuaStack.h
 ----------
 
-From LuaBridge. The original LuaRef.h was changed to use this. I didn't want to reverse
-that. Originally called Stack.h. If I wrote this myself, it would look almost the same
-anyhow. :-)
+From LuaBridge. The original LuaRef.h was changed to use this. I didn't want to
+reverse that. Originally called Stack.h. If I wrote this myself, it would look
+almost the same anyhow. :-)
