@@ -319,11 +319,7 @@ inline void LuaRefBase::call(int ret, Args... args) const
 {
   const int n = sizeof...(Args);
   push();
-  // Initializer expansion trick to call push for each arg.
-  // https://stackoverflow.com/questions/25680461/variadic-template-pack-expansion
-  int dummy[] = {
-      0, ((void)LuaStack<Args>::push(m_L, std::forward<Args>(args)), 0)...};
-  std::ignore = dummy;
+  ((void)LuaStack<Args>::push(m_L, std::forward<Args>(args)), ...);
   LuaException::pcall(m_L, n, ret);
   return;  // Return values, if any, are left on the Lua stack.
 }
