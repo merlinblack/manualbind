@@ -28,33 +28,34 @@ SOFTWARE.
 #ifndef __LUAREF_H
 #define __LUAREF_H
 
-#include "LuaException.h"
-#include "LuaStack.h"
 #include <lua.hpp>
 #include <string>
-#include <tuple> // For std::ignore
+#include <tuple>  // For std::ignore
+#include "LuaException.h"
+#include "LuaStack.h"
 
 namespace ManualBind {
 
 struct LuaNil {};
 
-template <> struct LuaStack<LuaNil> {
-  static inline void push(lua_State *L, LuaNil const &nil) { lua_pushnil(L); }
+template <>
+struct LuaStack<LuaNil> {
+  static inline void push(lua_State* L, LuaNil const& nil) { lua_pushnil(L); }
 };
 
 class LuaRef;
 
 class LuaRefBase {
-protected:
-  lua_State *m_L;
+ protected:
+  lua_State* m_L;
   int m_ref;
 
   class StackPopper {
-    lua_State *m_L;
+    lua_State* m_L;
     int m_count;
 
-  public:
-    StackPopper(lua_State *L, int count = 1) : m_L(L), m_count(count) {}
+   public:
+    StackPopper(lua_State* L, int count = 1) : m_L(L), m_count(count) {}
     ~StackPopper() { lua_pop(m_L, m_count); }
   };
 
@@ -63,27 +64,30 @@ protected:
   // These constructors as destructor are protected as this
   // class should not be used directly.
 
-  LuaRefBase(lua_State *L, FromStack) : m_L(L) {
+  LuaRefBase(lua_State* L, FromStack) : m_L(L)
+  {
     m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
   }
 
-  LuaRefBase(lua_State *L, int ref) : m_L(L), m_ref(ref) {}
+  LuaRefBase(lua_State* L, int ref) : m_L(L), m_ref(ref) {}
 
   ~LuaRefBase() { luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref); }
 
-public:
+ public:
   virtual void push() const { lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_ref); }
 
-  std::string tostring() const {
+  std::string tostring() const
+  {
     lua_getglobal(m_L, "tostring");
     push();
     lua_call(m_L, 1, 1);
-    const char *str = lua_tostring(m_L, 1);
+    const char* str = lua_tostring(m_L, 1);
     lua_pop(m_L, 1);
     return std::string(str);
   }
 
-  int type() const {
+  int type() const
+  {
     int result;
     push();
     result = lua_type(m_L, -1);
@@ -104,9 +108,12 @@ public:
   template <typename... Args>
   inline LuaRef const operator()(Args... args) const;
 
-  template <typename... Args> inline void call(int ret, Args... args) const;
+  template <typename... Args>
+  inline void call(int ret, Args... args) const;
 
-  template <typename T> void append(T v) const {
+  template <typename T>
+  void append(T v) const
+  {
     push();
     size_t len = lua_rawlen(m_L, -1);
     LuaStack<T>::push(m_L, v);
@@ -114,31 +121,40 @@ public:
     lua_pop(m_L, 1);
   }
 
-  template <typename T> T cast() {
+  template <typename T>
+  T cast()
+  {
     StackPopper p(m_L);
     push();
     return LuaStack<T>::get(m_L, -1);
   }
 
-  template <typename T> operator T() { return cast<T>(); }
+  template <typename T>
+  operator T()
+  {
+    return cast<T>();
+  }
 };
 
-template <typename K> class LuaTableElement : public LuaRefBase {
+template <typename K>
+class LuaTableElement : public LuaRefBase {
   friend class LuaRef;
 
-private:
+ private:
   K m_key;
 
   // This constructor has to be public, so that the operator[]
   // with a differing template type can call it.
   // I could not find a way to 'friend' it.
-public:
+ public:
   // Expects on the Lua stack
   // 1 - The table
-  LuaTableElement(lua_State *L, K key)
-      : LuaRefBase(L, FromStack()), m_key(key) {}
+  LuaTableElement(lua_State* L, K key) : LuaRefBase(L, FromStack()), m_key(key)
+  {
+  }
 
-  void push() const override {
+  void push() const override
+  {
     lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_ref);
     LuaStack<K>::push(m_L, m_key);
     lua_gettable(m_L, -2);
@@ -146,7 +162,9 @@ public:
   }
 
   // Assign a new value to this table/key.
-  template <typename T> LuaTableElement &operator=(T v) {
+  template <typename T>
+  LuaTableElement& operator=(T v)
+  {
     StackPopper p(m_L);
     lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_ref);
     LuaStack<K>::push(m_L, m_key);
@@ -155,14 +173,18 @@ public:
     return *this;
   }
 
-  template <typename NK> LuaTableElement<NK> operator[](NK key) const {
+  template <typename NK>
+  LuaTableElement<NK> operator[](NK key) const
+  {
     push();
     return LuaTableElement<NK>(m_L, key);
   }
 };
 
-template <typename K> struct LuaStack<LuaTableElement<K>> {
-  static inline void push(lua_State *L, LuaTableElement<K> const &e) {
+template <typename K>
+struct LuaStack<LuaTableElement<K>> {
+  static inline void push(lua_State* L, LuaTableElement<K> const& e)
+  {
     e.push();
   }
 };
@@ -170,27 +192,31 @@ template <typename K> struct LuaStack<LuaTableElement<K>> {
 class LuaRef : public LuaRefBase {
   friend LuaRefBase;
 
-private:
-  LuaRef(lua_State *L, FromStack fs) : LuaRefBase(L, fs) {}
+ private:
+  LuaRef(lua_State* L, FromStack fs) : LuaRefBase(L, fs) {}
 
-public:
-  LuaRef(lua_State *L) : LuaRefBase(L, LUA_REFNIL) {}
+ public:
+  LuaRef(lua_State* L) : LuaRefBase(L, LUA_REFNIL) {}
 
-  LuaRef(lua_State *L, const std::string &global) : LuaRefBase(L, LUA_REFNIL) {
+  LuaRef(lua_State* L, const std::string& global) : LuaRefBase(L, LUA_REFNIL)
+  {
     lua_getglobal(m_L, global.c_str());
     m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
   }
 
-  LuaRef(LuaRef const &other) : LuaRefBase(other.m_L, LUA_REFNIL) {
+  LuaRef(LuaRef const& other) : LuaRefBase(other.m_L, LUA_REFNIL)
+  {
     other.push();
     m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
   }
 
-  LuaRef(LuaRef &&other) noexcept : LuaRefBase(other.m_L, other.m_ref) {
+  LuaRef(LuaRef&& other) noexcept : LuaRefBase(other.m_L, other.m_ref)
+  {
     other.m_ref = LUA_REFNIL;
   }
 
-  LuaRef &operator=(LuaRef &&other) noexcept {
+  LuaRef& operator=(LuaRef&& other) noexcept
+  {
     if (this == &other)
       return *this;
 
@@ -200,7 +226,8 @@ public:
     return *this;
   }
 
-  LuaRef &operator=(LuaRef const &other) {
+  LuaRef& operator=(LuaRef const& other)
+  {
     if (this == &other)
       return *this;
     luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
@@ -210,7 +237,9 @@ public:
     return *this;
   }
 
-  template <typename K> LuaRef &operator=(LuaTableElement<K> &&other) noexcept {
+  template <typename K>
+  LuaRef& operator=(LuaTableElement<K>&& other) noexcept
+  {
     luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
     other.push();
     m_L = other.m_L;
@@ -218,7 +247,9 @@ public:
     return *this;
   }
 
-  template <typename K> LuaRef &operator=(LuaTableElement<K> const &other) {
+  template <typename K>
+  LuaRef& operator=(LuaTableElement<K> const& other)
+  {
     luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
     other.push();
     m_L = other.m_L;
@@ -226,39 +257,48 @@ public:
     return *this;
   }
 
-  template <typename K> LuaTableElement<K> operator[](K key) const {
+  template <typename K>
+  LuaTableElement<K> operator[](K key) const
+  {
     push();
     return LuaTableElement<K>(m_L, key);
   }
 
-  static LuaRef fromStack(lua_State *L, int index = -1) {
+  static LuaRef fromStack(lua_State* L, int index = -1)
+  {
     lua_pushvalue(L, index);
     return LuaRef(L, FromStack());
   }
 
-  static LuaRef newTable(lua_State *L) {
+  static LuaRef newTable(lua_State* L)
+  {
     lua_newtable(L);
     return LuaRef(L, FromStack());
   }
 
-  static LuaRef getGlobal(lua_State *L, char const *name) {
+  static LuaRef getGlobal(lua_State* L, char const* name)
+  {
     lua_getglobal(L, name);
     return LuaRef(L, FromStack());
   }
 };
 
-template <> struct LuaStack<LuaRef> {
-  static inline void push(lua_State *L, LuaRef const &r) { r.push(); }
+template <>
+struct LuaStack<LuaRef> {
+  static inline void push(lua_State* L, LuaRef const& r) { r.push(); }
 };
 
-template <> inline LuaRef const LuaRefBase::operator()() const {
+template <>
+inline LuaRef const LuaRefBase::operator()() const
+{
   push();
   LuaException::pcall(m_L, 0, 1);
   return LuaRef(m_L, FromStack());
 }
 
 template <typename... Args>
-inline LuaRef const LuaRefBase::operator()(Args... args) const {
+inline LuaRef const LuaRefBase::operator()(Args... args) const
+{
   const int n = sizeof...(Args);
   push();
   ((void)LuaStack<Args>::push(m_L, std::forward<Args>(args)), ...);
@@ -266,14 +306,17 @@ inline LuaRef const LuaRefBase::operator()(Args... args) const {
   return LuaRef(m_L, FromStack());
 }
 
-template <> inline void LuaRefBase::call(int ret) const {
+template <>
+inline void LuaRefBase::call(int ret) const
+{
   push();
   LuaException::pcall(m_L, 0, ret);
-  return; // Return values, if any, are left on the Lua stack.
+  return;  // Return values, if any, are left on the Lua stack.
 }
 
 template <typename... Args>
-inline void LuaRefBase::call(int ret, Args... args) const {
+inline void LuaRefBase::call(int ret, Args... args) const
+{
   const int n = sizeof...(Args);
   push();
   // Initializer expansion trick to call push for each arg.
@@ -282,14 +325,16 @@ inline void LuaRefBase::call(int ret, Args... args) const {
       0, ((void)LuaStack<Args>::push(m_L, std::forward<Args>(args)), 0)...};
   std::ignore = dummy;
   LuaException::pcall(m_L, n, ret);
-  return; // Return values, if any, are left on the Lua stack.
+  return;  // Return values, if any, are left on the Lua stack.
 }
 
-template <> inline LuaRef LuaRefBase::cast() {
+template <>
+inline LuaRef LuaRefBase::cast()
+{
   push();
   return LuaRef(m_L, FromStack());
 }
 
-}; // namespace ManualBind
+};  // namespace ManualBind
 
-#endif // __LUAREF_H
+#endif  // __LUAREF_H

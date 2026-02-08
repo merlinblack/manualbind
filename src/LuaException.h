@@ -36,19 +36,20 @@ SOFTWARE.
 namespace ManualBind {
 
 class LuaException : public std::exception {
-private:
-  lua_State *m_L;
+ private:
+  lua_State* m_L;
   std::string m_what;
 
-public:
+ public:
   //----------------------------------------------------------------------------
-  LuaException(lua_State *L, int /*code*/) : m_L(L) { whatFromStack(); }
+  LuaException(lua_State* L, int /*code*/) : m_L(L) { whatFromStack(); }
 
   LuaException(std::string what) : m_L(nullptr) { m_what = what; }
 
   //----------------------------------------------------------------------------
 
-  LuaException(lua_State *L, char const *, char const *, long) : m_L(L) {
+  LuaException(lua_State* L, char const*, char const*, long) : m_L(L)
+  {
     whatFromStack();
   }
 
@@ -58,7 +59,7 @@ public:
 
   //----------------------------------------------------------------------------
 
-  char const *what() const throw() { return m_what.c_str(); }
+  char const* what() const throw() { return m_what.c_str(); }
 
   //============================================================================
   /**
@@ -68,14 +69,18 @@ public:
     breakpoints before the stack is unwound, or otherwise customize the
     behavior.
     */
-  template <class Exception> static void Throw(Exception e) { throw e; }
+  template <class Exception>
+  static void Throw(Exception e)
+  {
+    throw e;
+  }
 
   //----------------------------------------------------------------------------
   /**
     Wrapper for lua_pcall that throws.
     */
-  static void pcall(lua_State *L, int nargs = 0, int nresults = 0,
-                    int msgh = 0) {
+  static void pcall(lua_State* L, int nargs = 0, int nresults = 0, int msgh = 0)
+  {
     int code = lua_pcall(L, nargs, nresults, msgh);
 
     if (code != LUA_OK)
@@ -84,18 +89,20 @@ public:
 
   //----------------------------------------------------------------------------
 
-protected:
-  void whatFromStack() {
+ protected:
+  void whatFromStack()
+  {
     if (lua_gettop(m_L) > 0) {
-      char const *s = lua_tostring(m_L, -1);
+      char const* s = lua_tostring(m_L, -1);
       m_what = s ? s : "";
-    } else {
+    }
+    else {
       // stack is empty
       m_what = "missing error";
     }
   }
 };
 
-}; // namespace ManualBind
+};  // namespace ManualBind
 
-#endif // __LUAEXCEPTION_H
+#endif  // __LUAEXCEPTION_H

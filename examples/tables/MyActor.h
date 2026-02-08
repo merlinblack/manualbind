@@ -3,20 +3,15 @@
 #include <iostream>
 
 class MyActor {
+ public:
+  std::string _name;
 
-public:
+  MyActor(std::string name) : _name(name)
+  {
+    std::cout << "Hello my name is " << _name << std::endl;
+  }
 
-    std::string _name;
-
-    MyActor( std::string name ) : _name(name)
-    {
-        std::cout << "Hello my name is " << _name << std::endl;
-    }
-
-    ~MyActor()
-    {
-        std::cout << "Goodbye from " << _name << std::endl;
-    }
+  ~MyActor() { std::cout << "Goodbye from " << _name << std::endl; }
 };
 
-#endif // __MYACTOR_H
+#endif  // __MYACTOR_H
