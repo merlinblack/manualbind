@@ -57,6 +57,27 @@ struct bind_properties {
   lua_CFunction setter;
 };
 
+// concepts for detecting user binding functions
+template <typename Binding>
+concept HasMembersFunc = requires() {
+  { Binding::members() } -> std::same_as<luaL_Reg*>;
+};
+
+template <typename Binding>
+concept HasPropertiesFunc = requires() {
+  { Binding::properties() } -> std::same_as<bind_properties*>;
+};
+
+template <typename Binding>
+concept HasExtraMetaFunc = requires(lua_State* L) {
+  { Binding::setExtraMeta(L) } -> std::same_as<void>;
+};
+
+template <typename Binding>
+concept HasCreateFunc = requires(lua_State* L) {
+  { Binding::create(L) } -> std::same_as<int>;
+};
+
 // Called when Lua object is indexed: obj[ndx]
 int LuaBindingIndex(lua_State* L);
 // Called whe Lua object index is assigned: obj[ndx] = blah
@@ -67,10 +88,10 @@ int LuaBindingGetExtraValuesTable(lua_State* L, int index);
 
 void LuaBindingSetProperties(lua_State* L, bind_properties* properties);
 
-// If the object at 'index' is a userdata with a metatable containing a __upcast
-// function, then replaces the userdata at 'index' in the stack with the result
-// of calling __upcast.
-// Otherwise the object at index is replaced with nil.
+// If the object at 'index' is a userdata with a metatable containing a
+// __upcast function, then replaces the userdata at 'index' in the stack with
+// the result of calling __upcast. Otherwise the object at index is replaced
+// with nil.
 int LuaBindingUpCast(lua_State* L, int index);
 
 // Check the number of arguments are as expected.
@@ -102,18 +123,14 @@ struct Binding {
 
   static void setMembers(lua_State* L)
   {
-    if constexpr (requires() {
-                    { B::members() } -> std::same_as<luaL_Reg*>;
-                  }) {
+    if constexpr (HasMembersFunc<B>) {
       luaL_setfuncs(L, B::members(), 0);
     }
   }
 
   static void setProperties(lua_State* L)
   {
-    if constexpr (requires() {
-                    { B::properties() } -> std::same_as<bind_properties*>;
-                  }) {
+    if constexpr (HasPropertiesFunc<B>) {
       bind_properties* props = B::properties();
       LuaBindingSetProperties(L, props);
     }
@@ -121,18 +138,14 @@ struct Binding {
 
   static void setExtras(lua_State* L)
   {
-    if constexpr (requires(lua_State* L) {
-                    { B::setExtraMeta(L) } -> std::same_as<void>;
-                  }) {
+    if constexpr (HasExtraMetaFunc<B>) {
       B::setExtraMeta(L);
     }
   }
 
   static int construct(lua_State* L)
   {
-    if constexpr (requires(lua_State* L) {
-                    { B::create(L) } -> std::same_as<int>;
-                  }) {
+    if constexpr (HasCreateFunc<B>) {
       // Remove table from stack.
       lua_remove(L, 1);
 
@@ -257,18 +270,14 @@ struct PODBinding {
 
   static void setMembers(lua_State* L)
   {
-    if constexpr (requires() {
-                    { B::members() } -> std::same_as<luaL_Reg*>;
-                  }) {
+    if constexpr (HasMembersFunc<B>) {
       luaL_setfuncs(L, B::members(), 0);
     }
   }
 
   static void setProperties(lua_State* L)
   {
-    if constexpr (requires() {
-                    { B::properties() } -> std::same_as<bind_properties*>;
-                  }) {
+    if constexpr (HasPropertiesFunc<B>) {
       bind_properties* props = B::properties();
       LuaBindingSetProperties(L, props);
     }
@@ -276,18 +285,14 @@ struct PODBinding {
 
   static void setExtras(lua_State* L)
   {
-    if constexpr (requires(lua_State* L) {
-                    { B::setExtraMeta(L) } -> std::same_as<void>;
-                  }) {
+    if constexpr (HasExtraMetaFunc<B>) {
       B::setExtraMeta(L);
     }
   }
 
   static int construct(lua_State* L)
   {
-    if constexpr (requires(B b, lua_State* L) {
-                    { B::create(L) } -> std::same_as<int>;
-                  }) {
+    if constexpr (HasCreateFunc<B>) {
       // Remove table from stack.
       lua_remove(L, 1);
 
@@ -378,7 +383,6 @@ struct PODBinding {
     return luaL_testudata(L, index, B::class_name) != nullptr;
   }
 };
-
 };  // namespace ManualBind
 
 #endif  // BINDING_H
