@@ -42,6 +42,11 @@ SOFTWARE.
  *
  */
 
+/* I didn't realise at the time I initailly wrote this, that the binding classes
+ * implement the "Curiously Recurring Template Pattern", or CRTP.
+ * https://en.cppreference.com/w/cpp/language/crtp.html
+ */
+
 #ifndef BINDING_H
 #define BINDING_H
 #include <lua.hpp>
