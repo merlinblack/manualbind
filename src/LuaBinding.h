@@ -85,12 +85,14 @@ concept HasCreateFunc = requires(lua_State* L) {
 
 // Called when Lua object is indexed: obj[ndx]
 int LuaBindingIndex(lua_State* L);
+
 // Called whe Lua object index is assigned: obj[ndx] = blah
 int LuaBindingNewIndex(lua_State* L);
 
 // Gets the table of extra values assigned to an instance.
 int LuaBindingGetExtraValuesTable(lua_State* L, int index);
 
+// Creates a lua table of functions to get and/or set properties.
 void LuaBindingSetProperties(lua_State* L, bind_properties* properties);
 
 // If the object at 'index' is a userdata with a metatable containing a
@@ -107,6 +109,7 @@ void CheckArgCount(lua_State* L, int expected);
 // T - the class you are binding to Lua.
 
 // Shared pointer version
+// ----------------------
 // Use this for classes that need to be shared between C++ and Lua,
 // or are expensive to copy. Think of it as like "by Reference".
 template <class B, class T>
@@ -258,8 +261,10 @@ struct Binding {
 };
 
 // Plain Old Data POD version.
+// ---------------------------
 // Use this for simpler classes/structures where coping is fairly cheap, and
-// C++ and Lua do not need to operate on the same instance.
+// C++ and Lua *do not* need to operate on the *same instance*.
+// I.e. push and fromStack create copies.
 // Think of this as "by Value"
 template <class B, class T>
 struct PODBinding {
@@ -347,7 +352,7 @@ struct PODBinding {
     lua_setglobal(L, B::class_name);
   }
 
-  // This is still here should a POD really need
+  // This is still here in case a POD really need
   // destructing. Shouldn't be a common case.
   static int destroy(lua_State* L)
   {

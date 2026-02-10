@@ -3,8 +3,6 @@
 #include "LuaBinding.h"
 #include "lauxlib.h"
 
-#include <iostream>
-
 using namespace ManualBind;
 
 class Basic {};
