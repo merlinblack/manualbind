@@ -30,6 +30,8 @@ SOFTWARE.
 #ifndef LUASTACK_H
 #define LUASTACK_H
 
+#include <lua.hpp>
+
 namespace ManualBind {
 
 template <typename T>
