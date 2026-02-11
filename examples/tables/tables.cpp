@@ -1,22 +1,20 @@
 #include <iostream>
 #include <vector>
-#include "LuaBinding.h"
-#include "LuaRef.h"
 #include "MyActor.h"
 #include "MyActorBinding.h"
 #include "common.h"
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 
 using MyActorList = std::vector<MyActorPtr>;
 
 MyActorList createList()
 {
-  MyActorList actors{std::make_shared<MyActor>("James"),
-                     std::make_shared<MyActor>("Who? Random extra"),
-                     std::make_shared<MyActor>("Harry"),
-                     std::make_shared<MyActor>("Mike")};
+  MyActorList actors{
+      make_shared<MyActor>("James"), make_shared<MyActor>("Who? Random extra"),
+      make_shared<MyActor>("Harry"), make_shared<MyActor>("Mike")};
 
   return actors;
 }
@@ -34,16 +32,19 @@ void pushToLua(lua_State* L, MyActorList list)
 
 MyActorList pullFromLua(lua_State* L)
 {
-  // Note this only stores the values, not the keys/indexes,
-  // which are usually just numbers.
-  // Also it simply skips over any elements that are not 'MyActor's.
+  // Note this only stores the values, not the keys/indexes.
+  // The keys are available at index -2 after calling lua_next,
+  // but if you need it, copy it first using lua_pushvalue and use that
+  // so that the original is left intact for the next call to lua_next.
+  //
+  // Also this simply skips over any elements that are not 'MyActor's.
   MyActorList list;
 
   if (lua_istable(L, -1)) {
     lua_pushnil(L);
 
     while (lua_next(L, -2)) {
-      if (luaL_testudata(L, -1, "MyActor")) {
+      if (MyActorBinding::isType(L, -1)) {
         list.push_back(MyActorBinding::fromStack(L, -1));
       }
       lua_pop(L, 1);
