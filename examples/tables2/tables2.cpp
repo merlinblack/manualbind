@@ -34,7 +34,7 @@ PersonList createListOfPeople()
   return people;
 }
 
-void pushPersonsToLua(lua_State* L, PersonList list)
+void pushPeopleToLua(lua_State* L, PersonList list)
 {
   LuaRef table = LuaRef::newTable(L);
 
@@ -45,7 +45,7 @@ void pushPersonsToLua(lua_State* L, PersonList list)
   table.push();
 }
 
-PersonList pullPersonsFromLua(lua_State* L)
+PersonList pullPeopleFromLua(lua_State* L)
 {
   // Note this only stores the values, not the keys/indexes.
   // Also this simply skips over any elements that are not 'Person's.
@@ -75,7 +75,7 @@ int main()
   {
     cout << "Pushing list of people to Lua.\n";
     PersonList people = createListOfPeople();
-    pushPersonsToLua(L, people);
+    pushPeopleToLua(L, people);
     lua_setglobal(L, "people");
   }
 
@@ -91,7 +91,7 @@ int main()
   {
     cout << "Pull list back into C++ vector, and list...\n";
     lua_getglobal(L, "people");
-    PersonList people = pullPersonsFromLua(L);
+    PersonList people = pullPeopleFromLua(L);
     lua_pop(L, 1);
 
     for (const auto& person : people) {
