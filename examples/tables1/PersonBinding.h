@@ -1,14 +1,14 @@
-#ifndef __MYACTORBINDING_H
-#define __MYACTORBINDING_H
+#ifndef __PERSONBINDING_H
+#define __PERSONBINDING_H
 #include "LuaBinding.h"
-#include "MyActor.h"
+#include "Person.h"
 
-using MyActorPtr = std::shared_ptr<MyActor>;
+using PersonPtr = std::shared_ptr<Person>;
 
 using namespace ManualBind;
 
-struct MyActorBinding : public Binding<MyActorBinding, MyActor> {
-  static constexpr const char* class_name = "MyActor";
+struct PersonBinding : public Binding<PersonBinding, Person> {
+  static constexpr const char* class_name = "Person";
 
   static bind_properties* properties()
   {
@@ -26,7 +26,7 @@ struct MyActorBinding : public Binding<MyActorBinding, MyActor> {
 
     const char* name = luaL_checkstring(L, 1);
 
-    MyActorPtr sp = std::make_shared<MyActor>(name);
+    PersonPtr sp = std::make_shared<Person>(name);
 
     push(L, sp);
 
@@ -38,10 +38,10 @@ struct MyActorBinding : public Binding<MyActorBinding, MyActor> {
   static int get_name(lua_State* L)
   {
     CheckArgCount(L, 2);
-    MyActorPtr a = fromStack(L, 1);
+    PersonPtr a = fromStack(L, 1);
     lua_pushstring(L, a->_name.c_str());
     return 1;
   }
 };
 
-#endif  // __MYACTORBINDING_H
+#endif  // __PERSONBINDING_H
