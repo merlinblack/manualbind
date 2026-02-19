@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 /*
 
-   Copyright 2017, Nigel Atkinson
+   Copyright © 2017-2026, Nigel Atkinson
 
 License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
 
