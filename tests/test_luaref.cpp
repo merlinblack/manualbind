@@ -100,3 +100,47 @@ TEST_CASE("Accessing table elements leaves luaTop at the same place.")
     REQUIRE(top == topAfter);
   }
 }
+
+static int testfunc(lua_State* L)
+{
+  lua_pushstring(L, "a string.");
+  return 1;
+}
+
+TEST_CASE("New table elements have proper types.")
+{
+  lua_State* L = luaL_newstate();
+
+  {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+    LuaRef G = LuaRef::fromStack(L);
+
+    G["mynumber1"] = 12;
+    G["mynumber2"] = 12.3;
+    G["mystring"] = "Hello";
+    G["myfunction"] = testfunc;
+    G["mytable"] = LuaRef::newTable(L);
+
+    lua_getglobal(L, "mynumber1");
+    REQUIRE(lua_type(L, -1) == LUA_TNUMBER);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "mynumber2");
+    REQUIRE(lua_type(L, -1) == LUA_TNUMBER);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "mystring");
+    REQUIRE(lua_type(L, -1) == LUA_TSTRING);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "myfunction");
+    REQUIRE(lua_type(L, -1) == LUA_TFUNCTION);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "mytable");
+    REQUIRE(lua_type(L, -1) == LUA_TTABLE);
+    lua_pop(L, 1);
+  }
+
+  lua_close(L);
+}
