@@ -31,7 +31,9 @@ SOFTWARE.
 
 #include <functional>
 #include <lua.hpp>
+#include <stdexcept>
 #include <string>
+#include <type_traits>
 #include "lua.h"
 
 namespace ManualBind {
@@ -462,6 +464,43 @@ struct LuaStack<CPP_Function> {
     push_std_function(L, fn);
   }
 };
+
+template <typename Ret = void, typename... Args>
+std::function<Ret(Args...)> getLuaFunc(lua_State* L, const std::string& name)
+{
+  lua_getglobal(L, name.c_str());
+  if (lua_type(L, -1) != LUA_TFUNCTION) {
+    lua_pop(L, 1);
+    throw std::runtime_error("Lua function with the name '" + name +
+                             "' was not found or is not a function.");
+  }
+
+  int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+
+  return [L, ref](Args... args) -> Ret {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+
+    ((void)LuaStack<Args>::push(L, std::forward<Args>(args)), ...);
+
+    constexpr int nargs = sizeof...(Args);
+    constexpr int nret = std::is_void_v<Ret> ? 0 : 1;
+
+    if (lua_pcall(L, nargs, nret, 0) != LUA_OK) {
+      std::string error = lua_tostring(L, -1);
+      lua_pop(L, 1);
+      throw std::runtime_error("Problem calling Lua function: " + error);
+    }
+
+    if constexpr (!std::is_void_v<Ret>) {
+      Ret result = LuaStack<Ret>::get(L, -1);
+      lua_pop(L, -1);
+      return result;
+    }
+    else {
+      return;
+    }
+  };
+}
 
 };  // namespace ManualBind
 
