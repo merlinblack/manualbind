@@ -250,4 +250,40 @@ void CheckArgCount(lua_State* L, int expected)
   return;
 }
 
+using CPP_Function = std::function<int(lua_State*)>;
+
+int trampoline(lua_State* L)
+{
+  auto fn = static_cast<CPP_Function*>(lua_touserdata(L, lua_upvalueindex(1)));
+
+  if (!fn) {
+    luaL_error(L, "Invalid function pointer.");
+  }
+
+  try {
+    return (*fn)(L);
+  } catch (const std::exception& e) {
+    return luaL_error(L, "C++ Exception: %s", e.what());
+  }
+}
+
+void push_std_function(lua_State* L, CPP_Function fn)
+{
+  void* userdata = lua_newuserdata(L, sizeof(CPP_Function));
+
+  new (userdata) CPP_Function(std::move(fn));
+
+  if (luaL_newmetatable(L, "Manualbind::std::function::meta")) {
+    lua_pushcfunction(L, [](lua_State* L) {
+      auto fn = static_cast<CPP_Function*>(lua_touserdata(L, 1));
+      fn->~function();  // Explicit destruct
+      return 0;
+    });
+    lua_setfield(L, -2, "__gc");
+  }
+
+  lua_setmetatable(L, -2);
+
+  lua_pushcclosure(L, trampoline, 1);
+}
 };  // namespace ManualBind
