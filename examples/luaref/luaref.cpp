@@ -117,6 +117,25 @@ int main()
     run(L, "a.text = text");
 
     printString(table["text"]);
+
+    // New since Feb 2026, C++ lambda support.
+
+    std::string something;
+
+    LuaRef G = LuaRef::globalTable(L);
+    G["setSomething"] = (CPP_Function)[&something](lua_State * L)->int
+    {
+      something = luaL_checkstring(L, -1);
+      lua_pushliteral(L, "Hello from C++ lambda");
+      return 1;
+    };
+
+    run(L,
+        "print("
+        "  setSomething('text set from Lua via a C++ lambda with captures')"
+        ")");
+
+    printString(something);
   }
 
   lua_close(L);
