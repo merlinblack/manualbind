@@ -117,6 +117,7 @@ TEST_CASE("New table elements have proper types.")
     G["mynumber1"] = 12;
     // Float
     G["mynumber2"] = 12.3;
+    // c string
     G["mystring"] = "Hello";
     // Plain C function
     G["myfunction"] = testfunc;
