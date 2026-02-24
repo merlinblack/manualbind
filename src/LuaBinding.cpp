@@ -26,6 +26,7 @@ SOFTWARE.
 //==============================================================================
 
 #include "LuaBinding.h"
+#include <functional>
 
 namespace ManualBind {
 

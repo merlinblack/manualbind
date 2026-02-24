@@ -101,10 +101,9 @@ TEST_CASE("Accessing table elements leaves luaTop at the same place.")
   }
 }
 
-static int testfunc(lua_State* L)
+int testfunc(lua_State* L)
 {
-  lua_pushstring(L, "a string.");
-  return 1;
+  return 0;
 }
 
 TEST_CASE("New table elements have proper types.")
@@ -112,13 +111,27 @@ TEST_CASE("New table elements have proper types.")
   lua_State* L = luaL_newstate();
 
   {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-    LuaRef G = LuaRef::fromStack(L);
+    LuaRef G = LuaRef::globalTable(L);
 
+    // Integer
     G["mynumber1"] = 12;
+    // Float
     G["mynumber2"] = 12.3;
     G["mystring"] = "Hello";
+    // Plain C function
     G["myfunction"] = testfunc;
+    // Lambda with captures
+    G["myfunction2"] = (CPP_Function)[&](lua_State * L)->int
+    {
+      return 0;
+    };
+    // Lambda without captures - potentially a tiny bit faster than with
+    // captures. Less usefull however.
+    G["myfunction3"] = (lua_CFunction)[](lua_State * L)->int
+    {
+      return 0;
+    };
+    // A table
     G["mytable"] = LuaRef::newTable(L);
 
     lua_getglobal(L, "mynumber1");
@@ -137,9 +150,42 @@ TEST_CASE("New table elements have proper types.")
     REQUIRE(lua_type(L, -1) == LUA_TFUNCTION);
     lua_pop(L, 1);
 
+    lua_getglobal(L, "myfunction2");
+    REQUIRE(lua_type(L, -1) == LUA_TFUNCTION);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "myfunction3");
+    REQUIRE(lua_type(L, -1) == LUA_TFUNCTION);
+    lua_pop(L, 1);
+
     lua_getglobal(L, "mytable");
     REQUIRE(lua_type(L, -1) == LUA_TTABLE);
     lua_pop(L, 1);
+  }
+
+  lua_close(L);
+}
+
+TEST_CASE("Lua can call C++ lambda with captures")
+{
+  lua_State* L = luaL_newstate();
+
+  {
+    LuaRef G = LuaRef::globalTable(L);
+
+    int x = 42;
+
+    G["lambda"] = (CPP_Function)[&x](lua_State * L)->int
+    {
+      x *= 2;
+      return 0;
+    };
+
+    REQUIRE(x == 42);
+
+    run(L, "lambda()");
+
+    REQUIRE(x == 84);
   }
 
   lua_close(L);

@@ -32,6 +32,7 @@ SOFTWARE.
 #include <string>
 #include "LuaException.h"
 #include "LuaStack.h"
+#include "lua.h"
 
 namespace ManualBind {
 
@@ -278,6 +279,12 @@ class LuaRef : public LuaRefBase {
   static LuaRef getGlobal(lua_State* L, char const* name)
   {
     lua_getglobal(L, name);
+    return LuaRef(L, FromStack());
+  }
+
+  static LuaRef globalTable(lua_State* L)
+  {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
     return LuaRef(L, FromStack());
   }
 };
