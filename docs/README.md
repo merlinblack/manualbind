@@ -12,6 +12,11 @@ See header files and LICENSE for author and license info.
 The binding code has now been simplified a little using C++20 concepts.
 You will now need at least C++20 capable compiler to compile.
 
+Manualbind now has support for registering C++ lambdas with captures with Lua, by
+assigning them to a LuaRef. Also added is a new function ``getLuaFunc()`` allows
+you to get a std::function<> object that calls a Lua function. This is useful for
+explicitly pinning down return types and parameters.
+
 *Update December 2025.*
 I've checked this still works with Lua 5.5 rc4. All tests pass, and the examples
 are working. I'm still using this library a lot, mainly with my 'disorganiser' project.
