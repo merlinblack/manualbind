@@ -38,6 +38,7 @@ example( extables1 tables1 )
 example( extables2 tables2 )
 example( extables3 tables3 )
 example( exgui guiexample )
+example( exgetluafunc getluafunc )
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gui.lua"
