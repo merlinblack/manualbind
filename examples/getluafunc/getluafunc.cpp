@@ -32,21 +32,23 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // std::function<int(int, int)
+  // std::function<int(int, int)>
   auto add = getLuaFunc<int, int, int>(L, "add");
 
-  // std::function<float(float, float), but the same Lua function as 'add'.
+  // std::function<float(float, float)>, but the same Lua function as 'add'.
   auto addF = getLuaFunc<float, float, float>(L, "add");
 
   // std::function<string(string, string, string)>
   auto concat = getLuaFunc<string, string, string, string>(L, "concat");
 
-  // The first template parameter, the return type defaults to 'void'.
+  // The first template parameter, the return type, defaults to 'void'.
   // The lack of any template parameters after that gives an empty arg list.
+  // std::function<void()>
   auto boring = getLuaFunc(L, "nothing");
 
-  // Any parameters you like.
-  LuaRef print = LuaRef::getGlobal(L, "print");
+  // Any parameters you like (that LuaStack can push). There is no type checking.
+  // LuaRef
+  auto print = LuaRef::getGlobal(L, "print");
 
   int x = add(5, 10);
   float y = addF(41.5, 0.5);
@@ -60,7 +62,6 @@ int main(int argc, char* argv[])
 
   boring();
 
-  // templates for LuaRef will take anything LuaStack can push.
   print(result, x, y, z);
 
   return EXIT_SUCCESS;
