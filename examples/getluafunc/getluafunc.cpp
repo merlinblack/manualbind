@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
   lua_State* L = luaL_newstate();
   luaL_openlibs(L);
 
+  std::cout << script << "\n";
+
   if (luaL_dostring(L, script) != LUA_OK) {
     std::cerr << lua_tostring(L, -1);
     return EXIT_FAILURE;
@@ -46,7 +48,8 @@ int main(int argc, char* argv[])
   // std::function<void()>
   auto boring = getLuaFunc(L, "nothing");
 
-  // Any parameters you like (that LuaStack can push). There is no type checking.
+  // Any parameters you like (that LuaStack can push). There is no type
+  // checking.
   // LuaRef
   auto print = LuaRef::getGlobal(L, "print");
 
