@@ -3,7 +3,6 @@
 #include <string>
 #include "LuaRef.h"
 #include "LuaStack.h"
-#include "lua.h"
 
 // Lifetimes.
 // The care and feeding of LuaRefs, and lambdas that capture heap objects.
@@ -39,7 +38,7 @@ int main()
     {
       auto ptr = std::make_shared<Thingo>("Bob");
 
-      // Capture will increase the Thingo instance's refcount.
+      // Capture will increase the refcount on the shared pointer.
       G["capture"] = (CPP_Function)[ptr](lua_State * L)->int
       {
         cout << "Thingo: " << ptr->name << "\n";
@@ -50,7 +49,7 @@ int main()
       cout << "Inner Scope ending\n";
 
       // `ptr` will go out of scope, and reduce the ref count by one on the
-      // Thingo instance.
+      // shared pointer for the Thingo instance, leaving it at 1.
     }
 
     cout << "Calling capture\n";
@@ -62,16 +61,16 @@ int main()
   cout << "Calling capture again\n";
   luaL_dostring(L, "capture()");
 
-  // After the GC call, the Thingo's refcount will become zero, as the lambda
-  // is cleaned up and it will destruct.
+  // After the GC call, the Thingo's shared pointer refcount will become zero,
+  // as the lambda is cleaned up and it will destruct the Thingo instance.
 
-  cout << "Remove reference to lambda and garbage collect\n";
+  cout << "Remove Lua held reference to the lambda and garbage collect\n";
   luaL_dostring(L, "capture = nil");
   lua_gc(L, LUA_GCCOLLECT);
 
   // If we hadn't cleaned up the lambda before, it would be cleaned up now as
-  // Lua closes and cause the Thingo instance's ref count to drop to zero, and
-  // hence, destruct.
+  // Lua closes and cause the shared pointer's refcount to drop to zero, and
+  // hence, destruct the Thingo.
 
   cout << "Closing Lua\n";
   lua_close(L);
