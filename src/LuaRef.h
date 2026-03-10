@@ -270,6 +270,12 @@ class LuaRef : public LuaRefBase {
     return LuaRef(L, FromStack());
   }
 
+  static LuaRef nil(lua_State* L)
+  {
+    lua_pushnil(L);
+    return LuaRef(L, FromStack());
+  }
+
   static LuaRef newTable(lua_State* L)
   {
     lua_newtable(L);

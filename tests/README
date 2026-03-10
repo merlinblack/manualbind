@@ -1,1 +1,9 @@
-See https://github.com/catchorg/Catch2 for details.
+See https://github.com/catchorg/Catch2 for details on the
+testing framework Catch2.
+
+These tests, besides making sure there are no regressions
+when I change things, also serve as examples of how things
+work.
+
+However do note that some of the setup is a little contrived
+in order to make a small self contained test.

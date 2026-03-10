@@ -27,7 +27,7 @@ TEST_CASE("Can call lua functions with LuaRef")
     REQUIRE(z.isFunction() == true);
 
   }  // Importaint: LuaRefs going out of scope and destructing, before
-     // lua_close();
+     // lua_close(); (Unless you assign them all to Nil)
 
   lua_close(L);
 }
@@ -54,7 +54,7 @@ TEST_CASE("LuaRef::call works like LuaRef::operator()")
     REQUIRE(z.isFunction() == true);
 
   }  // Importaint: LuaRefs going out of scope and destructing, before
-     // lua_close();
+     // lua_close(); (Unless you assign them all to Nil)
 
   lua_close(L);
 }
@@ -106,7 +106,7 @@ int testfunc(lua_State* L)
   return 0;
 }
 
-TEST_CASE("New table elements have proper types.")
+TEST_CASE("Adding table elements have proper types.")
 {
   lua_State* L = luaL_newstate();
 
@@ -188,6 +188,25 @@ TEST_CASE("Lua can call C++ lambda with captures")
 
     REQUIRE(x == 84);
   }
+
+  lua_close(L);
+}
+
+TEST_CASE("You can destuct a LuaRef after lua_close, if it holds LUA_REFNIL")
+{
+  lua_State* L = luaL_newstate();
+
+  LuaRef G = LuaRef::globalTable(L);
+
+  // This also unreferences whatever the LuaRef was previously referencing. You
+  // might want to do this to allow an object to be garbage collected, while
+  // keeping the LuaRef around. The global table being a bad example of this of
+  // course :wink:
+  G = LuaRef::nil(L);
+
+  // Note that this relies on the fact that a ref of LUA_REFNIL, when used with
+  // luaL_unref, (called in LuaRef's destructor) does literally nothing other
+  // than return.
 
   lua_close(L);
 }
