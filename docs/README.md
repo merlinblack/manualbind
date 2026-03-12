@@ -1,12 +1,17 @@
 ManualBind
 ==========
 
-[Licence](../LICENSE) | [Tutorial](quick%20tutorial.md) | [Todo List](TODO.md)
+[Licence](../LICENSE) | [Todo List](TODO.md)
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-Semi-manual binding between C++ and Lua.
+__Semi-manual binding between C++ and Lua.__
 See header files and LICENSE for author and license info.
+
+- [Quick Tutorial](quick%20tutorial.md)
+- [Calling Lua from C++](calling%20lua%20from%20c++.md)
+- [Lua 5.4+ and close annotations](Lua5.4.md)
+- [Diagram of Manualbind internals](diagram.txt)
 
 *Update February 2026*
 The binding code has now been simplified a little using C++20 concepts.
@@ -68,9 +73,9 @@ each class instance on the first value assigned, so if this feature is not used
 no extra memory is required for a class instance.
 
 Methods can be overridden on a class in Lua code, however unlike extra elements,
-this will affect **all** instances, both existing and new.
+this will affect __all__ instances, both existing and new.
 
-**Speed**
+__Speed__
 Method lookup is the fastest, followed by properties, extra elements and finally
 the case of not found. Each case requires progressively more table lookups in
 addition to the order they are done.
