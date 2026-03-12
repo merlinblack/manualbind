@@ -8,23 +8,22 @@ The first method is to use LuaRef to get a reference to a function and call it.
 
 ```c++
 
-LuaRef print = LuaRef::getGlobal(:L, "print");
+LuaRef print = LuaRef::getGlobal(L, "print");
 
 print( "Hello world!", 1, 2, 3 );
 
 ```
 
-This has the avantage of being able to take avantage of Lua function's ability
-to take any number of arguments or any type supportedA Currently only one
-return value is supported.
+This can take avantage of a Lua function's ability to take any number of
+arguments of any type. Currently only one return value is supported.
 
 ## getluafunc<>
-If you need type safety, or enforce a function signature, the second method
- will work better.
+If you need type safety, or to enforce a function signature, the second method
+will work better.
 
 ```c++
 
-// add will be a std::function<int(int,int)>
+// `add` will be a std::function<int(int,int)>
 
 auto add = getluafunc<int(int,int)>(L, "add");
 
