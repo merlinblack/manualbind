@@ -1,11 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include "LuaRef.h"
+#include "lua.h"
 
 void run(lua_State* L, const char* code);
 
 using namespace ManualBind;
 
-TEST_CASE("Can call lua functions with LuaRef")
+TEST_CASE("LuaRef: Can call lua functions with LuaRef")
 {
   lua_State* L = luaL_newstate();
 
@@ -32,7 +33,7 @@ TEST_CASE("Can call lua functions with LuaRef")
   lua_close(L);
 }
 
-TEST_CASE("LuaRef::call works like LuaRef::operator()")
+TEST_CASE("LuaRef: LuaRef::call works like LuaRef::operator()")
 {
   lua_State* L = luaL_newstate();
 
@@ -59,7 +60,7 @@ TEST_CASE("LuaRef::call works like LuaRef::operator()")
   lua_close(L);
 }
 
-TEST_CASE("LuaRef can index and access tables.")
+TEST_CASE("LuaRef: LuaRef can index and access tables.")
 {
   lua_State* L = luaL_newstate();
 
@@ -79,7 +80,7 @@ TEST_CASE("LuaRef can index and access tables.")
   lua_close(L);
 }
 
-TEST_CASE("Accessing table elements leaves luaTop at the same place.")
+TEST_CASE("LuaRef: Accessing table elements leaves luaTop at the same place.")
 {
   lua_State* L = luaL_newstate();
 
@@ -106,7 +107,7 @@ int testfunc(lua_State* L)
   return 0;
 }
 
-TEST_CASE("Adding table elements have proper types.")
+TEST_CASE("LuaRef: Adding table elements have proper types.")
 {
   lua_State* L = luaL_newstate();
 
@@ -167,7 +168,7 @@ TEST_CASE("Adding table elements have proper types.")
   lua_close(L);
 }
 
-TEST_CASE("Lua can call C++ lambda with captures")
+TEST_CASE("LuaRef: Lua can call C++ lambda with captures")
 {
   lua_State* L = luaL_newstate();
 
@@ -192,7 +193,8 @@ TEST_CASE("Lua can call C++ lambda with captures")
   lua_close(L);
 }
 
-TEST_CASE("You can destuct a LuaRef after lua_close, if it holds LUA_REFNIL")
+TEST_CASE(
+    "LuaRef: You can destuct a LuaRef after lua_close, if it holds LUA_REFNIL")
 {
   lua_State* L = luaL_newstate();
 
@@ -207,6 +209,40 @@ TEST_CASE("You can destuct a LuaRef after lua_close, if it holds LUA_REFNIL")
   // Note that this relies on the fact that a ref of LUA_REFNIL, when used with
   // luaL_unref, (called in LuaRef's destructor) does literally nothing other
   // than return.
+
+  lua_close(L);
+}
+
+TEST_CASE("LuaRef: You can implicitly cast a LuaRef to a string.")
+{
+  lua_State* L = luaL_newstate();
+
+  {
+    lua_pushliteral(L, "Hello Lua");
+    lua_setglobal(L, "mystring");
+
+    // NOTE: this will panic if not a string or convertable to a string.
+    std::string str = LuaRef::getGlobal(L, "mystring");
+
+    REQUIRE(str == "Hello Lua");
+  }
+
+  lua_close(L);
+}
+
+TEST_CASE("LuaRef: You can implicitly cast a LuaRef to an integer.")
+{
+  lua_State* L = luaL_newstate();
+
+  {
+    lua_pushinteger(L, 42);
+    lua_setglobal(L, "myint");
+
+    // NOTE: this will panic if not a integer or convertable to a integer.
+    int i = LuaRef::getGlobal(L, "myint");
+
+    REQUIRE(i == 42);
+  }
 
   lua_close(L);
 }
