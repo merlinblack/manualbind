@@ -27,38 +27,33 @@ struct Thingo {
   ~Thingo() { cout << "Destructed Thingo\n"; }
 };
 
+void make_capture(lua_State* L)
+{
+  LuaRef G = LuaRef::globalTable(L);
+
+  auto ptr = std::make_shared<Thingo>("Bob");
+
+  // Capture will increase the refcount on the shared pointer.
+  G["capture"] = (CPP_Function)[ptr](lua_State* L)->int
+  {
+    cout << "Thingo: " << ptr->name << "\n";
+    lua_pushstring(L, ptr->name.c_str());
+    return 1;
+  };
+
+  cout << "Make capture Scope ending\n";
+
+  // `ptr` will go out of scope, and reduce the ref count by one on the
+  // shared pointer for the Thingo instance, leaving it at 1.
+}
+
 int main()
 {
   lua_State* L = luaL_newstate();
 
-  // This scope ensures "G" is destructed before calling lua_close.
-  {
-    LuaRef G = LuaRef::globalTable(L);
+  make_capture(L);
 
-    {
-      auto ptr = std::make_shared<Thingo>("Bob");
-
-      // Capture will increase the refcount on the shared pointer.
-      G["capture"] = (CPP_Function)[ptr](lua_State * L)->int
-      {
-        cout << "Thingo: " << ptr->name << "\n";
-        lua_pushstring(L, ptr->name.c_str());
-        return 1;
-      };
-
-      cout << "Inner Scope ending\n";
-
-      // `ptr` will go out of scope, and reduce the ref count by one on the
-      // shared pointer for the Thingo instance, leaving it at 1.
-    }
-
-    cout << "Calling capture\n";
-    luaL_dostring(L, "capture()");
-
-    cout << "Outer Scope ending\n";
-  }
-
-  cout << "Calling capture again\n";
+  cout << "Calling capture\n";
   luaL_dostring(L, "capture()");
 
   // After the GC call, the Thingo's shared pointer refcount will become zero,
@@ -68,9 +63,15 @@ int main()
   luaL_dostring(L, "capture = nil");
   lua_gc(L, LUA_GCCOLLECT);
 
-  // If we hadn't cleaned up the lambda before, it would be cleaned up now as
-  // Lua closes and cause the shared pointer's refcount to drop to zero, and
+  make_capture(L);
+  cout << "Calling recreated capture\n";
+  luaL_dostring(L, "capture()");
+
+  // Lua close will cause the shared pointer's refcount to drop to zero, and
   // hence, destruct the Thingo.
+  // If Thingo had anything that needed a live lua statue to shutdown, we would
+  // have to shut them down prior to lua_close.
+  // For example a LuaRef member could be set to LuaRef:nil().
 
   cout << "Closing Lua\n";
   lua_close(L);
