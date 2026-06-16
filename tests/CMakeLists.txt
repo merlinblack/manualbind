@@ -1,20 +1,32 @@
 # Bulid tests
-cmake_minimum_required( VERSION 3.0...3.31 )
+cmake_minimum_required(VERSION 3.0...3.31)
 
-find_package( Lua )
+find_package(Lua)
 
-add_subdirectory(Catch2)
+include(FetchContent)
 
-file( GLOB TEST_SRCS *.cpp )
-
-include_directories(
-    ../src
-    ${LUA_INCLUDE_DIR}
+fetchcontent_declare(Catch2
+  GIT_REPOSITORY  https://github.com/catchorg/Catch2.git
+  GIT_TAG         v3.13.0
 )
 
-add_executable( runtests ${TEST_SRCS} ../src/LuaBinding.cpp )
+fetchcontent_makeavailable(Catch2)
 
-target_link_libraries( runtests
+file(GLOB TEST_SRCS *.cpp)
+
+include_directories(
+  ../src
+  ${LUA_INCLUDE_DIR}
+)
+
+add_executable(
+  runtests
+  ${TEST_SRCS}
+  ../src/LuaBinding.cpp
+)
+
+target_link_libraries(
+    runtests
     PRIVATE
     ${LUA_LIBRARY}
     ${LUA_MATH_LIBRARY}
