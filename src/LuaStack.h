@@ -40,7 +40,6 @@ namespace ManualBind {
 
 using CPP_Function = std::function<int(lua_State*)>;
 
-int trampoline(lua_State* L);
 void push_std_function(lua_State* L, CPP_Function fn);
 
 template <typename T>
