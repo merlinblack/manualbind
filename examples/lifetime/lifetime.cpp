@@ -34,7 +34,7 @@ void make_capture(lua_State* L)
   auto ptr = std::make_shared<Thingo>("Bob");
 
   // Capture will increase the refcount on the shared pointer.
-  G["capture"] = (CPP_Function)[ptr](lua_State* L)->int
+  G["capture"] = (CPP_Function)[ptr](lua_State * L)->int
   {
     cout << "Thingo: " << ptr->name << "\n";
     lua_pushstring(L, ptr->name.c_str());
@@ -65,13 +65,22 @@ int main()
 
   make_capture(L);
   cout << "Calling recreated capture\n";
-  luaL_dostring(L, "capture()");
+
+  LuaRef capture(L, "capture");
+
+  capture();
+
+  // As the above LuaRef will destruct *after* lua_close, we need to set in
+  // too LuaRef::nil() (eqivalent of LUA_REFNIL), so that the lua_unref in it's
+  // destructor will be a no-op.
+
+  capture = LuaRef::nil(L);
 
   // Lua close will cause the shared pointer's refcount to drop to zero, and
   // hence, destruct the Thingo.
   // If Thingo had anything that needed a live lua statue to shutdown, we would
   // have to shut them down prior to lua_close.
-  // For example a LuaRef member could be set to LuaRef:nil().
+  // For example a LuaRef member could be set to LuaRef::nil(), like above.
 
   cout << "Closing Lua\n";
   lua_close(L);
