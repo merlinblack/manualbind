@@ -29,9 +29,11 @@ struct WidgetWeakBinding : public PODBinding<WidgetWeakBinding, WidgetWeakPtr> {
     WidgetWeakPtr ww = fromStack(L, 1);
     WidgetPtr ws = ww.lock();
     if (!ws) {
-      return luaL_error(L, "Error: Widget pointer has expired.");
+      lua_pushboolean(L, false);
     }
-    lua_pushstring(L, ws->get().c_str());
+    else {
+      lua_pushstring(L, ws->get().c_str());
+    }
     return 1;
   }
 
@@ -41,10 +43,12 @@ struct WidgetWeakBinding : public PODBinding<WidgetWeakBinding, WidgetWeakPtr> {
     WidgetWeakPtr ww = fromStack(L, 1);
     WidgetPtr ws = ww.lock();
     if (!ws) {
-      return luaL_error(L, "Error: Widget pointer has expired.");
+      lua_pushboolean(L, false);
+      return 1;
     }
     ws->set(lua_tostring(L, 3));
-    return 0;
+    lua_pushboolean(L, true);
+    return 1;
   }
 
   static int get_valid(lua_State* L)
