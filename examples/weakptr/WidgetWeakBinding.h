@@ -1,17 +1,24 @@
-
 #ifndef __WIDGETWEAKBINDING_H
 #define __WIDGETWEAKBINDING_H
 #include "LuaBinding.h"
 #include "Widget.h"
+#include "WidgetBinding.h"
 #include "lua.h"
 
 using WidgetWeakPtr = std::weak_ptr<Widget>;
-using WidgetPtr = std::shared_ptr<Widget>;
 
 using namespace ManualBind;
 
 struct WidgetWeakBinding : public PODBinding<WidgetWeakBinding, WidgetWeakPtr> {
-  static constexpr const char* class_name = "WidgetWeakPtr";
+  static constexpr const char* class_name = "WidgetWeakRef";
+
+  static luaL_Reg* members()
+  {
+    static luaL_Reg members[] = {{"lock", get_lock}, {nullptr, nullptr}};
+    return members;
+  };
+
+  static int get_lock(lua_State* L);
 
   static bind_properties* properties()
   {

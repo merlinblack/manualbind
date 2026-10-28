@@ -1,5 +1,8 @@
+#include "WidgetBinding.h"
 #include "WidgetWeakBinding.h"
+
 #include "common.h"
+#include "lua.h"
 
 using std::make_shared;
 
@@ -8,6 +11,7 @@ auto main() -> int
   lua_State* L = luaL_newstate();
   luaL_openlibs(L);
 
+  WidgetBinding::register_class(L);
   WidgetWeakBinding::register_class(L);
 
   WidgetPtr a = make_shared<Widget>("Widget A");
@@ -35,5 +39,21 @@ auto main() -> int
 
   run(L, "print( WidgetA.name, WidgetB.name )");
 
-  run(L, "print( WidgetA.name )");
+  run(L, "strong = WidgetA:lock()");
+
+  run(L, "print(WidgetA, strong)");
+
+  std::cout << "Use count for A: " << a.use_count() << "\n";
+
+  run(L, "strong.name = 'I am strong'");
+
+  run(L, "weak = strong.weakref");
+
+  run(L, "print( weak.name )");
+
+  run(L, "strong = nil");
+
+  lua_gc(L, LUA_GCCOLLECT);
+
+  std::cout << "Use count for A: " << a.use_count() << "\n";
 }
