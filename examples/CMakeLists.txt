@@ -40,6 +40,7 @@ example( extables3 tables3 )
 example( exgui guiexample )
 example( exgetluafunc getluafunc )
 example( exlifetime lifetime )
+example( exweakptr weakptr )
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gui.lua"

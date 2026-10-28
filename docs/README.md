@@ -13,6 +13,9 @@ See header files and LICENSE for author and license info.
 - [Lua 5.4+ and close annotations](Lua5.4.md)
 - [Diagram of Manualbind internals](diagram.txt)
 
+*Update October 2026*
+Added an example of using PODBinding to use a weak pointer.
+
 *Update February 2026*
 The binding code has now been simplified a little using C++20 concepts.
 You will now need at least C++20 capable compiler to compile.
@@ -25,10 +28,6 @@ explicitly pinning down return types and parameters.
 *Update December 2025.*
 I've checked this still works with Lua 5.5 rc4. All tests pass, and the examples
 are working. I'm still using this library a lot, mainly with my 'disorganiser' project.
-
-*Update December 2020.*
-I've checked this still works with Lua 5.4. All tests pass, and the examples are
-working.
 
 Examples
 --------
