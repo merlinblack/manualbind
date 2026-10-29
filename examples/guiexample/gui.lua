@@ -6,7 +6,7 @@ Mouse.Button.Left = 1
 Mouse.Button.Right = 2
 
 -- Widget Base Class
--- This provides members and methods for all GUI objects that will be feed user input.
+-- This provides members and methods for all GUI objects that will be fed user input.
 -- These objects usally represent an interface item, but in some rare cases may not have
 -- any visual element at all.
 -- More specialised classes will be derived from this one.
@@ -57,7 +57,7 @@ function Widget:KeyPress(key)
 	if key == self.key then
 		return self:OnKeyPress()
 	else
-		for k, v in pairs(self.children) do
+		for _, v in pairs(self.children) do
 			if v:KeyPress(key) then
 				return true
 			end
@@ -75,7 +75,7 @@ end
 function Widget:MouseClick(button, x, y)
 	print("Mouse clicked", self.name, button, x, y)
 	if self.rect:isInside(x, y) then
-		for k, v in pairs(self.children) do
+		for _, v in pairs(self.children) do
 			if v:MouseClick(button, x, y) then
 				return true
 			end
@@ -99,7 +99,7 @@ function Widget:MouseMove(x, y)
 			self.hover = true
 			self:OnHover()
 		end
-		for k, v in pairs(self.children) do
+		for _, v in pairs(self.children) do
 			v:MouseMove(x, y)
 		end
 	else
@@ -107,7 +107,7 @@ function Widget:MouseMove(x, y)
 		if self.hover == true then
 			self.hover = false
 			self:OnHoverExit()
-			for k, v in pairs(self.children) do
+			for _, v in pairs(self.children) do
 				v:MouseLost()
 			end
 		end
@@ -124,7 +124,7 @@ function Widget:MouseLost()
 	if self.hover then
 		self.hover = false
 		self:OnHoverExit()
-		for k, v in pairs(self.children) do
+		for _, v in pairs(self.children) do
 			v:MouseLost()
 		end
 	end
