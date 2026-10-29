@@ -1,6 +1,10 @@
 #include "WidgetBinding.h"
 #include "WidgetWeakBinding.h"
 
+// These functions are here to avoid circular references
+// I.e. WidgetBinding needing WidgetWeakBinding to compile,
+// yet WidgetWeakBinding needing WidgetBinding to compile.
+
 int WidgetBinding::get_weak_ptr(lua_State* L)
 {
   CheckArgCount(L, 2);

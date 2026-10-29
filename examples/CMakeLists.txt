@@ -30,17 +30,17 @@ function( example name dir )
 
 endfunction()
 
-example( exdemo demo )
-example( exluaref luaref )
-example( exdowncast downcast )
-example( exupcast upcast )
-example( extables1 tables1 )
-example( extables2 tables2 )
-example( extables3 tables3 )
-example( exgui guiexample )
-example( exgetluafunc getluafunc )
-example( exlifetime lifetime )
-example( exweakptr weakptr )
+example( demo demo )
+example( luaref luaref )
+example( downcast downcast )
+example( upcast upcast )
+example( tables1 tables1 )
+example( tables2 tables2 )
+example( tables3 tables3 )
+example( gui guiexample )
+example( getluafunc getluafunc )
+example( lifetime lifetime )
+example( weakptr weakptr )
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gui.lua"
