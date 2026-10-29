@@ -42,6 +42,8 @@ There are several examples, which show various parts or techniques.
   rectangle class binding.
 - LuaRef. Exercises the new LuaRef code.
 - Tables. How to push / pull a C++ container to a Lua table.
+- Lifetime. The care and feeding of lambdas with captures and LuaRefs.
+- Weak pointer. Storing a weak_ptr in a PODBinding and converting to shared ponter and back.
 
 LuaBinding.h
 ------------
