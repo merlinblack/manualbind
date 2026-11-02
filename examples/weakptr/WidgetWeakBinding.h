@@ -1,5 +1,5 @@
-#ifndef __WIDGETWEAKBINDING_H
-#define __WIDGETWEAKBINDING_H
+#ifndef __WIDGET_WEAK_BINDING_H
+#define __WIDGET_WEAK_BINDING_H
 #include "LuaBinding.h"
 #include "Widget.h"
 #include "WidgetBinding.h"
@@ -18,6 +18,7 @@ struct WidgetWeakBinding : public PODBinding<WidgetWeakBinding, WidgetWeakPtr> {
     return members;
   };
 
+  // Defined in WidgetBinding.cpp
   static int get_lock(lua_State* L);
 
   static bind_properties* properties()
@@ -36,6 +37,7 @@ struct WidgetWeakBinding : public PODBinding<WidgetWeakBinding, WidgetWeakPtr> {
     WidgetWeakPtr ww = fromStack(L, 1);
     WidgetPtr ws = ww.lock();
     if (!ws) {
+      // We could not get a shared pointer, as the object has been free'd
       lua_pushboolean(L, false);
     }
     else {
@@ -62,9 +64,13 @@ struct WidgetWeakBinding : public PODBinding<WidgetWeakBinding, WidgetWeakPtr> {
   {
     CheckArgCount(L, 2);
     WidgetWeakPtr ww = fromStack(L, 1);
+    // Note that with 'expired()', if it returns false,
+    // keep in mind another thread might *expire* the pointer
+    // as soon as expired() returns. See online for notes about
+    // weak_ptr.expired()
     lua_pushboolean(L, !ww.expired());
     return 1;
   }
 };
 
-#endif  // __WIDGETWEAKBINDING_H
+#endif  // __WIDGET_WEAK_BINDING_H

@@ -32,7 +32,8 @@ auto main() -> int
   // Should be true
   run(L, "print( 'Does WidgetB still exist?', WidgetB.valid )");
 
-  // Access the name via weak pointer (binding grabs a shared pointer temporarily)
+  // Access the name via weak pointer (binding grabs a shared pointer
+  // temporarily)
   run(L, "WidgetB.name = 'Soon to be ex widget.'");
 
   // Should show we've updated the name
@@ -49,7 +50,7 @@ auto main() -> int
 
   // Get a shared pointer from the weak one.
   // In multi-threaded, this would stop WidgetA getting free'd
-  // until your done with it.
+  // until you're done with it.
   run(L, "strong = WidgetA:lock()");
 
   run(L, "print(WidgetA, strong)");
@@ -69,7 +70,7 @@ auto main() -> int
   // Drop the shared pointer to release the reference.
   run(L, "strong = nil");
   lua_gc(L, LUA_GCCOLLECT);
- 
+
   // Back to 1.
   std::cout << "Use count for A: " << a.use_count() << "\n";
 
@@ -79,5 +80,6 @@ auto main() -> int
   // Should be nil
   run(L, "print(gone)");
 
-  // WidgetA will destruct now as 'a' goes out of scope, and no other shared pointer has a reference.
+  // WidgetA will destruct now as 'a' goes out of scope, and no other shared
+  // pointer has a reference.
 }

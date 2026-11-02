@@ -1,5 +1,5 @@
-#ifndef __WIDGETBINDING_H
-#define __WIDGETBINDING_H
+#ifndef __WIDGET_BINDING_H
+#define __WIDGET_BINDING_H
 #include "LuaBinding.h"
 #include "Widget.h"
 #include "lua.h"
@@ -37,7 +37,8 @@ struct WidgetBinding : public Binding<WidgetBinding, Widget> {
     return 0;
   }
 
+  // Defined in WidgetBinding.cpp
   static int get_weak_ptr(lua_State* L);
 };
 
-#endif  // __WIDGETBINDING_H
+#endif  // __WIDGET_BINDING_H
